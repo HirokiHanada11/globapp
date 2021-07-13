@@ -57,7 +57,7 @@
                 if( this.currentRoom.id ){
                     let vm = this;
                     this.getMessages();
-                    window.Echo.private(`chat.${currentRoom.id}`)
+                    window.Echo.private(`chat.${this.currentRoom.id}`)
                     .listen('.message.new', e => {
                         vm.getMessages();
                     });
