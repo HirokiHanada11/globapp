@@ -22,3 +22,12 @@ mix.js('resources/js/app.js', 'public/js').vue()
 if (mix.inProduction()) {
     mix.version();
 }
+
+mix.browserSync('laravel.test');
+
+mix.options({
+    hmrOptions: {
+        host: 'localhost',
+        port: 8080,
+    },
+});

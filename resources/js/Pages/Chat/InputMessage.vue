@@ -6,7 +6,7 @@
                 v-model="message"
                 @keyup.enter="sendMessage()"
                 placeholder="Say something ..."
-                class="col-span-5 outline-none p-1"
+                class="col-span-5 border-none p-1"
             />
             <button
                 @click="sendMessage()"
