@@ -15,10 +15,14 @@ class ChatRoomSeeder extends Seeder
     public function run()
     {
         DB::table('chat_rooms')->insert([
-            'name' => 'General'
+            'name' => 'General',
+            'region' => 'World',
+            'description' => 'For general use'
         ]);
         DB::table('chat_rooms')->insert([
-            'name' => 'Tech Talk'
+            'name' => 'Tech Talk',
+            'region' => 'Japan',
+            'description' => 'For tech talk'
         ]);
     }
 }
