@@ -17,20 +17,28 @@
                 {{ room.name }}
                 </option>
             </select>
+            <new-chat-button 
+                :href="route('newRoom')"
+                class="float-right"
+            />
         </div>
     </div>
 </template>
 
 <script>
-export default {
-    props: ['rooms', 'currentRoom'],
-    data: () => {
-        return {
-            selected: ''
+    import NewChatButton from './NewChatButton.vue' 
+    export default {
+        components: {
+            NewChatButton,
+        },
+        props: ['rooms', 'currentRoom'],
+        data: () => {
+            return {
+                selected: ''
+            }
+        },
+        created() {
+            this.selected = this.currentRoom
         }
-    },
-    created() {
-        this.selected = this.currentRoom
     }
-}
 </script>
