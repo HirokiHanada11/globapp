@@ -32,4 +32,8 @@ class ChatController extends Controller
 
         return $newMessage;
     }
+
+    public function newRoom( Request $request, $roomName, $roomRegion ){
+        $newRoom = new ChatRoom;
+    }
 }
