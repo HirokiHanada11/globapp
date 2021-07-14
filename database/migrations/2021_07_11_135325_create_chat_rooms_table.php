@@ -17,6 +17,7 @@ class CreateChatRoomsTable extends Migration
             $table->id();
             $table->string('name');
             $table->string('region');
+            $table->mediumText('description');
             $table->timestamps();
         });
     }
