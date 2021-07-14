@@ -29,10 +29,7 @@
         },
         methods: {
             returnToChat () {
-                axios.get('/chat')
-                .catch(error => {
-                    console.error(error)
-                })
+                window.location = '/chat';
             }
         }
     }
