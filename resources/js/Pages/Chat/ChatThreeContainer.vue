@@ -1,22 +1,45 @@
 <template>
     <div ref="canvas" class="h-96 w-full">
-        Render three stuff here
+        <h1 style="position:absolute">{{room.name}}<br> Region: {{room.region}}</h1>
     </div>
 </template>
 
 <script>
 import * as THREE from 'three';
-let camera, scene, renderer, geometry, material, cube;
+let camera, scene, renderer, geometry, material, cube, loader, plane;
 
 export default {
     props: ['messages', 'room'],
     data () {
         return {
+            mapURL: '',
             componentHeight: 0,
             componentWidth: 0,
         }
     },
+    watch: {
+        room(newVal, oldVal){
+            console.log(oldVal.region, "->", newVal.region);
+            if(oldVal.region == 'World' || oldVal.region == 'Japan'){
+                this.$refs.canvas.removeChild(renderer.domElement);
+                this.renderThree();
+            }
+        }
+    },
     methods: {
+        setRegion() {
+            switch(this.room.region){
+                case "World":
+                    this.mapURL = "textures/world-map-world-map-in-grey-hd-png.png";
+                    break;
+                case "Japan":
+                    this.mapURL = "textures/map_of_Japan.png";
+                    break;
+                default:
+                    this.mapURL = "textures/world-map-world-map-in-grey-hd-png.png";
+                    break;
+            }
+        },
         calculateDimension() {
             this.componentHeight = this.$refs.canvas.clientHeight;
             this.componentWidth = this.$refs.canvas.clientWidth;
@@ -25,7 +48,9 @@ export default {
             scene = new THREE.Scene();
             camera = new THREE.PerspectiveCamera( 75, this.componentWidth / this.componentHeight, 0.1, 1000 );
             camera.position.z = 5;
-            renderer = new THREE.WebGLRenderer();
+            camera.position.y = -5;
+            camera.lookAt(0,0,0);
+            renderer = new THREE.WebGLRenderer({ alpha: true});
             renderer.setSize( this.componentWidth, this.componentHeight );
             this.$refs.canvas.appendChild( renderer.domElement);
         },
@@ -33,26 +58,50 @@ export default {
             geometry = new THREE.BoxGeometry();
             material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
             cube = new THREE.Mesh( geometry, material );
+            cube.position.set(5,5,0)
             scene.add( cube );
+        },
+        createPlane() {
+            geometry = new THREE.PlaneGeometry( 14, 7 );
+            loader = new THREE.TextureLoader();
+            loader.load(
+                this.mapURL,
+                (texture) => {
+                    material = new THREE.MeshBasicMaterial( {map: texture} );
+                    plane = new THREE.Mesh( geometry, material );
+                    scene.add( plane );
+                },
+                undefined,
+                (err) => {console.error(err)}
+            );
+            
+            
         },
         animate() {
             requestAnimationFrame( this.animate );
             cube.rotation.x += 0.01;
             cube.rotation.y += 0.01;
-
             renderer.render( scene, camera );
-        }
+        },
+        renderThree() {
+            this.calculateDimension();
+            console.log(this.componentHeight);
+            console.log(this.componentWidth);
+
+            this.initThree();
+
+            this.createShapes();
+            this.createPlane();
+
+            this.animate();
+        },
+    },
+    created() {
+        this.setRegion();
+        console.log(this.mapURL);
     },
     mounted () {
-        this.calculateDimension();
-        console.log(this.componentHeight);
-        console.log(this.componentWidth);
-
-        this.initThree();
-
-        this.createShapes();
-
-        this.animate();
+        this.renderThree();
     } 
 }
 </script>
