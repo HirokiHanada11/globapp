@@ -12,11 +12,34 @@ export default {
     props: ['messages', 'room'],
     data () {
         return {
+            mapURL: '',
             componentHeight: 0,
             componentWidth: 0,
         }
     },
+    watch: {
+        room(newVal, oldVal){
+            console.log(oldVal.region, "->", newVal.region);
+            if(oldVal.region == 'World' || oldVal.region == 'Japan'){
+                this.$refs.canvas.removeChild(renderer.domElement);
+                this.renderThree();
+            }
+        }
+    },
     methods: {
+        setRegion() {
+            switch(this.room.region){
+                case "World":
+                    this.mapURL = "textures/world-map-world-map-in-grey-hd-png.png";
+                    break;
+                case "Japan":
+                    this.mapURL = "textures/map_of_Japan.png";
+                    break;
+                default:
+                    this.mapURL = "textures/world-map-world-map-in-grey-hd-png.png";
+                    break;
+            }
+        },
         calculateDimension() {
             this.componentHeight = this.$refs.canvas.clientHeight;
             this.componentWidth = this.$refs.canvas.clientWidth;
@@ -42,7 +65,7 @@ export default {
             geometry = new THREE.PlaneGeometry( 14, 7 );
             loader = new THREE.TextureLoader();
             loader.load(
-                "textures/world-map-world-map-in-grey-hd-png.png",
+                this.mapURL,
                 (texture) => {
                     material = new THREE.MeshBasicMaterial( {map: texture} );
                     plane = new THREE.Mesh( geometry, material );
@@ -59,19 +82,26 @@ export default {
             cube.rotation.x += 0.01;
             cube.rotation.y += 0.01;
             renderer.render( scene, camera );
-        }
+        },
+        renderThree() {
+            this.calculateDimension();
+            console.log(this.componentHeight);
+            console.log(this.componentWidth);
+
+            this.initThree();
+
+            this.createShapes();
+            this.createPlane();
+
+            this.animate();
+        },
+    },
+    created() {
+        this.setRegion();
+        console.log(this.mapURL);
     },
     mounted () {
-        this.calculateDimension();
-        console.log(this.componentHeight);
-        console.log(this.componentWidth);
-
-        this.initThree();
-
-        this.createShapes();
-        this.createPlane();
-
-        this.animate();
+        this.renderThree();
     } 
 }
 </script>
