@@ -13,12 +13,14 @@
 
         <div class="py-12">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
-                    <message-container :messages="messages"/>
-                    <input-message 
-                        :room="currentRoom" 
-                        v-on:messagesent="getMessages()" />
+                <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg grid grid-cols-3">
+                    <chat-three-container :messages="messages" class="col-span-2"/>
+                    <message-container :messages="messages" class="col-start-3"/>
+                    
                 </div>
+                <input-message 
+                    :room="currentRoom" 
+                    v-on:messagesent="getMessages()" />
             </div>
         </div>
     </app-layout>
@@ -29,6 +31,7 @@
     import MessageContainer from './MessageContainer.vue'
     import InputMessage from './InputMessage.vue'
     import ChatRoomSelection from './ChatRoomSelection.vue'
+    import ChatThreeContainer from './ChatThreeContainer.vue'
 
     export default {
         components: {
@@ -36,6 +39,7 @@
             MessageContainer,
             InputMessage,
             ChatRoomSelection,
+            ChatThreeContainer,
         },
         data: () => {
             return {
