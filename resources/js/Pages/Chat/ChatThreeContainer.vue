@@ -1,6 +1,6 @@
 <template>
     <div ref="canvas" class="h-96 w-full">
-        Render three stuff here
+        <h1 style="position:absolute">{{room.name}}<br> Region: {{room.region}}</h1>
     </div>
 </template>
 
