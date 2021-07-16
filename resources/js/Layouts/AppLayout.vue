@@ -20,9 +20,6 @@
                                 <jet-nav-link :href="route('dashboard')" :active="route().current('dashboard')">
                                     Dashboard
                                 </jet-nav-link>
-                                <jet-nav-link :href="route('chat')" :active="route().current('chat')">
-                                    Chat
-                                </jet-nav-link>
                                 <jet-nav-link :href="route('chatrooms')" :active="route().current('chatrooms')">
                                     Chat Rooms
                                 </jet-nav-link>
@@ -148,9 +145,6 @@
                     <div class="pt-2 pb-3 space-y-1">
                         <jet-responsive-nav-link :href="route('dashboard')" :active="route().current('dashboard')">
                             Dashboard
-                        </jet-responsive-nav-link>
-                        <jet-responsive-nav-link :href="route('chat')" :active="route().current('chat')">
-                            Chat
                         </jet-responsive-nav-link>
                         <jet-responsive-nav-link :href="route('chatrooms')" :active="route().current('chatrooms')">
                             Chat Rooms
