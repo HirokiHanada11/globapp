@@ -2,12 +2,7 @@
     <app-layout>
         <template #header>
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                <chat-room-selection
-                    v-if="currentRoom.id"
-                    :rooms="chatRooms"
-                    :currentRoom="currentRoom"
-                    v-on:roomchanged="setRoom( $event )"
-                />
+                {{currentRoom.name}}
             </h2>
         </template>
 
@@ -33,6 +28,7 @@
     import ChatThreeContainer from './ChatThreeContainer.vue'
 
     export default {
+        props: ['roomId'],
         components: {
             AppLayout,
             MessageContainer,
@@ -42,7 +38,6 @@
         },
         data: () => {
             return {
-                chatRooms: [],
                 currentRoom: [],
                 messages: []
             }
@@ -56,6 +51,15 @@
             }
         },
         methods: {
+            getCurrentRoom(){
+                axios.get(`/chat/room/${this.roomId}`)
+                .then( response => {
+                    this.currentRoom = response.data[0];
+                })
+                .catch( error => {
+                    console.error(error);
+                })
+            },
             connect(){
                 if( this.currentRoom.id ){
                     let vm = this;
@@ -69,19 +73,6 @@
             disconnect( room ){
                 window.Echo.leave(`chat.${room.id}`);
             },
-            getRooms(){
-                axios.get('/chat/rooms')
-                .then( response => {
-                    this.chatRooms = response.data;
-                    this.setRoom( response.data[0] );
-                })
-                .catch( error => {
-                    console.error( error );
-                })
-            },
-            setRoom( room ){
-                this.currentRoom = room;
-            },
             getMessages(){
                 axios.get(`/chat/room/${this.currentRoom.id}/messages`)
                 .then( response => {
@@ -92,8 +83,8 @@
                 })
             }
         },
-        created() {
-            this.getRooms();
+        mounted() {
+            this.getCurrentRoom();
         }
     }
 </script>

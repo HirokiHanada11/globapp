@@ -7,11 +7,22 @@ use App\Models\ChatRoom;
 use App\Models\ChatMessage;
 use Illuminate\Support\Facades\Auth;
 use App\Events\NewChatMessage;
+use Inertia\Inertia;
 
 class ChatController extends Controller
 {
+    public function chatroom( Request $request, $roomId ){
+        return Inertia::render('Chat/ChatContainer', [
+            'roomId' => $roomId
+        ]);
+    }
+
     public function rooms( Request $request ){
         return ChatRoom::all();
+    }
+
+    public function currentRoom( Request $request, $roomId ){
+        return ChatRoom::where('id', $roomId)->get();
     }
 
     public function messages( Request $request, $roomId ){

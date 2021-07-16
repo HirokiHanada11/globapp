@@ -12,6 +12,7 @@ export default {
     props: ['messages', 'room'],
     data () {
         return {
+            roomRegion: '',
             mapURL: '',
             componentHeight: 0,
             componentWidth: 0,
@@ -20,25 +21,27 @@ export default {
     watch: {
         room(newVal, oldVal){
             console.log(oldVal.region, "->", newVal.region);
-            if(oldVal.region == 'World' || oldVal.region == 'Japan'){
-                this.$refs.canvas.removeChild(renderer.domElement);
+            if(newVal.region == 'World' || newVal.region == 'Japan'){
+                this.roomRegion = newVal.region;
+                this.setRegion();
                 this.renderThree();
             }
         }
     },
     methods: {
         setRegion() {
-            switch(this.room.region){
+            switch(this.roomRegion){
                 case "World":
-                    this.mapURL = "textures/world-map-world-map-in-grey-hd-png.png";
+                    this.mapURL = "/textures/world-map-world-map-in-grey-hd-png.png";
                     break;
                 case "Japan":
-                    this.mapURL = "textures/map_of_Japan.png";
+                    this.mapURL = "/textures/map_of_Japan.png";
                     break;
                 default:
-                    this.mapURL = "textures/world-map-world-map-in-grey-hd-png.png";
+                    this.mapURL = "/textures/world-map-world-map-in-grey-hd-png.png";
                     break;
             }
+            console.log(this.mapURL);
         },
         calculateDimension() {
             this.componentHeight = this.$refs.canvas.clientHeight;
@@ -96,12 +99,5 @@ export default {
             this.animate();
         },
     },
-    created() {
-        this.setRegion();
-        console.log(this.mapURL);
-    },
-    mounted () {
-        this.renderThree();
-    } 
 }
 </script>
