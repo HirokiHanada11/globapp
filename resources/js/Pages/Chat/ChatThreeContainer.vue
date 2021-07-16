@@ -21,8 +21,9 @@ export default {
         room(newVal, oldVal){
             console.log(oldVal.region, "->", newVal.region);
             if(oldVal.region == 'World' || oldVal.region == 'Japan'){
-                this.$refs.canvas.removeChild(renderer.domElement);
-                this.renderThree();
+                console.log('disposing plane')
+                plane.dispose();
+                //this.createPlane();
             }
         }
     },
