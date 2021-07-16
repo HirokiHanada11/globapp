@@ -24,7 +24,6 @@
     import AppLayout from '@/Layouts/AppLayout'
     import MessageContainer from './MessageContainer.vue'
     import InputMessage from './InputMessage.vue'
-    import ChatRoomSelection from './ChatRoomSelection.vue'
     import ChatThreeContainer from './ChatThreeContainer.vue'
 
     export default {
@@ -33,7 +32,6 @@
             AppLayout,
             MessageContainer,
             InputMessage,
-            ChatRoomSelection,
             ChatThreeContainer,
         },
         data: () => {
