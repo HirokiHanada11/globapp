@@ -37,9 +37,9 @@ Route::middleware(['auth:sanctum', 'verified'])->get('/chatrooms', function () {
     return Inertia::render('Chat/ChatRoomsContainer');
 })->name('chatrooms');
 
-Route::middleware('auth:sanctum')->get('/chatroom/{roomId}', [ChatController::class, 'chatroom']);
+Route::middleware('auth:sanctum')->get('/chatrooms/chatroom/{roomId}', [ChatController::class, 'chatroom']);
 
-Route::middleware(['auth:sanctum', 'verified'])->get('/chat/newRoom', function () {
+Route::middleware(['auth:sanctum', 'verified'])->get('/chatrooms/newRoom', function () {
     return Inertia::render('Chat/CreateNewContainer');
 })->name('newRoom');
 

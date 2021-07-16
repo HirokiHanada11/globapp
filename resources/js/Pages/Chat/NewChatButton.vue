@@ -14,7 +14,7 @@ export default {
     ],
     data () {
         return {
-            classes: "place-self-end bg-blue-700 hover:bg-gray-500 p-1 mt-1 rounded text-white"
+            classes: "place-self-end bg-blue-500 hover:bg-gray-500 py-1 px-2 mt-1 rounded text-white"
         }
     }
 

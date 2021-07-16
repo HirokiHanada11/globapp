@@ -1,9 +1,15 @@
 <template>
     <app-layout>
         <template #header>
+            <div class="grid grid-cols-2">
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
                 Chat Rooms
             </h2>
+            <new-chat-button 
+                :href="route('newRoom')"
+                class="float-right"
+            />
+            </div>
         </template>
 
         <div class="py-12">
@@ -25,11 +31,13 @@
 <script>
     import AppLayout from '@/Layouts/AppLayout'
     import ChatRoomOption from './ChatRoomOption.vue'
+    import NewChatButton from './NewChatButton.vue' 
 
     export default {
         components: {
             AppLayout,
             ChatRoomOption,
+            NewChatButton,
         },
         data: () => {
             return {
