@@ -17,12 +17,14 @@ class ChatRoomSeeder extends Seeder
         DB::table('chat_rooms')->insert([
             'name' => 'General',
             'region' => 'World',
-            'description' => 'For general use'
+            'description' => 'For general use',
+            'photo' => '/textures/globe.png'
         ]);
         DB::table('chat_rooms')->insert([
             'name' => 'Tech Talk',
             'region' => 'Japan',
-            'description' => 'For tech talk'
+            'description' => 'For tech talk',
+            'photo' => '/tech-rings.png'
         ]);
     }
 }

@@ -49,6 +49,12 @@ Route::middleware('auth:sanctum')->get('/chat/room/{roomId}', [ChatController::c
 
 Route::middleware('auth:sanctum')->get('/chat/room/{roomId}/messages', [ChatController::class, 'messages']);
 
+Route::middleware('auth:sanctum')->get('/chat/room/{roomId}/activeusers', [ChatController::class, 'ativeUsers']);
+
 Route::middleware('auth:sanctum')->post('/chat/room/{roomId}/message', [ChatController::class, 'newMessage']);
+
+Route::middleware('auth:sanctum')->post('/chat/room/{roomId}/acitiveuser', [ChatController::class, 'newAciveUser']);
+
+Route::middleware('auth:sanctum')->post('/chat/room/deactivate/{roomId}/{userId}', [ChatController::class, 'deactivateUser']);
 
 Route::middleware('auth:sanctum')->post('/chat/newRoom/create', [ChatController::class, 'newRoom']);
