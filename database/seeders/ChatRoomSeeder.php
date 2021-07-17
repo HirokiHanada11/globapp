@@ -24,7 +24,7 @@ class ChatRoomSeeder extends Seeder
             'name' => 'Tech Talk',
             'region' => 'Japan',
             'description' => 'For tech talk',
-            'photo' => '/tech-rings.png'
+            'photo' => '/textures/tech-rings.png'
         ]);
     }
 }

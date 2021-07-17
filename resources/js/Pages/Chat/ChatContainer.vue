@@ -1,8 +1,9 @@
 <template>
     <app-layout>
         <template #header>
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                {{currentRoom.name}}
+            <img :src="currentRoom.photo" class="grid-col-1 h-12 w-12 mx-4 float-left" style="border-radius: 50%"/>
+            <h2 class="font-semibold text-xl text-gray-800 leading-tight p-3">
+                <b>{{currentRoom.name}}</b> -- {{currentRoom.description}} 
             </h2>
         </template>
 

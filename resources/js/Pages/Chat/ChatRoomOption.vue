@@ -1,8 +1,18 @@
 <template>
     <div 
-        class="py-5 hover:bg-gray-300 cursor-pointer"
+        class="py-5 grid grid-cols-2 hover:bg-gray-300 cursor-pointer"
         @click="openChatRoom()">
-        {{ room.id }}:{{ room.name }}:{{room.description}}:{{activeUsersLen}}
+        <span class="grid-col-1">
+            <img :src="room.photo" class="grid-col-1 h-12 w-12 mx-4 float-left" style="border-radius: 50%"/>
+            <div class="float-left p-3">
+            {{ room.id }}
+            <b>{{ room.name }}</b>
+            -- {{ room.description }}
+            </div>
+        </span>
+        <div class="grid-col-2">
+            <div class="float-right p-3">Active Users: {{ activeUsersLen }}</div>
+        </div>
     </div>
 </template>
 
