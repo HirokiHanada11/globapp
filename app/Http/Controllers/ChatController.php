@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\ChatRoom;
 use App\Models\ChatMessage;
+use App\Models\ActiveUser;
 use Illuminate\Support\Facades\Auth;
 use App\Events\NewChatMessage;
 use Inertia\Inertia;
@@ -32,6 +33,18 @@ class ChatController extends Controller
             ->get();
     }
 
+    public function activeUsers( Request $request, $roomId ){
+        return ActiveUser::where('chat_room_id', $roomId)
+            ->with('user')
+            ->get();
+    }
+
+    public function deactivateUser( Request $request, $roomId, $userId ){
+        return ActiveUser::where('chat_room_id', $roomId)
+            ->find($userId)
+            ->delete();
+    }
+
     public function newMessage( Request $request, $roomId ){
         $newMessage = new ChatMessage;
         $newMessage->user_id = Auth::id();
@@ -52,5 +65,14 @@ class ChatController extends Controller
         $newRoom->save();
 
         return $newRoom;
+    }
+
+    public function newActiveUser( Request $request, $roomId ){
+        $newActiveUser = new ActiveUSer;
+        $newActiveUser->chat_room_id = $roomId;
+        $newActiveUser->user_id = Auth::id();
+        $newActiveUser->save();
+        
+        return $newActiveUser;
     }
 }
