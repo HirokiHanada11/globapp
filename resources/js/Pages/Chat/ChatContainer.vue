@@ -37,14 +37,12 @@
         data: () => {
             return {
                 currentRoom: [],
-                messages: []
+                messages: [],
+                activeUsers: [],
             }
         },
         watch: {
             currentRoom( val, oldVal ) {
-                if( oldVal.id ){
-                    this.disconnect( oldVal );
-                }
                 this.connect();
             }
         },
@@ -62,6 +60,7 @@
                 if( this.currentRoom.id ){
                     let vm = this;
                     this.getMessages();
+                    this.getActiveUsers();
                     window.Echo.private(`chat.${this.currentRoom.id}`)
                     .listen('.message.new', e => {
                         vm.getMessages();
@@ -69,6 +68,8 @@
                 }
             },
             disconnect( room ){
+                console.log('disconnecting');
+                this.deactivateUser();
                 window.Echo.leave(`chat.${room.id}`);
             },
             getMessages(){
@@ -79,7 +80,30 @@
                 .catch( error => {
                     console.error(error);
                 })
+            },
+            getActiveUsers(){
+                axios.get(`/chat/room/${this.currentRoom.id}/activeusers`)
+                .then( response => {
+                    this.activeUsers = response.data;
+                })
+                .catch( error => {
+                    console.error(error);
+                })
+            },
+            deactivateUser(){
+                axios.post(`/chat/room/deactivate/${this.currentRoom.id}`)
+                .then( response => {
+                    if( response.status == 201 ){
+                        console.log('deactivated user');
+                    }
+                })
+                .catch( error => {
+                    console.error(error);
+                })
             }
+        },
+        beforeUnmount() {
+            this.disconnect(this.currentRoom);
         },
         mounted() {
             this.getCurrentRoom();
