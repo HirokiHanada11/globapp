@@ -39,9 +39,9 @@ class ChatController extends Controller
             ->get();
     }
 
-    public function deactivateUser( Request $request, $roomId, $userId ){
+    public function deactivateUser( Request $request, $roomId ){
         return ActiveUser::where('chat_room_id', $roomId)
-            ->find($userId)
+            ->where('user_id', Auth::id())
             ->delete();
     }
 
