@@ -62,6 +62,7 @@ class ChatController extends Controller
         $newRoom->name = $request->roomName;
         $newRoom->region = $request->roomRegion;
         $newRoom->description = $request->roomDescription;
+        $newRoom->photo = $request->roomPhoto;
         $newRoom->save();
 
         return $newRoom;
