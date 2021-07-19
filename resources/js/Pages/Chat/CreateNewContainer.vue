@@ -29,7 +29,7 @@
         },
         methods: {
             returnToChat () {
-                window.location = '/chat';
+                window.location = '/chatrooms';
             }
         }
     }
