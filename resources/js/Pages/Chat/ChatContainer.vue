@@ -4,11 +4,18 @@
             <img :src="currentRoom.photo" class="grid-col-1 h-12 w-12 mx-4 float-left" style="border-radius: 50%"/>
             <h2 class="font-semibold text-xl text-gray-800 leading-tight p-3">
                 <b>{{currentRoom.name}}</b> -- {{currentRoom.description}} 
+            <button v-if='!show' @click="showActiveUsers" class="float-right place-self-end bg-blue-500 hover:bg-gray-500 py-1 px-2 mt-1 rounded text-white text-sm">
+                Show Active Users
+            </button>
+            <button v-if='show' @click="hideActiveUsers" class="float-right place-self-end bg-blue-500 hover:bg-gray-500 py-1 px-2 mt-1 rounded text-white text-sm">
+                Hide Active Users
+            </button>
             </h2>
         </template>
 
         <div class="py-12">
-            <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 relative">
+                <active-users-container v-show="show" :activeUsers="activeUsers"/>
                 <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg grid grid-cols-3">
                     <chat-three-container :messages="messages" :room="currentRoom" class="col-span-2"/>
                     <message-container :messages="messages" class="col-start-3"/>
@@ -18,6 +25,10 @@
                     v-on:messagesent="getMessages()" />
             </div>
         </div>
+
+        <div>
+
+        </div>
     </app-layout>
 </template>
 
@@ -26,6 +37,7 @@
     import MessageContainer from './MessageContainer.vue'
     import InputMessage from './InputMessage.vue'
     import ChatThreeContainer from './ChatThreeContainer.vue'
+    import ActiveUsersContainer from './ActiveUsersContainer.vue'
 
     export default {
         props: ['roomId'],
@@ -34,12 +46,14 @@
             MessageContainer,
             InputMessage,
             ChatThreeContainer,
+            ActiveUsersContainer,
         },
         data: () => {
             return {
                 currentRoom: [],
                 messages: [],
                 activeUsers: [],
+                show: false,
             }
         },
         watch: {
@@ -86,6 +100,7 @@
                 axios.get(`/chat/room/${this.currentRoom.id}/activeusers`)
                 .then( response => {
                     this.activeUsers = response.data;
+                    console.log(response.data)
                 })
                 .catch( error => {
                     console.error(error);
@@ -101,7 +116,13 @@
                 .catch( error => {
                     console.error(error);
                 })
-            }
+            },
+            showActiveUsers() {
+                this.show = true;
+            },
+            hideActiveUsers() {
+                this.show = false;
+            },
         },
         beforeUnmount() {
             this.disconnect(this.currentRoom);
