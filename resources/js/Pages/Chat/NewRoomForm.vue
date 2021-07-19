@@ -85,8 +85,8 @@ export default {
         createRoom (e) {
             e.preventDefault();
             
-            if( this.roomName == '' || this.roomDescription == ''){
-                alert("Please Enter room name and description");
+            if( this.roomName == '' || this.roomDescription == '' || this.file == ''){
+                alert("Please Enter room name, description, and photo");
                 return;
             }
 
