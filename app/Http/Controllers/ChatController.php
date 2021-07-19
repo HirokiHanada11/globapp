@@ -62,7 +62,16 @@ class ChatController extends Controller
         $newRoom->name = $request->roomName;
         $newRoom->region = $request->roomRegion;
         $newRoom->description = $request->roomDescription;
-        $newRoom->photo = $request->roomPhoto;
+        
+        if ($request->hasFile('roomPhoto')) {
+            $request->validate([
+                'roomPhoto' => 'mimes:jpg,jpeg,png'
+            ]);
+            $filename = $request->roomPhoto->getClientOriginalName();
+            $path = $request->roomPhoto->storePubliclyAs('useruploads', $filename, 'public');
+            $newRoom->photo = '/storage/'.$path;
+        }
+
         $newRoom->save();
 
         return $newRoom;

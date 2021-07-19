@@ -52,6 +52,7 @@
                 axios.get(`/chat/room/${this.roomId}`)
                 .then( response => {
                     this.currentRoom = response.data[0];
+                    console.log(this.currentRoom.photo);
                 })
                 .catch( error => {
                     console.error(error);
