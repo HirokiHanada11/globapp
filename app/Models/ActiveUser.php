@@ -17,7 +17,4 @@ class ActiveUser extends Model
         return $this->hasOne('App\Models\User', 'id', 'user_id');
     }
 
-    public function more_user_info() {
-        return $this->hasOne('App\Models\MoreUserInfo', 'id', 'user_id');
-    }
 }

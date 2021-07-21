@@ -17,6 +17,7 @@ class CreateActiveUsersTable extends Migration
             $table->id();
             $table->integer('chat_room_id');
             $table->integer('user_id');
+            $table->string('region');
             $table->timestamps();
         });
     }
