@@ -39,20 +39,6 @@ export default {
         toggleShow() {
             this.showPopUp = !this.showPopUp;
         },
-        openChatRoom () {
-            axios.post(`/chat/room/${this.room.id}/newactiveuser`, {
-                region: 'Japan'
-            })
-            .then( response => {
-                if( response.status == 201 ){
-                    console.log('activated new user');
-                }
-            })
-            .catch( error => {
-                console.error(error);
-            })
-            window.location = `/chatrooms/chatroom/${this.room.id}`;
-        },
         getActiveUsers(){
                 axios.get(`/chat/room/${this.room.id}/activeusers`)
                 .then( response => {

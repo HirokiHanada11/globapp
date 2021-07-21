@@ -80,8 +80,6 @@ export default {
         },
         animate() {
             requestAnimationFrame( this.animate );
-            // cube.rotation.x += 0.01;
-            // cube.rotation.y += 0.01;
             threeSetup.renderer.render( threeSetup.scene, threeSetup.camera );
         },
         renderThree() {
