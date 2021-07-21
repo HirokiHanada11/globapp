@@ -100,7 +100,7 @@
                 axios.get(`/chat/room/${this.currentRoom.id}/activeusers`)
                 .then( response => {
                     this.activeUsers = response.data;
-                    console.log(response.data)
+                    //console.log(response.data)
                 })
                 .catch( error => {
                     console.error(error);

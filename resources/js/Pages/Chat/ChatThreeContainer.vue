@@ -28,12 +28,12 @@ export default {
                 this.renderThree();
             }
         },
-        activeUsers(newVal, oldVal){
-            console.log("activeusers changed", oldVal,"->",newVal);
-            newVal.forEach((user)=>{
-                this.generateUserModel(user);
-            })
-        }
+        // activeUsers(newVal, oldVal){
+        //     console.log("activeusers changed", oldVal,"->",newVal);
+        //     newVal.forEach((user)=>{
+        //         this.generateUserModel(user);
+        //     })
+        // }
     },
     methods: {
         setRegion() {
@@ -86,8 +86,6 @@ export default {
         },
         renderThree() {
             this.calculateDimension();
-            console.log(this.componentHeight);
-            console.log(this.componentWidth);
 
             this.initThree();
 
