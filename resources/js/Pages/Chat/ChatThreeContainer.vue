@@ -6,10 +6,11 @@
 
 <script>
 import * as THREE from 'three';
-let camera, scene, renderer, geometry, material, cube, loader, plane;
+import { ThreeSetup } from './threeControls';
+let threeSetup;
 
 export default {
-    props: ['messages', 'room'],
+    props: ['messages', 'room', 'activeUsers'],
     data () {
         return {
             roomRegion: '',
@@ -20,12 +21,18 @@ export default {
     },
     watch: {
         room(newVal, oldVal){
-            console.log(oldVal.region, "->", newVal.region);
+            console.log("room changed", oldVal.region, "->", newVal.region);
             if(newVal.region == 'World' || newVal.region == 'Japan'){
                 this.roomRegion = newVal.region;
                 this.setRegion();
                 this.renderThree();
             }
+        },
+        activeUsers(newVal, oldVal){
+            console.log("activeusers changed", oldVal,"->",newVal);
+            newVal.forEach((user)=>{
+                this.generateUserModel(user);
+            })
         }
     },
     methods: {
@@ -48,43 +55,34 @@ export default {
             this.componentWidth = this.$refs.canvas.clientWidth;
         },
         initThree() {
-            scene = new THREE.Scene();
-            camera = new THREE.PerspectiveCamera( 75, this.componentWidth / this.componentHeight, 0.1, 1000 );
-            camera.position.z = 5;
-            camera.position.y = -5;
-            camera.lookAt(0,0,0);
-            renderer = new THREE.WebGLRenderer({ alpha: true});
-            renderer.setSize( this.componentWidth, this.componentHeight );
-            this.$refs.canvas.appendChild( renderer.domElement);
+            threeSetup = new ThreeSetup( this.componentWidth, this.componentHeight, this.$refs.canvas );
+            threeSetup.camera.position.z = 5;
+            threeSetup.camera.position.y = -5;
+            threeSetup.camera.lookAt(0,0,0);
+
+            threeSetup.renderer.setSize( threeSetup.width, threeSetup.height );
+            threeSetup.canvas.appendChild( threeSetup.renderer.domElement);
         },
-        createShapes() {
-            geometry = new THREE.BoxGeometry();
-            material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
-            cube = new THREE.Mesh( geometry, material );
-            cube.position.set(5,5,0)
-            scene.add( cube );
-        },
+
         createPlane() {
-            geometry = new THREE.PlaneGeometry( 14, 7 );
-            loader = new THREE.TextureLoader();
+            let geometry = new THREE.PlaneGeometry( 14, 7 );
+            let loader = new THREE.TextureLoader();
             loader.load(
                 this.mapURL,
                 (texture) => {
-                    material = new THREE.MeshBasicMaterial( {map: texture} );
-                    plane = new THREE.Mesh( geometry, material );
-                    scene.add( plane );
+                    let material = new THREE.MeshBasicMaterial( {map: texture} );
+                    let plane = new THREE.Mesh( geometry, material );
+                    threeSetup.scene.add( plane );
                 },
                 undefined,
                 (err) => {console.error(err)}
             );
-            
-            
         },
         animate() {
             requestAnimationFrame( this.animate );
-            cube.rotation.x += 0.01;
-            cube.rotation.y += 0.01;
-            renderer.render( scene, camera );
+            // cube.rotation.x += 0.01;
+            // cube.rotation.y += 0.01;
+            threeSetup.renderer.render( threeSetup.scene, threeSetup.camera );
         },
         renderThree() {
             this.calculateDimension();
@@ -93,7 +91,6 @@ export default {
 
             this.initThree();
 
-            this.createShapes();
             this.createPlane();
 
             this.animate();

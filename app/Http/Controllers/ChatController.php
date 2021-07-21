@@ -81,6 +81,7 @@ class ChatController extends Controller
         $newActiveUser = new ActiveUSer;
         $newActiveUser->chat_room_id = $roomId;
         $newActiveUser->user_id = Auth::id();
+        $newActiveUser->region = $request->region;
         $newActiveUser->save();
         
         return $newActiveUser;
