@@ -12,62 +12,62 @@ export class ThreeSetup {
     }
 }
 
-// export const JapanRegionsCoors = {
-//     'Hokkaido': {
-//         maxX:
-//         minX:
-//         maxY:
-//         minY:
-//     },
-//     'Tohoku': {
-//         maxX:
-//         minX:
-//         maxY:
-//         minY:
-//     }, 
-//     'Kanto': {
-//         maxX:
-//         minX:
-//         maxY:
-//         minY:
-//     }, 
-//     'Chubu': {
-//         maxX:
-//         minX:
-//         maxY:
-//         minY:
-//     },
-//     'Kansai': {
-//         maxX:
-//         minX:
-//         maxY:
-//         minY:
-//     }, 
-//     'Chugoku': {
-//         maxX:
-//         minX:
-//         maxY:
-//         minY:
-//     }, 
-//     'Shikoku': {
-//         maxX:
-//         minX:
-//         maxY:
-//         minY:
-//     }, 
-//     'Kyushu': {
-//         maxX:
-//         minX:
-//         maxY:
-//         minY:
-//     }, 
-//     'Okinawa': {
-//         maxX:
-//         minX:
-//         maxY:
-//         minY:
-//     },
-// }
+export const JapanRegionsCoors = {
+    'Hokkaido': {
+        maxX:45,
+        minX:15,
+        maxY:20,
+        minY:10
+    },
+    'Tohoku': {
+        maxX:30,
+        minX:15,
+        maxY:10,
+        minY:-5
+    }, 
+    'Kanto': {
+        maxX:25,
+        minX:10,
+        maxY:-5,
+        minY:-10
+    }, 
+    'Chubu': {
+        maxX:10,
+        minX:-5,
+        maxY:5,
+        minY:-15
+    },
+    'Kansai': {
+        maxX:-5,
+        minX:-15,
+        maxY:-10,
+        minY:-20
+    }, 
+    'Chugoku': {
+        maxX:-15,
+        minX:-45,
+        maxY:-10,
+        minY:-15
+    }, 
+    'Shikoku': {
+        maxX:-10,
+        minX:-30,
+        maxY:-15,
+        minY:-20
+    }, 
+    'Kyushu': {
+        maxX:-30,
+        minX:-45,
+        maxY:-15,
+        minY:-25
+    }, 
+    'Okinawa': {
+        maxX:42,
+        minX:38,
+        maxY:-18,
+        minY:-22
+    },
+}
 
 export const WorldRegionsCoors = {
     'Asia': {

@@ -6,7 +6,7 @@
 
 <script>
 import * as THREE from 'three';
-import { ThreeSetup, WorldRegionsCoors } from './threeControls';
+import { ThreeSetup, WorldRegionsCoors, JapanRegionsCoors } from './threeControls';
 let threeSetup;
 
 export default {
@@ -81,7 +81,7 @@ export default {
             );
             let gridHelper = new THREE.GridHelper( 100, 10 );
             gridHelper.rotateX(Math.PI / 2);
-            gridHelper.position.z = 1;
+            gridHelper.position.z = 2;
             threeSetup.scene.add( gridHelper );
         },
         animate() {
@@ -95,7 +95,8 @@ export default {
             this.animate();
         },
         generateUserModel(user) {
-            let coords = this.getRandomCoords( WorldRegionsCoors[user.region] );
+            let coordsSet = this.roomRegion == 'World' ? WorldRegionsCoors[user.region] : JapanRegionsCoors[user.region];
+            let coords = this.getRandomCoords( coordsSet );
             let modelGroup = new THREE.Group();
 
             let cylinderGeometry = new THREE.CylinderGeometry( 1.2, 0.2, 3, 32);
