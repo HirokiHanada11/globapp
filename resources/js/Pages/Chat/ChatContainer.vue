@@ -15,19 +15,16 @@
 
         <div class="py-12">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 relative">
-                <active-users-container v-show="show" :activeUsers="activeUsers"/>
-                <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg grid grid-cols-3">
-                    <chat-three-container :messages="messages" :room="currentRoom" :activeUsers="activeUsers" class="col-span-2"/>
-                    <message-container :messages="messages" class="col-start-3"/>
+                
+                <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg h-96 w-full relative">
+                    <message-container :messages="messages" /> 
+                    <chat-three-container :messages="messages" :room="currentRoom" :activeUsers="activeUsers" />
+                    <active-users-container v-show="show" :activeUsers="activeUsers"/>
                 </div>
                 <input-message 
                     :room="currentRoom" 
                     v-on:messagesent="getMessages()" />
             </div>
-        </div>
-
-        <div>
-
         </div>
     </app-layout>
 </template>

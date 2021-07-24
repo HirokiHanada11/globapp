@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 
 export class ThreeSetup {
     constructor(width, height, canvas) {
@@ -8,8 +9,112 @@ export class ThreeSetup {
         this.scene = new THREE.Scene();
         this.camera = new THREE.PerspectiveCamera( 75, width / height, 0.1, 1000 );
         this.renderer = new THREE.WebGLRenderer({ alpha: true});
-        this.clock = new THREE.Clock();
+        this.controls = new OrbitControls(this.camera, this.canvas);
+        
     }
+    init = () => {
+        this.camera.position.set(0, 0, 50);
+        this.camera.lookAt(0,0,0);
+
+        this.renderer.setSize(this.width, this.height);
+        this.canvas.appendChild(this.renderer.domElement);
+
+        this.controls.enableDamping = true;
+    }
+}
+
+export class ThreeGeometries {
+    static createPlane(){
+        const loader = new THREE.TextureLoader();
+        const planeGroup = new THREE.Group();
+        planeGroup.name = "Plane";
+
+        let height = loader.load('/textures/monochrome-height.jpg');
+        let texture = loader.load('/textures/monochrome-height.jpg'); 
+    
+        const landGeometry = new THREE.PlaneBufferGeometry( 100, 50, 1012, 1012 );
+        let landMaterial = new THREE.MeshStandardMaterial( {
+            map: texture,
+            displacementMap: height,
+            displacementScale: 1.5,
+        } );
+        let landPlane = new THREE.Mesh( landGeometry, landMaterial );
+        landPlane.name = "Land";
+        planeGroup.add( landPlane );
+
+        const waterGeometry = new THREE.PlaneBufferGeometry( 150, 75, 16, 16);
+
+       
+        let waterMap = loader.load('/textures/water-normal-map.jpg');
+        
+        waterMap.wrapS = THREE.RepeatWrapping;
+        waterMap.wrapT = THREE.RepeatWrapping;
+        waterMap.repeat.set(4,2);
+
+        let waterMaterial = new THREE.MeshStandardMaterial({
+            color: new THREE.Color('skyblue'),
+            normalMap: waterMap
+        })
+
+        let waterPlane = new THREE.Mesh( waterGeometry, waterMaterial );
+        waterPlane.position.z=0.5;
+        waterPlane.name = "Water";
+        planeGroup.add(waterPlane);
+        const gridHelper = new THREE.GridHelper( 100, 10 );
+        gridHelper.rotateX(Math.PI / 2);
+        planeGroup.add(gridHelper);
+
+        return planeGroup;
+    }
+
+    static createPointLight(){
+        const lightsGroup = new THREE.Group();
+        lightsGroup.name = "Lights";
+
+        const pointLight = new THREE.PointLight(0xffffed, 0.5);
+        pointLight.position.x = 30;
+        pointLight.position.y = 0;
+        pointLight.position.z = 40;
+        lightsGroup.add(pointLight);
+        
+
+        const pointLight2 = new THREE.PointLight(0xffffed, 0.5);
+        pointLight2.position.x = -30;
+        pointLight2.position.y = 0;
+        pointLight2.position.z = 40;
+        lightsGroup.add(pointLight2);
+
+        return lightsGroup;
+    }
+}
+
+export class ThreeAnimation {
+    constructor(scene, renderer, camera){
+        this.movement = {
+            camera: true,
+            user: [],
+            water: true,
+        };
+        this.clock = new THREE.Clock();
+        this.scene = scene;
+        this.renderer = renderer;
+        this.camera = camera;
+    }
+    tick = () => {
+        const elapsedTime = this.clock.getElapsedTime();
+        if (this.movement.camera){
+            this.camera.position.x = 4 * Math.cos(elapsedTime * 0.1);
+            this.camera.position.y = 2 * Math.sin(elapsedTime * 0.1) - 20; 
+            this.camera.lookAt(0,0,0);
+        }
+        if (this.movement.water){
+            this.scene.children[0].children[1].material.normalScale.set( Math.sin(elapsedTime), Math.cos(elapsedTime));
+        }
+
+        this.renderer.render(this.scene, this.camera);
+        window.requestAnimationFrame(this.tick);
+    }
+
 }
 
 export const JapanRegionsCoors = {

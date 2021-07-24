@@ -1,12 +1,12 @@
 <template>
-    <div ref="canvas" class="h-96 w-full">
+    <div ref="canvas" class="h-full w-full">
         <h1 style="position:absolute">{{room.name}}<br> Region: {{room.region}}</h1>
     </div>
 </template>
 
 <script>
 import * as THREE from 'three';
-import { ThreeSetup, WorldRegionsCoors, JapanRegionsCoors } from './threeControls';
+import { ThreeSetup, ThreeGeometries, ThreeAnimation, WorldRegionsCoors, JapanRegionsCoors } from './threeControls';
 let threeSetup;
 
 export default {
@@ -58,41 +58,26 @@ export default {
         },
         initThree() {
             threeSetup = new ThreeSetup( this.componentWidth, this.componentHeight, this.$refs.canvas );
-            threeSetup.camera.position.z = 40;
-            threeSetup.camera.position.y = -20;
-            threeSetup.camera.lookAt(0,0,0);
-
-            threeSetup.renderer.setSize( threeSetup.width, threeSetup.height );
-            threeSetup.canvas.appendChild( threeSetup.renderer.domElement);
+            threeSetup.init();
         },
 
         createPlane() {
-            let geometry = new THREE.PlaneGeometry( 100, 50 );
-            let loader = new THREE.TextureLoader();
-            loader.load(
-                this.mapURL,
-                (texture) => {
-                    let material = new THREE.MeshBasicMaterial( {map: texture} );
-                    let plane = new THREE.Mesh( geometry, material );
-                    threeSetup.scene.add( plane );
-                },
-                undefined,
-                (err) => {console.error(err)}
-            );
-            let gridHelper = new THREE.GridHelper( 100, 10 );
-            gridHelper.rotateX(Math.PI / 2);
-            gridHelper.position.z = 2;
-            threeSetup.scene.add( gridHelper );
+            let planeGroup = ThreeGeometries.createPlane();
+            threeSetup.scene.add( planeGroup );
+
+            let lightsGroup = ThreeGeometries.createPointLight();
+            threeSetup.scene.add( lightsGroup );
         },
         animate() {
-            requestAnimationFrame( this.animate );
-            threeSetup.renderer.render( threeSetup.scene, threeSetup.camera );
+            let threeAnimation = new ThreeAnimation(threeSetup.scene,threeSetup.renderer, threeSetup.camera);
+            threeAnimation.tick();
         },
         renderThree() {
             this.calculateDimension();
             this.initThree();
             this.createPlane();
             this.animate();
+            console.log(threeSetup.scene.children)
         },
         generateUserModel(user) {
             let coordsSet = this.roomRegion == 'World' ? WorldRegionsCoors[user.region] : JapanRegionsCoors[user.region];
