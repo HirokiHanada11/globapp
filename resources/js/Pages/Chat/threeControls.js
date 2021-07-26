@@ -121,9 +121,9 @@ export class ThreeGeometries {
         const material = new THREE.PointsMaterial({
             size: 0.05
         })
-        const particlesMesh = new THREE.Points(particleGeometry, material);
-        // particlesMesh.position.z = -300
-        scene.add(particlesMesh);
+        const particles = new THREE.Points(particleGeometry, material);
+        particles.name = "Stars";
+        scene.add(particles);
     }
 
     static createPointLight(scene){
