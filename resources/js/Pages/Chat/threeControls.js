@@ -79,6 +79,7 @@ export class ThreeGeometries {
 
         let landMaterial = new THREE.MeshStandardMaterial( {
             map: texture,
+            color: new THREE.Color('#7da27e'),
             displacementMap: height,
             displacementScale: 1,
         } );
