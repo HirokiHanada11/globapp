@@ -8,7 +8,10 @@ export class ThreeSetup {
         this.canvas = canvas;
         this.scene = new THREE.Scene();
         this.camera = new THREE.PerspectiveCamera( 75, width / height, 0.1, 1000 );
-        this.renderer = new THREE.WebGLRenderer({ alpha: false});
+        this.renderer = new THREE.WebGLRenderer({
+            alpha: false, 
+            antialias: true,
+        });
         this.controls = new OrbitControls(this.camera, this.canvas);
         
     }
@@ -132,18 +135,13 @@ export class ThreeGeometries {
         const lightsGroup = new THREE.Group();
         lightsGroup.name = "Lights";
 
-        const pointLight = new THREE.PointLight(0xffffed, 0.5);
-        pointLight.position.x = 50;
-        pointLight.position.y = 30;
-        pointLight.position.z = 150;
-        lightsGroup.add(pointLight);
-        
+        const ambientLight = new THREE.AmbientLight(0xffffed, 0.1);
+        lightsGroup.add(ambientLight);
 
-        const pointLight2 = new THREE.PointLight(0xffffed, 0.5);
-        pointLight2.position.x = -50;
-        pointLight2.position.y = -30;
-        pointLight2.position.z = 150;
-        lightsGroup.add(pointLight2);
+        const sunLight = new THREE.DirectionalLight(0xffffed, 1);
+        sunLight.position.set(0,0,150);
+        sunLight.target.position.set(0,0,0);
+        lightsGroup.add(sunLight, sunLight.target);
 
         scene.add(lightsGroup);
     }
@@ -180,63 +178,7 @@ export class ThreeAnimation {
 
 }
 
-export const JapanRegionsCoors = {
-    'Hokkaido': {
-        maxX:45,
-        minX:15,
-        maxY:20,
-        minY:10
-    },
-    'Tohoku': {
-        maxX:30,
-        minX:15,
-        maxY:10,
-        minY:-5
-    }, 
-    'Kanto': {
-        maxX:25,
-        minX:10,
-        maxY:-5,
-        minY:-10
-    }, 
-    'Chubu': {
-        maxX:10,
-        minX:-5,
-        maxY:5,
-        minY:-15
-    },
-    'Kansai': {
-        maxX:-5,
-        minX:-15,
-        maxY:-10,
-        minY:-20
-    }, 
-    'Chugoku': {
-        maxX:-15,
-        minX:-45,
-        maxY:-10,
-        minY:-15
-    }, 
-    'Shikoku': {
-        maxX:-10,
-        minX:-30,
-        maxY:-15,
-        minY:-20
-    }, 
-    'Kyushu': {
-        maxX:-30,
-        minX:-45,
-        maxY:-15,
-        minY:-25
-    }, 
-    'Okinawa': {
-        maxX:42,
-        minX:38,
-        maxY:-18,
-        minY:-22
-    },
-}
-
+//set in polar coords
 export const WorldRegionsCoors = {
     'Asia': {
         maxX: 35,
