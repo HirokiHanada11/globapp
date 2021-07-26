@@ -8,7 +8,7 @@ export class ThreeSetup {
         this.canvas = canvas;
         this.scene = new THREE.Scene();
         this.camera = new THREE.PerspectiveCamera( 75, width / height, 0.1, 1000 );
-        this.renderer = new THREE.WebGLRenderer({ alpha: true});
+        this.renderer = new THREE.WebGLRenderer({ alpha: false});
         this.controls = new OrbitControls(this.camera, this.canvas);
         
     }
@@ -17,6 +17,7 @@ export class ThreeSetup {
         this.camera.lookAt(0,0,0);
 
         this.renderer.setSize(this.width, this.height);
+        this.renderer.setClearColor(new THREE.Color('#1d2951'),1);
         this.canvas.appendChild(this.renderer.domElement);
 
         this.controls.enableDamping = true;
@@ -24,7 +25,7 @@ export class ThreeSetup {
 }
 
 export class ThreeGeometries {
-    static createPlane(){
+    static createPlane(scene){
         const loader = new THREE.TextureLoader();
         const planeGroup = new THREE.Group();
         planeGroup.name = "Plane";
@@ -64,34 +65,92 @@ export class ThreeGeometries {
         gridHelper.rotateX(Math.PI / 2);
         planeGroup.add(gridHelper);
 
-        return planeGroup;
+        scene.add(planeGroup);
+    }
+    static createGlobe(scene){
+        const sphereGroup = new THREE.Group();
+        sphereGroup.name = "Sphere";
+
+        let loader = new THREE.TextureLoader();
+        let height = loader.load('/textures/monochrome-height.jpg');
+        let texture = loader.load('/textures/monochrome-height.jpg');
+
+        const landGeometry = new THREE.SphereBufferGeometry(20, 1024, 1024);
+
+        let landMaterial = new THREE.MeshStandardMaterial( {
+            map: texture,
+            displacementMap: height,
+            displacementScale: 1,
+        } );
+
+        let landSphere = new THREE.Mesh( landGeometry, landMaterial );
+        landSphere.name = "Land";
+        sphereGroup.add(landSphere);
+
+        const waterGeometry = new THREE.SphereBufferGeometry(20.5, 32, 32);
+
+        let waterMap = loader.load('/textures/water-normal-map.jpg');
+        waterMap.wrapS = THREE.RepeatWrapping;
+        waterMap.wrapT = THREE.RepeatWrapping;
+        waterMap.repeat.set(4,2);
+
+        let waterMaterial = new THREE.MeshStandardMaterial({
+            color: new THREE.Color('skyblue'),
+            normalMap: waterMap
+        })
+
+        let waterSphere = new THREE.Mesh( waterGeometry, waterMaterial );
+        waterSphere.name = "Water";
+        sphereGroup.add(waterSphere);
+
+        scene.add(sphereGroup);
     }
 
-    static createPointLight(){
+    static createParticles(scene){
+        const particleGeometry = new THREE.BufferGeometry;
+        const particleCount = 5000;
+
+        const positions = new Float32Array(particleCount * 3);
+
+        for(let i = 0; i < particleCount * 3; i++){
+            positions[i] = (Math.random() - 0.5) * 500;
+        }
+
+        particleGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+
+        const material = new THREE.PointsMaterial({
+            size: 0.05
+        })
+        const particlesMesh = new THREE.Points(particleGeometry, material);
+        // particlesMesh.position.z = -300
+        scene.add(particlesMesh);
+    }
+
+    static createPointLight(scene){
         const lightsGroup = new THREE.Group();
         lightsGroup.name = "Lights";
 
-        const pointLight = new THREE.PointLight(0xffffed, 0.5);
+        const pointLight = new THREE.PointLight(0xffffed, 1);
         pointLight.position.x = 30;
         pointLight.position.y = 0;
         pointLight.position.z = 40;
         lightsGroup.add(pointLight);
         
 
-        const pointLight2 = new THREE.PointLight(0xffffed, 0.5);
+        const pointLight2 = new THREE.PointLight(0xffffed, 1);
         pointLight2.position.x = -30;
         pointLight2.position.y = 0;
         pointLight2.position.z = 40;
         lightsGroup.add(pointLight2);
 
-        return lightsGroup;
+        scene.add(lightsGroup);
     }
 }
 
 export class ThreeAnimation {
     constructor(scene, renderer, camera){
         this.movement = {
-            camera: true,
+            camera: false,
             user: [],
             water: true,
         };
@@ -110,7 +169,9 @@ export class ThreeAnimation {
         if (this.movement.water){
             this.scene.children[0].children[1].material.normalScale.set( Math.sin(elapsedTime), Math.cos(elapsedTime));
         }
-
+        this.scene.children[0].rotation.y = 0.3 * elapsedTime;
+        this.scene.children[2].rotation.y = -0.005 * elapsedTime;
+        this.scene.children[2].rotation.x = -0.005 * elapsedTime;
         this.renderer.render(this.scene, this.camera);
         window.requestAnimationFrame(this.tick);
     }
