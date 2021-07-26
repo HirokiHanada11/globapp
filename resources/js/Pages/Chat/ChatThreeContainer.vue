@@ -1,6 +1,6 @@
 <template>
     <div ref="canvas" class="h-full w-full">
-        <h1 style="position:absolute">{{room.name}}<br> Topic: {{room.topic}}</h1>
+        <h1 class="absolute text-white left-2 top-2">Topic: {{room.topic}}</h1>
     </div>
 </template>
 
@@ -44,11 +44,9 @@ export default {
         },
 
         createPlane() {
-            let planeGroup = ThreeGeometries.createPlane();
-            threeSetup.scene.add( planeGroup );
-
-            let lightsGroup = ThreeGeometries.createPointLight();
-            threeSetup.scene.add( lightsGroup );
+            ThreeGeometries.createGlobe(threeSetup.scene);
+            ThreeGeometries.createPointLight(threeSetup.scene);
+            ThreeGeometries.createParticles(threeSetup.scene);
         },
         animate() {
             let threeAnimation = new ThreeAnimation(threeSetup.scene,threeSetup.renderer, threeSetup.camera);
