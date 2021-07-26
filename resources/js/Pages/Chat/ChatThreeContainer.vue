@@ -6,7 +6,7 @@
 
 <script>
 import * as THREE from 'three';
-import { ThreeSetup, ThreeGeometries, ThreeAnimation, WorldRegionsCoors, JapanRegionsCoors } from './threeControls';
+import { ThreeSetup, ThreeGeometries, ThreeAnimation, WorldRegionsCoors, } from './threeControls';
 let threeSetup;
 
 export default {
