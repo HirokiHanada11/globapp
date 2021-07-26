@@ -1,6 +1,6 @@
 <template>
     <div ref="canvas" class="h-full w-full">
-        <h1 style="position:absolute">{{room.name}}<br> Region: {{room.region}}</h1>
+        <h1 style="position:absolute">{{room.name}}<br> Topic: {{room.topic}}</h1>
     </div>
 </template>
 
@@ -21,37 +21,19 @@ export default {
     },
     watch: {
         room(newVal, oldVal){
-            console.log("room changed", oldVal.region, "->", newVal.region);
-            if(newVal.region == 'World' || newVal.region == 'Japan'){
-                this.roomRegion = newVal.region;
-                this.setRegion();
-                this.renderThree();
-            }
+            console.log("room changed", oldVal.name, "->", newVal.name);
+            this.renderThree();
         },
         activeUsers(newVal, oldVal){
             console.log("activeusers changed", oldVal,"->",newVal);
-            let filtered = newVal.filter(user => !(oldVal.includes(user)));
-            console.log('filtered array',filtered)
-            filtered.forEach((user)=>{
-                this.generateUserModel(user);
-            })
+            // let filtered = newVal.filter(user => !(oldVal.includes(user)));
+            // console.log('filtered array',filtered)
+            // filtered.forEach((user)=>{
+            //     this.generateUserModel(user);
+            // })
         }
     },
     methods: {
-        setRegion() {
-            switch(this.roomRegion){
-                case "World":
-                    this.mapURL = "/textures/world-map-world-map-in-grey-hd-png.png";
-                    break;
-                case "Japan":
-                    this.mapURL = "/textures/map_of_Japan.png";
-                    break;
-                default:
-                    this.mapURL = "/textures/world-map-world-map-in-grey-hd-png.png";
-                    break;
-            }
-            //console.log(this.mapURL);
-        },
         calculateDimension() {
             this.componentHeight = this.$refs.canvas.clientHeight;
             this.componentWidth = this.$refs.canvas.clientWidth;

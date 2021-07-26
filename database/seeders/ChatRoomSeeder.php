@@ -16,15 +16,9 @@ class ChatRoomSeeder extends Seeder
     {
         DB::table('chat_rooms')->insert([
             'name' => 'General',
-            'region' => 'World',
-            'description' => 'For general use',
+            'topic' => 'Olympics',
+            'description' => 'For talking about olympics',
             'photo' => '/storage/useruploads/globe.png'
-        ]);
-        DB::table('chat_rooms')->insert([
-            'name' => 'Tech Talk',
-            'region' => 'Japan',
-            'description' => 'For tech talk',
-            'photo' => '/storage/useruploads/tech-rings.png'
         ]);
     }
 }
