@@ -34,12 +34,14 @@ export default {
         return {
             selected: '',
             userRegions: [],
+            modelId: 0,
         }
     },
     methods: {
         openChatRoom () {
             axios.post(`/chat/room/${this.room.id}/newactiveuser`, {
-                region: this.selected
+                region: this.selected,
+                modelId: this.modelId,
             })
             .then( response => {
                 if( response.status == 201 ){
@@ -51,19 +53,22 @@ export default {
             })
             window.location = `/chatrooms/chatroom/${this.room.id}`;
         },
+        //need a method to update user model
     },
     mounted() {
         console.log(this.room)
-        switch(this.room.region){
-            case 'World':
-                this.selected = 'Asia';
-                this.userRegions = ['Asia', 'Oceania', 'North America', 'South America', 'Europe', 'Africa', 'Middle East'];
-                break;
-            case 'Japan':
-                this.selected = 'Kanto';
-                this.userRegions = ['Hokkaido', 'Tohoku', 'Kanto', 'Chubu', 'Kansai', 'Chugoku', 'Shikoku', 'Kyushu', 'Okinawa'];
-                break;
-        }
+        this.userRegions = ['Asia', 'Oceania', 'North America', 'South America', 'Europe', 'Africa', 'Middle East'];
+        this.selected = 'Asia';
+        // switch(this.room.region){
+        //     case 'World':
+        //         this.selected = 'Asia';
+        //         this.userRegions = ['Asia', 'Oceania', 'North America', 'South America', 'Europe', 'Africa', 'Middle East'];
+        //         break;
+        //     case 'Japan':
+        //         this.selected = 'Kanto';
+        //         this.userRegions = ['Hokkaido', 'Tohoku', 'Kanto', 'Chubu', 'Kansai', 'Chugoku', 'Shikoku', 'Kyushu', 'Okinawa'];
+        //         break;
+        // }
     }
 }
 </script>

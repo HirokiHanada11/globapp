@@ -13,22 +13,22 @@
                 id="roomName"
             />
         </div>
-        <!-- Regions Select -->
+        <!-- Topics Select -->
         <div class="grid grid-cols-2 mt-4">
-            <label class="block font-medium text-sm text-gray-700" for='region'>
-                Select Region 
+            <label class="block font-medium text-sm text-gray-700" for='topic'>
+                Select Topic 
             </label>
-            <div id="region">
+            <div id="topic">
                 <select
                     v-model="selected"
                     class="float-right rounded py-1">
 
                     <option
-                        v-for="(region, index) in regions"
+                        v-for="(topic, index) in topics"
                         :key="index"
-                        :value="region"
+                        :value="topic"
                         >
-                    {{ region }}
+                    {{ topic }}
                     </option>
                 </select>
             </div>
@@ -74,8 +74,8 @@ export default {
     emits: ['roomcreated'],
     data ()  {
         return {
-            regions: ['World', 'Japan'],
-            selected: 'World',
+            topics: ['Olympics', 'Tech'],
+            selected: 'Olympics',
             roomName: '',
             roomDescription: '',
             file: ''
@@ -98,9 +98,9 @@ export default {
 
             let data = new FormData(); 
             data.append('roomName', this.roomName);
-            data.append('roomRegion', this.selected);
-            data.append('roomDescription', this.roomDescription)
-            data.append('roomPhoto', this.file)
+            data.append('roomTopic', this.selected);
+            data.append('roomDescription', this.roomDescription);
+            data.append('roomPhoto', this.file);
             console.log(data.values);
 
             axios.post('/chat/newRoom/create', data, config)
@@ -108,7 +108,7 @@ export default {
                 if( response.status == 201 ){
                     this.roomName = '';
                     this.roomDescription = '';
-                    this.selected = 'World';
+                    this.selected = 'Olympics';
                     this.file = '';
                     this.$emit('roomcreated'); //emit event messagesent which can be accessed by the parent component
                 }

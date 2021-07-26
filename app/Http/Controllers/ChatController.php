@@ -50,6 +50,7 @@ class ChatController extends Controller
         $newMessage->user_id = Auth::id();
         $newMessage->chat_room_id = $roomId;
         $newMessage->message = $request->message;
+        $newMessage->replying_to = $request->replyTo;
         $newMessage->save();
 
         broadcast(new NewChatMessage( $newMessage ))->toOthers();
@@ -60,7 +61,7 @@ class ChatController extends Controller
     public function newRoom( Request $request ){ //request includes the object with three elements
         $newRoom = new ChatRoom;
         $newRoom->name = $request->roomName;
-        $newRoom->region = $request->roomRegion;
+        $newRoom->topic = $request->roomTopic;
         $newRoom->description = $request->roomDescription;
         
         if ($request->hasFile('roomPhoto')) {
@@ -82,6 +83,7 @@ class ChatController extends Controller
         $newActiveUser->chat_room_id = $roomId;
         $newActiveUser->user_id = Auth::id();
         $newActiveUser->region = $request->region;
+        $newActiveUser->model_id = $request->modelId;
         $newActiveUser->save();
         
         return $newActiveUser;

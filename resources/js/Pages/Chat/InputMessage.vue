@@ -24,7 +24,8 @@ export default {
     props: ['room'],
     data: () => {
         return {
-            message: '' //holds the input value (defined using v-model)
+            message: '', //holds the input value (defined using v-model)
+            replyTo: null
         }
     },
     methods: {
@@ -34,7 +35,8 @@ export default {
             }
 
             axios.post(`/chat/room/${this.room.id}/message`, {
-                message: this.message
+                message: this.message,
+                replyTo: this.replyTo,
             })
             .then( response => {
                 if( response.status == 201 ){
