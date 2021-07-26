@@ -130,17 +130,17 @@ export class ThreeGeometries {
         const lightsGroup = new THREE.Group();
         lightsGroup.name = "Lights";
 
-        const pointLight = new THREE.PointLight(0xffffed, 1);
-        pointLight.position.x = 30;
+        const pointLight = new THREE.PointLight(0xffffed, 0.5);
+        pointLight.position.x = 50;
         pointLight.position.y = 0;
-        pointLight.position.z = 40;
+        pointLight.position.z = 150;
         lightsGroup.add(pointLight);
         
 
-        const pointLight2 = new THREE.PointLight(0xffffed, 1);
-        pointLight2.position.x = -30;
+        const pointLight2 = new THREE.PointLight(0xffffed, 0.5);
+        pointLight2.position.x = -50;
         pointLight2.position.y = 0;
-        pointLight2.position.z = 40;
+        pointLight2.position.z = 150;
         lightsGroup.add(pointLight2);
 
         scene.add(lightsGroup);
