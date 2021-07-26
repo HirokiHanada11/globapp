@@ -72,10 +72,10 @@ export class ThreeGeometries {
         sphereGroup.name = "Sphere";
 
         let loader = new THREE.TextureLoader();
-        let height = loader.load('/textures/monochrome-height.jpg');
-        let texture = loader.load('/textures/monochrome-height.jpg');
+        let height = loader.load('/textures/world-height-map-v3.jpg');
+        let texture = loader.load('/textures/world-height-map-v3.jpg');
 
-        const landGeometry = new THREE.SphereBufferGeometry(20, 1024, 1024);
+        const landGeometry = new THREE.SphereBufferGeometry(20, 512, 256);
 
         let landMaterial = new THREE.MeshStandardMaterial( {
             map: texture,
@@ -85,6 +85,7 @@ export class ThreeGeometries {
 
         let landSphere = new THREE.Mesh( landGeometry, landMaterial );
         landSphere.name = "Land";
+        landSphere.rotateY(0.937032369);
         sphereGroup.add(landSphere);
 
         const waterGeometry = new THREE.SphereBufferGeometry(20.5, 32, 32);
@@ -132,14 +133,14 @@ export class ThreeGeometries {
 
         const pointLight = new THREE.PointLight(0xffffed, 0.5);
         pointLight.position.x = 50;
-        pointLight.position.y = 0;
+        pointLight.position.y = 30;
         pointLight.position.z = 150;
         lightsGroup.add(pointLight);
         
 
         const pointLight2 = new THREE.PointLight(0xffffed, 0.5);
         pointLight2.position.x = -50;
-        pointLight2.position.y = 0;
+        pointLight2.position.y = -30;
         pointLight2.position.z = 150;
         lightsGroup.add(pointLight2);
 
