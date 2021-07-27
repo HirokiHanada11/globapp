@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import {CountriesShort} from "./countries.js";
 
 export class ThreeSetup {
     constructor(width, height, canvas) {
@@ -13,17 +14,18 @@ export class ThreeSetup {
             antialias: true,
         });
         this.controls = new OrbitControls(this.camera, this.canvas);
-        
     }
     init = () => {
-        this.camera.position.set(0, 0, 50);
-        this.camera.lookAt(0,0,0);
+        this.camera.position.set(15, 0, 50);
+        this.camera.lookAt(15,0,0);
 
         this.renderer.setSize(this.width, this.height);
+        this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
         this.renderer.setClearColor(new THREE.Color('#1d2951'),1);
         this.canvas.appendChild(this.renderer.domElement);
 
         this.controls.enableDamping = true;
+        this.controls.target.set(15,0,0);
     }
 }
 
@@ -75,8 +77,8 @@ export class ThreeGeometries {
         sphereGroup.name = "Sphere";
 
         let loader = new THREE.TextureLoader();
-        let height = loader.load('/textures/world-height-map-v3.jpg');
-        let texture = loader.load('/textures/world-height-map-v3.jpg');
+        let height = loader.load('/textures/world-height-map-v8.jpg');
+        let texture = loader.load('/textures/world-height-map-v8.jpg');
 
         const landGeometry = new THREE.SphereBufferGeometry(20, 512, 256);
 
@@ -89,7 +91,7 @@ export class ThreeGeometries {
 
         let landSphere = new THREE.Mesh( landGeometry, landMaterial );
         landSphere.name = "Land";
-        landSphere.rotateY(0.937032369);
+        // landSphere.rotateY(0.937032369);
         sphereGroup.add(landSphere);
 
         const waterGeometry = new THREE.SphereBufferGeometry(20.5, 32, 32);
@@ -145,10 +147,45 @@ export class ThreeGeometries {
 
         scene.add(lightsGroup);
     }
+
+    static createUserModel = (scene, user) =>{
+        const coords = getCoords(user.region);
+        const userModel = new THREE.Group;
+        userModel.name = user.user.id;
+
+        let cylinderGeometry = new THREE.CylinderGeometry( 1.2, 0.2, 3, 32);
+        let sphereGeometry = new THREE.SphereGeometry( 1, 32, 32 );
+
+        let material = new THREE.MeshBasicMaterial();
+        material.color = new THREE.Color(0xff0000);
+
+        const sphere = new THREE.Mesh(sphereGeometry,material);
+        const cylinder = new THREE.Mesh(cylinderGeometry,material);
+        sphere.position.z = -4;
+        cylinder.position.z = -2;
+        cylinder.rotateX( Math.PI / 2);
+
+        userModel.add(sphere, cylinder);
+        userModel.position.setFromSphericalCoords(20, coords.phi, coords.theta);
+        userModel.lookAt(0,0,0);
+
+        scene.children[0].add(userModel);
+    }
+
+}
+
+const getCoords = (region) => {
+    const coords = CountriesShort[region];
+    console.log(region);
+    console.log(CountriesShort)
+    return {
+        phi: (90 - coords[0]) * Math.PI / 180,
+        theta: (90 + coords[1]) * Math.PI / 180,
+    }
 }
 
 export class ThreeAnimation {
-    constructor(scene, renderer, camera){
+    constructor(scene, renderer, camera, controls){
         this.movement = {
             camera: false,
             user: [],
@@ -158,6 +195,7 @@ export class ThreeAnimation {
         this.scene = scene;
         this.renderer = renderer;
         this.camera = camera;
+        this.controls = controls;
     }
     tick = () => {
         const elapsedTime = this.clock.getElapsedTime();
@@ -167,11 +205,22 @@ export class ThreeAnimation {
             this.camera.lookAt(0,0,0);
         }
         if (this.movement.water){
-            this.scene.children[0].children[1].material.normalScale.set( Math.sin(elapsedTime), Math.cos(elapsedTime));
+            this.scene.children[0].children[1].material.normalScale.set( Math.sin(elapsedTime*0.3), Math.cos(elapsedTime*0.3));
         }
         this.scene.children[0].rotation.y = 0.3 * elapsedTime;
         this.scene.children[2].rotation.y = -0.005 * elapsedTime;
         this.scene.children[2].rotation.x = -0.005 * elapsedTime;
+
+        this.controls.update();
+
+        if(this.movement.user.length > 0){
+            let userModel = this.scene.children[0].getObjectByName(this.movement.user[0]);
+            // console.log(userModel.matrixWorld)
+            let position = new THREE.Vector3();
+            position.setFromMatrixPosition(userModel.matrixWorld);
+            //console.log(position);
+        }
+
         this.renderer.render(this.scene, this.camera);
         window.requestAnimationFrame(this.tick);
     }
@@ -179,47 +228,55 @@ export class ThreeAnimation {
 }
 
 //set in polar coords
+//center = 90, -90 
+//in map: 90 - real lat, 90 + real long 
 export const WorldRegionsCoors = {
     'Asia': {
-        maxX: 35,
-        minX: 15,
-        maxY: 0,
-        minY: 20
+        maxLat: 75,
+        minLat: 30,
+        maxLon: 240,
+        minLon: 150
     },
     'Oceania': {
-        maxX: 45,
-        minX: 25,
-        maxY: -5,
-        minY: -20
+        maxLat: 90,
+        minLat: 135,
+        maxLon: -120,
+        minLon: -150
     }, 
     'North America': {
-        maxX: -20,
-        minX: -40,
-        maxY: 20,
-        minY: 0
+        maxLat: 75,
+        minLat: 20,
+        maxLon: 30,
+        minLon: -30
     }, 
     'South America': {
-        maxX: -15,
-        minX: -25,
-        maxY: -5,
-        minY: -20
+        maxLat: 135,
+        minLat: 90,
+        maxLon: 60,
+        minLon: 15
     }, 
     'Europe': {
-        maxX: 10,
-        minX: -7,
-        maxY: 5,
-        minY: 15
+        maxLat: 60,
+        minLat: 20,
+        maxLon: 150,
+        minLon: 75
     }, 
-    'Africa': {
-        maxX: 10,
-        minX: -10,
-        maxY: 3,
-        minY: -15
+    'Africa (North)': {
+        maxLat: 75,
+        minLat: 60,
+        maxLon: 120,
+        minLon: 75
+    }, 
+    'Africa (South)': {
+        maxLat: 120,
+        minLat: 75,
+        maxLon: 135,
+        minLon: 75
     }, 
     'Middle East': {
-        maxX: 15,
-        minX: 5,
-        maxY: 5,
-        minY: -5
+        maxLat: 75,
+        minLat: 45,
+        maxLon: 150,
+        minLon: 120
     }
 }

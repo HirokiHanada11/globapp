@@ -27,6 +27,9 @@
 </template>
 
 <script>
+import { WorldRegionsCoors } from "./threeControls";
+import {CountriesShort} from "./countries.js";
+
 
 export default {
     props: ['room'],
@@ -57,8 +60,9 @@ export default {
     },
     mounted() {
         console.log(this.room)
-        this.userRegions = ['Asia', 'Oceania', 'North America', 'South America', 'Europe', 'Africa', 'Middle East'];
-        this.selected = 'Asia';
+        this.userRegions = Object.keys(CountriesShort);
+        console.log(this.userRegions);
+        this.selected = this.userRegions[0];
         // switch(this.room.region){
         //     case 'World':
         //         this.selected = 'Asia';
