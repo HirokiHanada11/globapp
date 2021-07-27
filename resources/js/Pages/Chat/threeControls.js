@@ -16,8 +16,8 @@ export class ThreeSetup {
         this.controls = new OrbitControls(this.camera, this.canvas);
     }
     init = () => {
-        this.camera.position.set(0, 0, 50);
-        this.camera.lookAt(0,0,0);
+        this.camera.position.set(15, 0, 50);
+        this.camera.lookAt(15,0,0);
 
         this.renderer.setSize(this.width, this.height);
         this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -25,6 +25,7 @@ export class ThreeSetup {
         this.canvas.appendChild(this.renderer.domElement);
 
         this.controls.enableDamping = true;
+        this.controls.target.set(15,0,0);
     }
 }
 
@@ -76,8 +77,8 @@ export class ThreeGeometries {
         sphereGroup.name = "Sphere";
 
         let loader = new THREE.TextureLoader();
-        let height = loader.load('/textures/world-height-map-v3.jpg');
-        let texture = loader.load('/textures/world-height-map-v3.jpg');
+        let height = loader.load('/textures/world-height-map-v8.jpg');
+        let texture = loader.load('/textures/world-height-map-v8.jpg');
 
         const landGeometry = new THREE.SphereBufferGeometry(20, 512, 256);
 
@@ -168,7 +169,7 @@ export class ThreeGeometries {
         userModel.position.setFromSphericalCoords(20, coords.phi, coords.theta);
         userModel.lookAt(0,0,0);
 
-        scene.add(userModel);
+        scene.children[0].add(userModel);
     }
 
 }
@@ -184,7 +185,7 @@ const getCoords = (region) => {
 }
 
 export class ThreeAnimation {
-    constructor(scene, renderer, camera){
+    constructor(scene, renderer, camera, controls){
         this.movement = {
             camera: false,
             user: [],
@@ -194,6 +195,7 @@ export class ThreeAnimation {
         this.scene = scene;
         this.renderer = renderer;
         this.camera = camera;
+        this.controls = controls;
     }
     tick = () => {
         const elapsedTime = this.clock.getElapsedTime();
@@ -203,11 +205,22 @@ export class ThreeAnimation {
             this.camera.lookAt(0,0,0);
         }
         if (this.movement.water){
-            this.scene.children[0].children[1].material.normalScale.set( Math.sin(elapsedTime), Math.cos(elapsedTime));
+            this.scene.children[0].children[1].material.normalScale.set( Math.sin(elapsedTime*0.3), Math.cos(elapsedTime*0.3));
         }
-        //this.scene.children[0].rotation.y = 0.3 * elapsedTime;
+        this.scene.children[0].rotation.y = 0.3 * elapsedTime;
         this.scene.children[2].rotation.y = -0.005 * elapsedTime;
         this.scene.children[2].rotation.x = -0.005 * elapsedTime;
+
+        this.controls.update();
+
+        if(this.movement.user.length > 0){
+            let userModel = this.scene.children[0].getObjectByName(this.movement.user[0]);
+            // console.log(userModel.matrixWorld)
+            let position = new THREE.Vector3();
+            position.setFromMatrixPosition(userModel.matrixWorld);
+            //console.log(position);
+        }
+
         this.renderer.render(this.scene, this.camera);
         window.requestAnimationFrame(this.tick);
     }

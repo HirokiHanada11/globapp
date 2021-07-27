@@ -14,9 +14,9 @@
         </template>
 
         <div class="py-12">
-            <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 relative">
+            <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 relative" style="height:70vh">
                 
-                <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg h-96 w-full relative">
+                <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg h-full w-full relative">
                     <message-container :messages="messages" /> 
                     <chat-three-container :messages="messages" :room="currentRoom" :activeUsers="activeUsers" />
                     <active-users-container v-show="show" :activeUsers="activeUsers"/>
