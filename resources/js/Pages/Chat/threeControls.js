@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import {CountriesShort} from "./countries.js";
 
 export class ThreeSetup {
     constructor(width, height, canvas) {
@@ -173,10 +174,12 @@ export class ThreeGeometries {
 }
 
 const getCoords = (region) => {
-    const coords = WorldRegionsCoors[region];
+    const coords = CountriesShort[region];
+    console.log(region);
+    console.log(CountriesShort)
     return {
-        phi: (Math.random() * (coords.maxLat - coords.minLat) + coords.minLat) * Math.PI / 180,
-        theta: (Math.random() * (coords.maxLon - coords.minLon) + coords.minLon) * Math.PI / 180
+        phi: (90 - coords[0]) * Math.PI / 180,
+        theta: (90 + coords[1]) * Math.PI / 180,
     }
 }
 

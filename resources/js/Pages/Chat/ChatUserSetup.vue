@@ -28,6 +28,9 @@
 
 <script>
 import { WorldRegionsCoors } from "./threeControls";
+import {CountriesShort} from "./countries.js";
+
+
 export default {
     props: ['room'],
     data () {
@@ -57,7 +60,8 @@ export default {
     },
     mounted() {
         console.log(this.room)
-        this.userRegions = Object.keys(WorldRegionsCoors);
+        this.userRegions = Object.keys(CountriesShort);
+        console.log(this.userRegions);
         this.selected = this.userRegions[0];
         // switch(this.room.region){
         //     case 'World':
