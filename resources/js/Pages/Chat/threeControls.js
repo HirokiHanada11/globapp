@@ -20,6 +20,7 @@ export class ThreeSetup {
         this.camera.lookAt(0,0,0);
 
         this.renderer.setSize(this.width, this.height);
+        this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
         this.renderer.setClearColor(new THREE.Color('#1d2951'),1);
         this.canvas.appendChild(this.renderer.domElement);
 
@@ -89,7 +90,7 @@ export class ThreeGeometries {
 
         let landSphere = new THREE.Mesh( landGeometry, landMaterial );
         landSphere.name = "Land";
-        landSphere.rotateY(0.937032369);
+        // landSphere.rotateY(0.937032369);
         sphereGroup.add(landSphere);
 
         const waterGeometry = new THREE.SphereBufferGeometry(20.5, 32, 32);
@@ -169,7 +170,7 @@ export class ThreeAnimation {
         if (this.movement.water){
             this.scene.children[0].children[1].material.normalScale.set( Math.sin(elapsedTime), Math.cos(elapsedTime));
         }
-        this.scene.children[0].rotation.y = 0.3 * elapsedTime;
+        //this.scene.children[0].rotation.y = 0.3 * elapsedTime;
         this.scene.children[2].rotation.y = -0.005 * elapsedTime;
         this.scene.children[2].rotation.x = -0.005 * elapsedTime;
         this.renderer.render(this.scene, this.camera);
@@ -179,47 +180,55 @@ export class ThreeAnimation {
 }
 
 //set in polar coords
+//center = 90, -90 
+//in map: 90 - real lat, 90 + real long 
 export const WorldRegionsCoors = {
     'Asia': {
-        maxX: 35,
-        minX: 15,
-        maxY: 0,
-        minY: 20
+        maxLat: 75,
+        minLat: 30,
+        maxLon: 240,
+        minLon: 150
     },
     'Oceania': {
-        maxX: 45,
-        minX: 25,
-        maxY: -5,
-        minY: -20
+        maxLat: 90,
+        minLat: 135,
+        maxLon: -120,
+        minLon: -150
     }, 
     'North America': {
-        maxX: -20,
-        minX: -40,
-        maxY: 20,
-        minY: 0
+        maxLat: 75,
+        minLat: 20,
+        maxLon: 30,
+        minLon: -30
     }, 
     'South America': {
-        maxX: -15,
-        minX: -25,
-        maxY: -5,
-        minY: -20
+        maxLat: 135,
+        minLat: 90,
+        maxLon: 60,
+        minLon: 15
     }, 
     'Europe': {
-        maxX: 10,
-        minX: -7,
-        maxY: 5,
-        minY: 15
+        maxLat: 60,
+        minLat: 20,
+        maxLon: 150,
+        minLon: 75
     }, 
-    'Africa': {
-        maxX: 10,
-        minX: -10,
-        maxY: 3,
-        minY: -15
+    'Africa (North)': {
+        maxLat: 75,
+        minLat: 60,
+        maxLon: 120,
+        minLon: 75
+    }, 
+    'Africa (South)': {
+        maxLat: 120,
+        minLat: 75,
+        maxLon: 135,
+        minLon: 75
     }, 
     'Middle East': {
-        maxX: 15,
-        minX: 5,
-        maxY: 5,
-        minY: -5
+        maxLat: 75,
+        minLat: 45,
+        maxLon: 150,
+        minLon: 120
     }
 }
