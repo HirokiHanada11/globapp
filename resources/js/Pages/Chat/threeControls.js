@@ -13,7 +13,6 @@ export class ThreeSetup {
             antialias: true,
         });
         this.controls = new OrbitControls(this.camera, this.canvas);
-        
     }
     init = () => {
         this.camera.position.set(0, 0, 50);
@@ -145,6 +144,39 @@ export class ThreeGeometries {
         lightsGroup.add(sunLight, sunLight.target);
 
         scene.add(lightsGroup);
+    }
+
+    static createUserModel = (scene, user) =>{
+        const coords = getCoords(user.region);
+        const userModel = new THREE.Group;
+        userModel.name = user.user.id;
+
+        let cylinderGeometry = new THREE.CylinderGeometry( 1.2, 0.2, 3, 32);
+        let sphereGeometry = new THREE.SphereGeometry( 1, 32, 32 );
+
+        let material = new THREE.MeshBasicMaterial();
+        material.color = new THREE.Color(0xff0000);
+
+        const sphere = new THREE.Mesh(sphereGeometry,material);
+        const cylinder = new THREE.Mesh(cylinderGeometry,material);
+        sphere.position.z = -4;
+        cylinder.position.z = -2;
+        cylinder.rotateX( Math.PI / 2);
+
+        userModel.add(sphere, cylinder);
+        userModel.position.setFromSphericalCoords(20, coords.phi, coords.theta);
+        userModel.lookAt(0,0,0);
+
+        scene.add(userModel);
+    }
+
+}
+
+const getCoords = (region) => {
+    const coords = WorldRegionsCoors[region];
+    return {
+        phi: (Math.random() * (coords.maxLat - coords.minLat) + coords.minLat) * Math.PI / 180,
+        theta: (Math.random() * (coords.maxLon - coords.minLon) + coords.minLon) * Math.PI / 180
     }
 }
 

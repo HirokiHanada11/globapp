@@ -57,7 +57,7 @@ export default {
     },
     mounted() {
         console.log(this.room)
-        this.userRegions = WorldRegionsCoors.keys();
+        this.userRegions = Object.keys(WorldRegionsCoors);
         this.selected = this.userRegions[0];
         // switch(this.room.region){
         //     case 'World':
