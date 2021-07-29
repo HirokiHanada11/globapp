@@ -10,6 +10,11 @@
             <button v-if='show' @click="hideActiveUsers" class="float-right place-self-end bg-blue-500 hover:bg-gray-500 py-1 px-2 mt-1 rounded text-white text-sm">
                 Hide Active Users
             </button>
+            <button
+                @click="fetchNews()"
+                class="float-right place-self-end bg-blue-500 hover:bg-gray-500 py-1 px-2 mt-1 rounded text-white text-sm">
+                Fetch News
+            </button>
             </h2>
         </template>
 
@@ -24,6 +29,7 @@
                 <input-message 
                     :room="currentRoom" 
                     v-on:messagesent="getMessages()" />
+                
             </div>
         </div>
     </app-layout>
@@ -51,6 +57,8 @@
                 messages: [],
                 activeUsers: [],
                 show: false,
+                sortBy: 'popularity',
+                news: [],
             }
         },
         watch: {
@@ -59,6 +67,17 @@
             }
         },
         methods: {
+            fetchNews() {
+                console.log(this.currentRoom.topic);
+                axios.get(`/chat/room/news/${this.currentRoom.topic}/${this.sortBy}`)
+                .then( response => {
+                    console.log(response);
+                    this.news = response.data[0];
+                })
+                .catch( error => {
+                    console.error(error);
+                })
+            },
             getCurrentRoom(){
                 axios.get(`/chat/room/${this.roomId}`)
                 .then( response => {

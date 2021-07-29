@@ -9,9 +9,24 @@ use App\Models\ActiveUser;
 use Illuminate\Support\Facades\Auth;
 use App\Events\NewChatMessage;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\Http;
 
 class ChatController extends Controller
 {
+    public function news( Request $request, $topic, $sortBy ){
+        $newsApiEndPoint = 'https://newsapi.org/v2/everything';
+        // $requestUrl = $newsApiEndPoint . 'qInTitle='. $topic . '&sortBy' . $sortBy;
+
+        $response = Http::withHeaders([
+            'X-Api-Key' => 'b3223848c6a34470867e3961b2db38be'
+        ])->get($newsApiEndPoint, [
+            'qInTitle' => $topic,
+            'sortBy' => $sortBy
+        ]);
+
+        return $response->json();
+    }
+
     public function chatroom( Request $request, $roomId ){
         return Inertia::render('Chat/ChatContainer', [
             'roomId' => $roomId
