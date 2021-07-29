@@ -19,12 +19,14 @@
         </template>
 
         <div class="py-12">
-            <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 relative" style="height:70vh">
-                
+            <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 relative" style="height:70vh">               
+                <news-container :news="news" />
                 <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg h-full w-full relative">
-                    <message-container :messages="messages" /> 
+                    <div class="h-full w-1/4 absolute top-0 right-0">
+                        <active-users-container v-show="show" :activeUsers="activeUsers"/>
+                        <message-container :messages="messages" />
+                    </div> 
                     <chat-three-container :messages="messages" :room="currentRoom" :activeUsers="activeUsers" />
-                    <active-users-container v-show="show" :activeUsers="activeUsers"/>
                 </div>
                 <input-message 
                     :room="currentRoom" 
@@ -41,6 +43,7 @@
     import InputMessage from './InputMessage.vue'
     import ChatThreeContainer from './ChatThreeContainer.vue'
     import ActiveUsersContainer from './ActiveUsersContainer.vue'
+    import NewsContainer from './NewsContainer.vue'
 
     export default {
         props: ['roomId'],
@@ -50,6 +53,7 @@
             InputMessage,
             ChatThreeContainer,
             ActiveUsersContainer,
+            NewsContainer,
         },
         data: () => {
             return {
@@ -71,8 +75,8 @@
                 console.log(this.currentRoom.topic);
                 axios.get(`/chat/room/news/${this.currentRoom.topic}/${this.sortBy}`)
                 .then( response => {
-                    console.log(response);
-                    this.news = response.data[0];
+                    console.log(response.data.articles);
+                    this.news = response.data.articles;
                 })
                 .catch( error => {
                     console.error(error);

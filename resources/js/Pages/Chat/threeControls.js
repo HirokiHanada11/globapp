@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-import {CountriesShort} from "./countries.js";
+import {nameToCoords, codeToCoords} from "./countries.js";
 
 //class for setting up three js 
 export class ThreeSetup {
@@ -236,9 +236,9 @@ export class ThreeGeometries {
 
 //global function to retrieve coodinates of a country by their name
 const getCoords = (region) => {
-    const coords = CountriesShort[region];
+    const coords = nameToCoords[region];
     console.log(region);
-    console.log(CountriesShort)
+    console.log(nameToCoords)
     return {
         phi: (90 - coords[0]) * Math.PI / 180,
         theta: (90 + coords[1]) * Math.PI / 180,

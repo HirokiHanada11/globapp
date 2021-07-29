@@ -27,8 +27,7 @@
 </template>
 
 <script>
-import { WorldRegionsCoors } from "./threeControls";
-import {CountriesShort} from "./countries.js";
+import { nameToCoords } from "./countries.js";
 
 
 export default {
@@ -59,20 +58,11 @@ export default {
         //need a method to update user model
     },
     mounted() {
-        console.log(this.room)
-        this.userRegions = Object.keys(CountriesShort);
-        console.log(this.userRegions);
+        // console.log(this.room)
+        this.userRegions = Object.keys(nameToCoords);
+        // console.log(this.userRegions);
         this.selected = this.userRegions[0];
-        // switch(this.room.region){
-        //     case 'World':
-        //         this.selected = 'Asia';
-        //         this.userRegions = ['Asia', 'Oceania', 'North America', 'South America', 'Europe', 'Africa', 'Middle East'];
-        //         break;
-        //     case 'Japan':
-        //         this.selected = 'Kanto';
-        //         this.userRegions = ['Hokkaido', 'Tohoku', 'Kanto', 'Chubu', 'Kansai', 'Chugoku', 'Shikoku', 'Kyushu', 'Okinawa'];
-        //         break;
-        // }
+
     }
 }
 </script>
