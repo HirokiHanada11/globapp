@@ -1,4 +1,5 @@
 const defaultTheme = require('tailwindcss/defaultTheme');
+const plugin = require('tailwindcss/plugin');
 
 module.exports = {
     mode: 'jit',
@@ -24,5 +25,21 @@ module.exports = {
         },
     },
 
-    plugins: [require('@tailwindcss/forms'), require('@tailwindcss/typography')],
+    plugins: [
+        require('@tailwindcss/forms'),
+        require('@tailwindcss/typography'),
+        plugin(function({ addUtilities }) {
+            const newUtilities = {
+                ".no-scrollbar::-webkit-scrollbar" :{
+                    display: "none",
+                },
+                ".no-scrollbar" : {
+                    "-ms-overflow-style": "none",  /* IE and Edge */
+                    "scrollbar-width": "none"  /* Firefox */
+                }
+            }
+      
+            addUtilities(newUtilities)
+          })
+    ],
 };

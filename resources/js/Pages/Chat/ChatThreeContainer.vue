@@ -31,6 +31,14 @@ export default {
             filtered.forEach((user)=>{
                 this.generateUserModel(user);
             })
+            
+            // console.log(threeSetup.scene.getObjectByName('Sphere').getObjectByName(1));
+        },
+        messages(newVal, oldVal){
+            if(typeof oldVal[0] !== 'undefined'){
+                console.log('new message', newVal[0]);
+                this.createMessagePayload(newVal[0]);
+            }
         }
     },
     methods: {
@@ -62,11 +70,13 @@ export default {
             ThreeGeometries.createUserModel(threeSetup.scene, user);
             threeAnimation.movement.user.push(user.user.id);
         },
-        getRandomCoords(coords) {
-            return {
-                x: Math.random() * (coords.maxX - coords.minX) + coords.minX,
-                y: Math.random() * (coords.maxY - coords.minY) + coords.minY
-            }
+        createMessagePayload(message){
+            let payloadPath = ThreeGeometries.createMessagePayload(threeSetup.scene, message);
+            threeAnimation.movement.payloads.push({
+                payloadId: message.id,
+                curve: payloadPath,
+                fraction: 0.03,
+            });
         }
         
     },

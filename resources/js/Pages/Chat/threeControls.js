@@ -1,7 +1,8 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-import {CountriesShort} from "./countries.js";
+import {nameToCoords, codeToCoords} from "./countries.js";
 
+//class for setting up three js 
 export class ThreeSetup {
     constructor(width, height, canvas) {
         this.width = width;
@@ -29,7 +30,9 @@ export class ThreeSetup {
     }
 }
 
+//class for creating and adding Object3D to scene
 export class ThreeGeometries {
+    //static function to create plane with world map texture (Not used currently)
     static createPlane(scene){
         const loader = new THREE.TextureLoader();
         const planeGroup = new THREE.Group();
@@ -72,6 +75,7 @@ export class ThreeGeometries {
 
         scene.add(planeGroup);
     }
+    //static function to create a sphere with world map texture wrapped. (Used over createPlane)
     static createGlobe(scene){
         const sphereGroup = new THREE.Group();
         sphereGroup.name = "Sphere";
@@ -91,7 +95,6 @@ export class ThreeGeometries {
 
         let landSphere = new THREE.Mesh( landGeometry, landMaterial );
         landSphere.name = "Land";
-        // landSphere.rotateY(0.937032369);
         sphereGroup.add(landSphere);
 
         const waterGeometry = new THREE.SphereBufferGeometry(20.5, 32, 32);
@@ -113,6 +116,7 @@ export class ThreeGeometries {
         scene.add(sphereGroup);
     }
 
+    //static function to create background particles to represent stars
     static createParticles(scene){
         const particleGeometry = new THREE.BufferGeometry;
         const particleCount = 5000;
@@ -133,6 +137,7 @@ export class ThreeGeometries {
         scene.add(particles);
     }
 
+    // static function to create light sources including sun light, ambient light, and point light for the message payload animation    
     static createPointLight(scene){
         const lightsGroup = new THREE.Group();
         lightsGroup.name = "Lights";
@@ -146,8 +151,15 @@ export class ThreeGeometries {
         lightsGroup.add(sunLight, sunLight.target);
 
         scene.add(lightsGroup);
+
+        for (let i = 0; i < 3; i++){
+            let pointLight = new THREE.PointLight(new THREE.Color("#a7d8de"),0.5);
+            pointLight.name = `light${i}`;
+            scene.add(pointLight);
+        }
     }
 
+    //static function to create user model when user joins the room, the model generated is a placeholder at the moment, planning to develop more complex models in the future
     static createUserModel = (scene, user) =>{
         const coords = getCoords(user.region);
         const userModel = new THREE.Group;
@@ -172,53 +184,139 @@ export class ThreeGeometries {
         scene.children[0].add(userModel);
     }
 
+    //static function to create message payload object and its path for message sent animation. 
+    //returns a curve that reprsents the path of the payload that it travels on
+    static createMessagePayload = (scene, message) =>{
+        const userModel = scene.getObjectByName('Sphere').getObjectByName(message.user.id);
+        const position = new THREE.Vector3();
+        position.setFromMatrixPosition(userModel.matrixWorld);
+
+        const tarilGeometry = new THREE.CylinderBufferGeometry(0.2,0.7, 1, 8, 8, false);
+        const trailMaterial = new THREE.PointsMaterial({size:0.0005}) 
+        const trail = new THREE.Points(tarilGeometry, trailMaterial);
+
+        const tarilGeometry2 = new THREE.CylinderBufferGeometry(0.4,0.1, 3.5, 8, 8, false);
+        const trailMaterial2 = new THREE.PointsMaterial({size:0.0005}) 
+        const trail2 = new THREE.Points(tarilGeometry2, trailMaterial2);
+        trail2.position.y = -2;
+
+        const trailGroup = new THREE.Group();
+        trailGroup.name = message.id;
+        trailGroup.add(trail);
+        trailGroup.add(trail2);
+        trailGroup.position.set(position.x, position.y, position.z);
+        scene.add(trailGroup);
+
+        const target = new THREE.Vector3(80,0,0);
+        let p1 = new THREE.Vector3();
+        let p2 = new THREE.Vector3();
+        let px = new THREE.Vector3();
+        let py = new THREE.Vector3();
+        let p = new THREE.Vector3();
+        let p0 = position;
+        let p3 = target;
+        let angle = Math.abs(position.angleTo(target));
+        if (angle > Math.PI/2){
+            px.set(0, p0.y, p0 .z).normalize();
+            py.copy(p3).normalize();
+            p2.copy(px).multiplyScalar(40*angle/Math.PI);
+            p1.copy(p0).add(p.copy(px).multiplyScalar(40*angle/Math.PI)).add(py.multiplyScalar(-5));
+        }
+        else{
+            px.set(0, p0.y, p0 .z).normalize();
+            py.copy(p3).normalize();
+            p1.copy(px).multiplyScalar(30*(angle / (Math.PI/2))).add(p.copy(py).multiplyScalar(5));
+            p2.copy(px).multiplyScalar(30*(angle / (Math.PI/2))).add(p.copy(py).multiplyScalar(30));
+        }
+        console.log(p0,p1,p2,p3)
+        return new THREE.CubicBezierCurve3(p0,p1,p2,p3);
+    }
+
 }
 
+//global function to retrieve coodinates of a country by their name
 const getCoords = (region) => {
-    const coords = CountriesShort[region];
+    const coords = nameToCoords[region];
     console.log(region);
-    console.log(CountriesShort)
+    console.log(nameToCoords)
     return {
         phi: (90 - coords[0]) * Math.PI / 180,
         theta: (90 + coords[1]) * Math.PI / 180,
     }
 }
 
+//class to instantiate animation
 export class ThreeAnimation {
     constructor(scene, renderer, camera, controls){
-        this.movement = {
+        this.movement = { //setting trusy values here will trigger corresponding animations 
             camera: false,
             user: [],
             water: true,
+            payloads: [],
         };
         this.clock = new THREE.Clock();
         this.scene = scene;
         this.renderer = renderer;
         this.camera = camera;
         this.controls = controls;
+        this.axis = new THREE.Vector3();
+        this.up = new THREE.Vector3(0,1,0);
+        this.target = new THREE.Vector3(50,0,0);
     }
     tick = () => {
         const elapsedTime = this.clock.getElapsedTime();
-        if (this.movement.camera){
-            this.camera.position.x = 4 * Math.cos(elapsedTime * 0.1);
-            this.camera.position.y = 2 * Math.sin(elapsedTime * 0.1) - 20; 
-            this.camera.lookAt(0,0,0);
-        }
-        if (this.movement.water){
-            this.scene.children[0].children[1].material.normalScale.set( Math.sin(elapsedTime*0.3), Math.cos(elapsedTime*0.3));
-        }
         this.scene.children[0].rotation.y = 0.3 * elapsedTime;
         this.scene.children[2].rotation.y = -0.005 * elapsedTime;
         this.scene.children[2].rotation.x = -0.005 * elapsedTime;
 
         this.controls.update();
 
-        if(this.movement.user.length > 0){
+        if (this.movement.camera){ //camera movement 
+            this.camera.position.x = 4 * Math.cos(elapsedTime * 0.1);
+            this.camera.position.y = 2 * Math.sin(elapsedTime * 0.1) - 20; 
+            this.camera.lookAt(0,0,0);
+        }
+        if (this.movement.water){ //wave animation
+            this.scene.children[0].children[1].material.normalScale.set( Math.sin(elapsedTime*0.3), Math.cos(elapsedTime*0.3));
+        }
+
+        if(this.movement.user.length > 0){ //user animation, currenty unset
             let userModel = this.scene.children[0].getObjectByName(this.movement.user[0]);
-            // console.log(userModel.matrixWorld)
             let position = new THREE.Vector3();
             position.setFromMatrixPosition(userModel.matrixWorld);
-            //console.log(position);
+        }
+
+        if(this.movement.payloads.length > 0){ //message sent animation
+            let f = false;
+            this.movement.payloads.map((payload, index) => {
+                let payloadModel = new THREE.Object3D();
+                payloadModel = this.scene.getObjectByName(payload.payloadId);
+                if (typeof payload.light === 'undefined'){
+                    payload.light = this.scene.getObjectByName(`light${index}`)
+                }
+                if(payload.fraction < 1){
+                    let lightPosition = payload.curve.getPoint(payload.fraction);
+                    payload.light.position.copy(lightPosition);
+
+                    let newPostion = payload.curve.getPoint(payload.fraction-0.02);
+                    let tangent = payload.curve.getTangent(payload.fraction-0.02);
+                    let radians = this.up.angleTo(this.target);
+                    this.axis.crossVectors(this.up,tangent).normalize();
+                    payloadModel.position.copy(newPostion);
+                    payloadModel.quaternion.setFromAxisAngle(this.axis,radians);
+                    payload.fraction += 0.01;
+                    return payload;
+                } else{
+                    this.scene.remove(payloadModel);
+                    payload.light.position.set(0,0,0);
+                    f = true;
+                    return null;
+                }
+            });
+            if(f){
+                this.movement.payloads = this.movement.payloads.filter(payload => payload !== null);
+                f = false;
+            }
         }
 
         this.renderer.render(this.scene, this.camera);

@@ -52,7 +52,7 @@ export default {
     },
     mounted() {
         this.getActiveUsers();
-        console.log(this.room.photo)
+        // console.log(this.room.photo)
     }
 }
 </script>
