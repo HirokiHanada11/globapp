@@ -172,6 +172,62 @@ export class ThreeGeometries {
         scene.children[0].add(userModel);
     }
 
+    static createMessagePayload = (scene, message) =>{
+        const userModel = scene.getObjectByName('Sphere').getObjectByName(message.user.id);
+        const position = new THREE.Vector3();
+        position.setFromMatrixPosition(userModel.matrixWorld);
+
+        // const geometry = new THREE.SphereBufferGeometry( 0.2, 8, 8 );
+        // const material = new THREE.MeshStandardMaterial( { color: new THREE.Color("#a7d8de"), } );
+        // const lathe = new THREE.Mesh( geometry, material );
+        // lathe.name = "Lathe";
+        
+
+        const tarilGeometry = new THREE.CylinderBufferGeometry(0.2,0.7, 1, 8, 8, false);
+        // const trailMaterial = new THREE.MeshStandardMaterial( { color: new THREE.Color("#85b0bd"), emissiveIntensity: 0.5} );
+        // const trail = new THREE.Mesh( tarilGeometry, trailMaterial );
+        const trailMaterial = new THREE.PointsMaterial({size:0.0005}) 
+        const trail = new THREE.Points(tarilGeometry, trailMaterial);
+
+        const tarilGeometry2 = new THREE.CylinderBufferGeometry(0.4,0.1, 3.5, 8, 8, false);
+        // const trailMaterial2 = new THREE.MeshStandardMaterial( { color: new THREE.Color("#85b0bd") } );
+        // const trail2 = new THREE.Mesh( tarilGeometry2, trailMaterial2 );
+        const trailMaterial2 = new THREE.PointsMaterial({size:0.0005}) 
+        const trail2 = new THREE.Points(tarilGeometry2, trailMaterial2);
+        trail2.position.y = -2;
+
+        const trailGroup = new THREE.Group();
+        trailGroup.name = message.id;
+        trailGroup.add(trail);
+        trailGroup.add(trail2);
+        trailGroup.position.set(position.x, position.y, position.z);
+        scene.add(trailGroup);
+
+        const target = new THREE.Vector3(50,0,0);
+        let p1 = new THREE.Vector3();
+        let p2 = new THREE.Vector3();
+        let px = new THREE.Vector3();
+        let py = new THREE.Vector3();
+        let p = new THREE.Vector3();
+        let p0 = position;
+        let p3 = target;
+        let angle = Math.abs(position.angleTo(target));
+        if (angle > Math.PI/2){
+            px.set(0, p0.y, p0 .z).normalize();
+            py.copy(p3).normalize();
+            p2.copy(px).multiplyScalar(40*angle/Math.PI);
+            p1.copy(p0).add(p.copy(px).multiplyScalar(40*angle/Math.PI)).add(py.multiplyScalar(-5));
+        }
+        else{
+            px.set(0, p0.y, p0 .z).normalize();
+            py.copy(p3).normalize();
+            p1.copy(px).multiplyScalar(30*(angle / (Math.PI/2))).add(p.copy(py).multiplyScalar(5));
+            p2.copy(px).multiplyScalar(30*(angle / (Math.PI/2))).add(p.copy(py).multiplyScalar(30));
+        }
+        console.log(p0,p1,p2,p3)
+        return new THREE.CubicBezierCurve3(p0,p1,p2,p3);
+    }
+
 }
 
 const getCoords = (region) => {
@@ -190,12 +246,16 @@ export class ThreeAnimation {
             camera: false,
             user: [],
             water: true,
+            payloads: [],
         };
         this.clock = new THREE.Clock();
         this.scene = scene;
         this.renderer = renderer;
         this.camera = camera;
         this.controls = controls;
+        this.axis = new THREE.Vector3();
+        this.up = new THREE.Vector3(0,1,0);
+        this.target = new THREE.Vector3(50,0,0);
     }
     tick = () => {
         const elapsedTime = this.clock.getElapsedTime();
@@ -219,6 +279,32 @@ export class ThreeAnimation {
             let position = new THREE.Vector3();
             position.setFromMatrixPosition(userModel.matrixWorld);
             //console.log(position);
+        }
+
+        if(this.movement.payloads.length > 0){
+            let f = false;
+            this.movement.payloads.map((payload) => {
+                let payloadModel = new THREE.Object3D();
+                payloadModel = this.scene.getObjectByName(payload.payloadId);
+                if(payload.fraction < 1){
+                    let newPostion = payload.curve.getPoint(payload.fraction-0.02);
+                    let tangent = payload.curve.getTangent(payload.fraction-0.02);
+                    let radians = this.up.angleTo(this.target);
+                    this.axis.crossVectors(this.up,tangent).normalize();
+                    payloadModel.position.copy(newPostion);
+                    payloadModel.quaternion.setFromAxisAngle(this.axis,radians);
+                    payload.fraction += 0.01;
+                    return payload;
+                } else{
+                    this.scene.remove(payloadModel);
+                    f = true;
+                    return null;
+                }
+            });
+            if(f){
+                this.movement.payloads = this.movement.payloads.filter(payload => payload !== null);
+                f = false;
+            }
         }
 
         this.renderer.render(this.scene, this.camera);
