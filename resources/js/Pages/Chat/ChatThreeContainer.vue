@@ -6,11 +6,11 @@
 
 <script>
 import * as THREE from 'three';
-import { ThreeSetup, ThreeGeometries, ThreeAnimation, WorldRegionsCoors, } from './threeControls';
+import { ThreeSetup, ThreeGeometries, ThreeAnimation, } from './threeControls';
 let threeSetup, threeAnimation;
 
 export default {
-    props: ['messages', 'room', 'activeUsers'],
+    props: ['messages', 'room', 'activeUsers', 'news'],
     data () {
         return {
             roomRegion: '',

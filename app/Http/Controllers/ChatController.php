@@ -13,16 +13,22 @@ use Illuminate\Support\Facades\Http;
 
 class ChatController extends Controller
 {
-    public function news( Request $request, $topic, $sortBy ){
-        $newsApiEndPoint = 'https://newsapi.org/v2/everything';
-        // $requestUrl = $newsApiEndPoint . 'qInTitle='. $topic . '&sortBy' . $sortBy;
+    public function news( Request $request, $topic ){
+        $newsApiEndPoint = 'https://newsapi.org/v2/top-headlines';
 
         $response = Http::withHeaders([
             'X-Api-Key' => 'b3223848c6a34470867e3961b2db38be'
         ])->get($newsApiEndPoint, [
-            'qInTitle' => $topic,
-            'sortBy' => $sortBy
+            'q' => $topic
         ]);
+
+        // $sources = Http::withHeaders([
+        //     'X-Api-Key' => 'b3223848c6a34470867e3961b2db38be'
+        // ])->get('https://newsapi.org/v2/top-headlines/sources', [
+        //         'language' => 'en',
+        //     ]);
+
+        
 
         return $response->json();
     }

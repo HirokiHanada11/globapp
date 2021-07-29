@@ -26,7 +26,7 @@
                         <message-container :messages="messages" />
                         <news-container :v-if="showNews" :news="news" />
                     </div> 
-                    <chat-three-container :messages="messages" :room="currentRoom" :activeUsers="activeUsers" />
+                    <chat-three-container :messages="messages" :room="currentRoom" :activeUsers="activeUsers" :news="news" />
                 </div>
                 <input-message 
                     :room="currentRoom" 
@@ -75,7 +75,7 @@
             fetchNews() {
                 console.log(this.currentRoom.topic);
                 this.showNews = !this.showNews;
-                axios.get(`/chat/room/news/${this.currentRoom.topic}/${this.sortBy}`)
+                axios.get(`/chat/room/news/${this.currentRoom.topic}`)
                 .then( response => {
                     console.log(response.data.articles);
                     this.news = response.data.articles;
