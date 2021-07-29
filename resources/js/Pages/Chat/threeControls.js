@@ -146,6 +146,12 @@ export class ThreeGeometries {
         lightsGroup.add(sunLight, sunLight.target);
 
         scene.add(lightsGroup);
+
+        for (let i = 0; i < 3; i++){
+            let pointLight = new THREE.PointLight(new THREE.Color("#a7d8de"),0.5);
+            pointLight.name = `light${i}`;
+            scene.add(pointLight);
+        }
     }
 
     static createUserModel = (scene, user) =>{
@@ -283,10 +289,16 @@ export class ThreeAnimation {
 
         if(this.movement.payloads.length > 0){
             let f = false;
-            this.movement.payloads.map((payload) => {
+            this.movement.payloads.map((payload, index) => {
                 let payloadModel = new THREE.Object3D();
                 payloadModel = this.scene.getObjectByName(payload.payloadId);
+                if (typeof payload.light === 'undefined'){
+                    payload.light = this.scene.getObjectByName(`light${index}`)
+                }
                 if(payload.fraction < 1){
+                    let lightPosition = payload.curve.getPoint(payload.fraction);
+                    payload.light.position.copy(lightPosition);
+
                     let newPostion = payload.curve.getPoint(payload.fraction-0.02);
                     let tangent = payload.curve.getTangent(payload.fraction-0.02);
                     let radians = this.up.angleTo(this.target);
@@ -297,6 +309,7 @@ export class ThreeAnimation {
                     return payload;
                 } else{
                     this.scene.remove(payloadModel);
+                    payload.light.position.set(0,0,0);
                     f = true;
                     return null;
                 }
