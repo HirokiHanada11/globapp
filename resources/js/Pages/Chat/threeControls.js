@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import {CountriesShort} from "./countries.js";
 
+//class for setting up three js 
 export class ThreeSetup {
     constructor(width, height, canvas) {
         this.width = width;
@@ -29,7 +30,9 @@ export class ThreeSetup {
     }
 }
 
+//class for creating and adding Object3D to scene
 export class ThreeGeometries {
+    //static function to create plane with world map texture (Not used currently)
     static createPlane(scene){
         const loader = new THREE.TextureLoader();
         const planeGroup = new THREE.Group();
@@ -72,6 +75,7 @@ export class ThreeGeometries {
 
         scene.add(planeGroup);
     }
+    //static function to create a sphere with world map texture wrapped. (Used over createPlane)
     static createGlobe(scene){
         const sphereGroup = new THREE.Group();
         sphereGroup.name = "Sphere";
@@ -91,7 +95,6 @@ export class ThreeGeometries {
 
         let landSphere = new THREE.Mesh( landGeometry, landMaterial );
         landSphere.name = "Land";
-        // landSphere.rotateY(0.937032369);
         sphereGroup.add(landSphere);
 
         const waterGeometry = new THREE.SphereBufferGeometry(20.5, 32, 32);
@@ -113,6 +116,7 @@ export class ThreeGeometries {
         scene.add(sphereGroup);
     }
 
+    //static function to create background particles to represent stars
     static createParticles(scene){
         const particleGeometry = new THREE.BufferGeometry;
         const particleCount = 5000;
@@ -133,6 +137,7 @@ export class ThreeGeometries {
         scene.add(particles);
     }
 
+    // static function to create light sources including sun light, ambient light, and point light for the message payload animation    
     static createPointLight(scene){
         const lightsGroup = new THREE.Group();
         lightsGroup.name = "Lights";
@@ -154,6 +159,7 @@ export class ThreeGeometries {
         }
     }
 
+    //static function to create user model when user joins the room, the model generated is a placeholder at the moment, planning to develop more complex models in the future
     static createUserModel = (scene, user) =>{
         const coords = getCoords(user.region);
         const userModel = new THREE.Group;
@@ -178,26 +184,18 @@ export class ThreeGeometries {
         scene.children[0].add(userModel);
     }
 
+    //static function to create message payload object and its path for message sent animation. 
+    //returns a curve that reprsents the path of the payload that it travels on
     static createMessagePayload = (scene, message) =>{
         const userModel = scene.getObjectByName('Sphere').getObjectByName(message.user.id);
         const position = new THREE.Vector3();
         position.setFromMatrixPosition(userModel.matrixWorld);
 
-        // const geometry = new THREE.SphereBufferGeometry( 0.2, 8, 8 );
-        // const material = new THREE.MeshStandardMaterial( { color: new THREE.Color("#a7d8de"), } );
-        // const lathe = new THREE.Mesh( geometry, material );
-        // lathe.name = "Lathe";
-        
-
         const tarilGeometry = new THREE.CylinderBufferGeometry(0.2,0.7, 1, 8, 8, false);
-        // const trailMaterial = new THREE.MeshStandardMaterial( { color: new THREE.Color("#85b0bd"), emissiveIntensity: 0.5} );
-        // const trail = new THREE.Mesh( tarilGeometry, trailMaterial );
         const trailMaterial = new THREE.PointsMaterial({size:0.0005}) 
         const trail = new THREE.Points(tarilGeometry, trailMaterial);
 
         const tarilGeometry2 = new THREE.CylinderBufferGeometry(0.4,0.1, 3.5, 8, 8, false);
-        // const trailMaterial2 = new THREE.MeshStandardMaterial( { color: new THREE.Color("#85b0bd") } );
-        // const trail2 = new THREE.Mesh( tarilGeometry2, trailMaterial2 );
         const trailMaterial2 = new THREE.PointsMaterial({size:0.0005}) 
         const trail2 = new THREE.Points(tarilGeometry2, trailMaterial2);
         trail2.position.y = -2;
@@ -209,7 +207,7 @@ export class ThreeGeometries {
         trailGroup.position.set(position.x, position.y, position.z);
         scene.add(trailGroup);
 
-        const target = new THREE.Vector3(50,0,0);
+        const target = new THREE.Vector3(80,0,0);
         let p1 = new THREE.Vector3();
         let p2 = new THREE.Vector3();
         let px = new THREE.Vector3();
@@ -236,6 +234,7 @@ export class ThreeGeometries {
 
 }
 
+//global function to retrieve coodinates of a country by their name
 const getCoords = (region) => {
     const coords = CountriesShort[region];
     console.log(region);
@@ -246,9 +245,10 @@ const getCoords = (region) => {
     }
 }
 
+//class to instantiate animation
 export class ThreeAnimation {
     constructor(scene, renderer, camera, controls){
-        this.movement = {
+        this.movement = { //setting trusy values here will trigger corresponding animations 
             camera: false,
             user: [],
             water: true,
@@ -265,29 +265,28 @@ export class ThreeAnimation {
     }
     tick = () => {
         const elapsedTime = this.clock.getElapsedTime();
-        if (this.movement.camera){
-            this.camera.position.x = 4 * Math.cos(elapsedTime * 0.1);
-            this.camera.position.y = 2 * Math.sin(elapsedTime * 0.1) - 20; 
-            this.camera.lookAt(0,0,0);
-        }
-        if (this.movement.water){
-            this.scene.children[0].children[1].material.normalScale.set( Math.sin(elapsedTime*0.3), Math.cos(elapsedTime*0.3));
-        }
         this.scene.children[0].rotation.y = 0.3 * elapsedTime;
         this.scene.children[2].rotation.y = -0.005 * elapsedTime;
         this.scene.children[2].rotation.x = -0.005 * elapsedTime;
 
         this.controls.update();
 
-        if(this.movement.user.length > 0){
-            let userModel = this.scene.children[0].getObjectByName(this.movement.user[0]);
-            // console.log(userModel.matrixWorld)
-            let position = new THREE.Vector3();
-            position.setFromMatrixPosition(userModel.matrixWorld);
-            //console.log(position);
+        if (this.movement.camera){ //camera movement 
+            this.camera.position.x = 4 * Math.cos(elapsedTime * 0.1);
+            this.camera.position.y = 2 * Math.sin(elapsedTime * 0.1) - 20; 
+            this.camera.lookAt(0,0,0);
+        }
+        if (this.movement.water){ //wave animation
+            this.scene.children[0].children[1].material.normalScale.set( Math.sin(elapsedTime*0.3), Math.cos(elapsedTime*0.3));
         }
 
-        if(this.movement.payloads.length > 0){
+        if(this.movement.user.length > 0){ //user animation, currenty unset
+            let userModel = this.scene.children[0].getObjectByName(this.movement.user[0]);
+            let position = new THREE.Vector3();
+            position.setFromMatrixPosition(userModel.matrixWorld);
+        }
+
+        if(this.movement.payloads.length > 0){ //message sent animation
             let f = false;
             this.movement.payloads.map((payload, index) => {
                 let payloadModel = new THREE.Object3D();
