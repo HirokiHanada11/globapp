@@ -1,5 +1,5 @@
 <template>
-    <div class="h-1/4 p-2 flex flex-row overflow-y-hidden overflow-x-scroll no-scrollbar" >
+    <div class="h-1/2 p-2 flex flex-col overflow-y-scroll no-scrollbar" >
         <div v-for="(newsArticle, index) in news" :key="index" class="h-full">
             <article-item :newsArticle="newsArticle" />
         </div>

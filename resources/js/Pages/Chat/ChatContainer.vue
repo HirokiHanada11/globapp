@@ -4,10 +4,10 @@
             <img :src="currentRoom.photo" class="grid-col-1 h-12 w-12 mx-4 float-left" style="border-radius: 50%"/>
             <h2 class="font-semibold text-xl text-gray-800 leading-tight p-3">
                 <b>{{currentRoom.name}}</b> -- {{currentRoom.description}} 
-            <button v-if='!show' @click="showActiveUsers" class="float-right place-self-end bg-blue-500 hover:bg-gray-500 py-1 px-2 mt-1 rounded text-white text-sm">
+            <button v-if='!showActive' @click="toggleShowActive" class="float-right place-self-end bg-blue-500 hover:bg-gray-500 py-1 px-2 mt-1 rounded text-white text-sm">
                 Show Active Users
             </button>
-            <button v-if='show' @click="hideActiveUsers" class="float-right place-self-end bg-blue-500 hover:bg-gray-500 py-1 px-2 mt-1 rounded text-white text-sm">
+            <button v-if='showActive' @click="toggleShowActive" class="float-right place-self-end bg-blue-500 hover:bg-gray-500 py-1 px-2 mt-1 rounded text-white text-sm">
                 Hide Active Users
             </button>
             <button
@@ -20,11 +20,11 @@
 
         <div class="py-12">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 relative" style="height:70vh">               
-                <news-container :news="news" />
                 <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg h-full w-full relative">
                     <div class="h-full w-1/4 absolute top-0 right-0">
-                        <active-users-container v-show="show" :activeUsers="activeUsers"/>
+                        <active-users-container v-show="showActive" :activeUsers="activeUsers"/>
                         <message-container :messages="messages" />
+                        <news-container :v-if="showNews" :news="news" />
                     </div> 
                     <chat-three-container :messages="messages" :room="currentRoom" :activeUsers="activeUsers" />
                 </div>
@@ -60,9 +60,10 @@
                 currentRoom: [],
                 messages: [],
                 activeUsers: [],
-                show: false,
+                showActive: false,
                 sortBy: 'popularity',
                 news: [],
+                showNews: false,
             }
         },
         watch: {
@@ -73,6 +74,7 @@
         methods: {
             fetchNews() {
                 console.log(this.currentRoom.topic);
+                this.showNews = !this.showNews;
                 axios.get(`/chat/room/news/${this.currentRoom.topic}/${this.sortBy}`)
                 .then( response => {
                     console.log(response.data.articles);
@@ -137,12 +139,10 @@
                     console.error(error);
                 })
             },
-            showActiveUsers() {
-                this.show = true;
+            toggleShowActive() {
+                this.showActive = !this.showActive;
             },
-            hideActiveUsers() {
-                this.show = false;
-            },
+            
         },
         beforeUnmount() {
             this.disconnect(this.currentRoom);
