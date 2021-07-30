@@ -15,6 +15,8 @@ export class ThreeSetup {
             antialias: true,
         });
         this.controls = new OrbitControls(this.camera, this.canvas);
+        this.raycaster = new THREE.Raycaster();
+        this.mouse = new THREE.Vector2();
     }
     init = () => {
         this.camera.position.set(15, 0, 50);
@@ -240,6 +242,13 @@ export class ThreeGeometries {
         const material = new THREE.MeshBasicMaterial({color: new THREE.Color('#c70039')})
         articles.forEach((article, index) => {
             if(typeof soucresToCountry[article.source.name] !== 'undefined'){
+                // let material;
+                // if(article.urlToImage !== null){
+                //     let texture = loader.load(article.urlToImage);
+                //     material = new THREE.MeshStandardMaterial({texture: texture});
+                // }else{
+                //     material = new THREE.MeshBasicMaterial({color: new THREE.Color('#c70039')})
+                // }
                 let marker = new THREE.Mesh(circleGeometry, material);
                 marker.name = 'news' + index; 
                 sphereGroup.add(marker);
@@ -348,6 +357,14 @@ export class ThreeAnimation {
                 this.movement.payloads = this.movement.payloads.filter(payload => payload !== null);
                 f = false;
             }
+        }
+
+        if(this.movement.news.length > 0){
+            // console.log(this.camera.position)
+            this.movement.news.forEach((article, index) => {
+                let marker = this.scene.getObjectByName('Sphere').getObjectByName('news' + index);
+                marker.lookAt(this.camera.position);
+            })
         }
 
         this.renderer.render(this.scene, this.camera);

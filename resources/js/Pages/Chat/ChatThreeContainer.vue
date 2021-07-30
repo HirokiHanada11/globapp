@@ -86,6 +86,7 @@ export default {
         },
         createNewsMarkers(articles){
             ThreeGeometries.createNewsMarkers(threeSetup.scene, articles);
+            threeAnimation.movement.news = articles;
         }
         
     },
