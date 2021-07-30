@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-import {nameToCoords, codeToCoords} from "./countries.js";
+import {nameToCoords, soucresToCountry} from "./countries.js";
 
 //class for setting up three js 
 export class ThreeSetup {
@@ -232,16 +232,46 @@ export class ThreeGeometries {
         return new THREE.CubicBezierCurve3(p0,p1,p2,p3);
     }
 
+    //static function to create news article markers
+    static createNewsMarkers(scene, articles){
+        const sphereGroup = scene.getObjectByName('Sphere');
+        const circleGeometry = new THREE.CircleBufferGeometry(0.5, 32);
+        // const loader = new THREE.TextureLoader();
+        const material = new THREE.MeshBasicMaterial({color: new THREE.Color('#c70039')})
+        articles.forEach((article, index) => {
+            if(typeof soucresToCountry[article.source.name] !== 'undefined'){
+                let marker = new THREE.Mesh(circleGeometry, material);
+                marker.name = 'news' + index; 
+                sphereGroup.add(marker);
+                let markerCoords = getCoordsFromSource(article.source);
+                marker.position.setFromSphericalCoords( 22, markerCoords.phi, markerCoords.theta );
+            }
+        })
+    } 
 }
 
 //global function to retrieve coodinates of a country by their name
 const getCoords = (region) => {
     const coords = nameToCoords[region];
-    console.log(region);
-    console.log(nameToCoords)
     return {
         phi: (90 - coords[0]) * Math.PI / 180,
         theta: (90 + coords[1]) * Math.PI / 180,
+    }
+}
+
+const getCoordsFromSource = (source) => {
+    const coords = soucresToCountry[source.name];
+    const jittering = createJittering();
+    return {
+        phi: ((90 - coords.coords[0] + jittering.phiJit) * Math.PI / 180),
+        theta: ((90 + coords.coords[1] + jittering.thetaJit) * Math.PI / 180) ,
+    }
+}
+
+const createJittering = () => {
+    return {
+        phiJit: Math.floor(Math.random() * (5 + 5) - 5),
+        thetaJit: Math.floor(Math.random() * (5 + 5) - 5), 
     }
 }
 
@@ -253,6 +283,7 @@ export class ThreeAnimation {
             user: [],
             water: true,
             payloads: [],
+            news: [],
         };
         this.clock = new THREE.Clock();
         this.scene = scene;

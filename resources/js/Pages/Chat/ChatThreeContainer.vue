@@ -39,6 +39,12 @@ export default {
                 console.log('new message', newVal[0]);
                 this.createMessagePayload(newVal[0]);
             }
+        },
+        news(newVal, oldVal){
+            if(typeof newVal !== 'undefined'){
+                console.log('new fetched', newVal);
+                this.createNewsMarkers(newVal);
+            }
         }
     },
     methods: {
@@ -77,6 +83,9 @@ export default {
                 curve: payloadPath,
                 fraction: 0.03,
             });
+        },
+        createNewsMarkers(articles){
+            ThreeGeometries.createNewsMarkers(threeSetup.scene, articles);
         }
         
     },
