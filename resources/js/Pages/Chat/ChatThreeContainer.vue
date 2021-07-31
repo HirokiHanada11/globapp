@@ -7,7 +7,8 @@
 <script>
 import * as THREE from 'three';
 import { ThreeSetup, ThreeGeometries, ThreeAnimation, } from './threeControls';
-let threeSetup, threeAnimation;
+import { ThreeSetup2 } from './threeControls2';
+let threeSetup2, threeAnimation;
 
 export default {
     props: ['messages', 'room', 'activeUsers', 'news'],
@@ -53,18 +54,24 @@ export default {
             this.componentWidth = this.$refs.canvas.clientWidth;
         },
         initThree() {
-            threeSetup = new ThreeSetup( this.componentWidth, this.componentHeight, this.$refs.canvas );
-            threeSetup.init();
+            // threeSetup = new ThreeSetup( this.componentWidth, this.componentHeight, this.$refs.canvas );
+            // threeSetup.init();
+            threeSetup2 = new ThreeSetup2( this.componentWidth, this.componentHeight, this.$refs.canvas );
+            threeSetup2.init();
         },
 
         createPlane() {
-            ThreeGeometries.createGlobe(threeSetup.scene);
-            ThreeGeometries.createPointLight(threeSetup.scene);
-            ThreeGeometries.createParticles(threeSetup.scene);
+            // ThreeGeometries.createGlobe(threeSetup.scene);
+            // ThreeGeometries.createPointLight(threeSetup.scene);
+            // ThreeGeometries.createParticles(threeSetup.scene);
+            threeSetup2.createGlobe();
+            threeSetup2.createPointLight();
+            threeSetup2.createParticles();
         },
         animate() {
-            threeAnimation = new ThreeAnimation(threeSetup.scene,threeSetup.renderer, threeSetup.camera, threeSetup.controls);
-            threeAnimation.tick();
+            // threeAnimation = new ThreeAnimation(threeSetup.scene,threeSetup.renderer, threeSetup.camera, threeSetup.controls);
+            // threeAnimation.tick();
+            threeSetup2.tick()
         },
         renderThree() {
             this.calculateDimension();
@@ -73,20 +80,30 @@ export default {
             this.animate();
         },
         generateUserModel(user) {
-            ThreeGeometries.createUserModel(threeSetup.scene, user);
-            threeAnimation.movement.user.push(user.user.id);
+            // ThreeGeometries.createUserModel(threeSetup.scene, user);
+            // threeAnimation.movement.user.push(user.user.id);
+            threeSetup2.createUserModel(user);
+            // threeSetup2.movement.user.push(user.user.id);
         },
         createMessagePayload(message){
-            let payloadPath = ThreeGeometries.createMessagePayload(threeSetup.scene, message);
-            threeAnimation.movement.payloads.push({
+            // let payloadPath = ThreeGeometries.createMessagePayload(threeSetup.scene, message);
+            // threeAnimation.movement.payloads.push({
+            //     payloadId: message.id,
+            //     curve: payloadPath,
+            //     fraction: 0.03,
+            // });
+            let payloadPath = threeSetup2.createMessagePayload(message);
+            threeSetup2.movement.payloads.push({
                 payloadId: message.id,
                 curve: payloadPath,
                 fraction: 0.03,
             });
         },
         createNewsMarkers(articles){
-            ThreeGeometries.createNewsMarkers(threeSetup.scene, articles);
-            threeAnimation.movement.news = articles;
+            // ThreeGeometries.createNewsMarkers(threeSetup.scene, articles);
+            // threeAnimation.movement.news = articles;
+            threeSetup2.createNewsMarkers(articles);
+            threeSetup2.movement.news = articles;
         }
         
     },
