@@ -1,5 +1,7 @@
 <template>
-<div class=" w-full text-white rounded border-t border-gray-100 border-solid p-1 hover:bg-blue-100 hover:text-blue-700" >
+<div 
+    class=" w-full text-white rounded border-t border-gray-100 border-solid p-1 hover:bg-blue-100 hover:text-blue-700" 
+    :id="'news' + index">
     <a :href="newsArticle.url" target="_blank">
         <div class=" ">
             <div class="text-left">
@@ -18,6 +20,6 @@
 
 <script>
 export default {
-    props: ['newsArticle'],
+    props: ['newsArticle', 'index'],
 }
 </script>

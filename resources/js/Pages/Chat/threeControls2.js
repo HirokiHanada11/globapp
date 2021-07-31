@@ -14,7 +14,7 @@ export class ThreeSetup2 {
             alpha: false, 
             antialias: true,
         });
-        this.controls = new OrbitControls(this.camera, this.canvas);
+        // this.controls = new OrbitControls(this.camera, this.canvas);
         this.raycaster = new THREE.Raycaster();
         this.mouse = new THREE.Vector2();
         this.objectsInScene = [];
@@ -31,7 +31,7 @@ export class ThreeSetup2 {
         };
     }
     init = () => {
-        this.camera.position.set(15, 0, 50);
+        this.camera.position.set(0, 0, 50);
         this.camera.lookAt(15,0,0);
 
         this.renderer.setSize(this.width, this.height);
@@ -39,10 +39,40 @@ export class ThreeSetup2 {
         this.renderer.setClearColor(new THREE.Color('#1d2951'),1);
         this.canvas.appendChild(this.renderer.domElement);
 
-        this.controls.enableDamping = true;
-        this.controls.target.set(15,0,0);
+        // this.controls.enableDamping = true;
+        // this.controls.target.set(15,0,0);
 
-        // this.raycaster.setFromCamera( this.mouse, this.camera );
+        this.canvas.addEventListener('click', (event) => this.meshClicked(event));
+        this.canvas.addEventListener('mousemove', (event) => this.mouseMove(event))
+    }
+
+    meshClicked = (event) => {
+        let rect = this.canvas.getBoundingClientRect();
+        this.mouse.x = ( (event.clientX - rect.left) / this.width ) * 2 - 1;
+        this.mouse.y = - ( (event.clientY - rect.top) / this.height ) * 2 + 1;
+        let raycasterClick = new THREE.Raycaster();
+        raycasterClick.setFromCamera(this.mouse, this.camera);
+        let intersects = raycasterClick.intersectObjects(this.scene.getObjectByName('Sphere').getObjectByName('Markers').children, true);
+        if (intersects.length > 0){
+            console.log(intersects)
+            let topPos = document.getElementById(intersects[0].object.name).offsetTop;
+            console.log(topPos)
+            document.getElementById("articles").scrollTop = topPos;
+            console.log(document.getElementById("articles").scrollTop)
+        }
+    }
+
+    mouseMove = (event) => {
+        let rect = this.canvas.getBoundingClientRect();
+        this.mouse.x = ( (event.clientX - rect.left) / this.width ) * 2 - 1;
+        this.mouse.y = - ( (event.clientY - rect.top) / this.height ) * 2 + 1;
+        this.raycaster.setFromCamera(this.mouse, this.camera);
+        let intersects = this.raycaster.intersectObjects(this.scene.getObjectByName('Sphere').getObjectByName('Markers').children, true);
+        if(intersects.length > 0){
+            this.canvas.classList.add('cursor-pointer');
+        }else if(this.canvas.classList.contains('cursor-pointer')){
+            this.canvas.classList.remove('cursor-pointer');
+        }
     }
     
     //static function to create a sphere with world map texture wrapped. (Used over createPlane)
@@ -82,6 +112,10 @@ export class ThreeSetup2 {
         let waterSphere = new THREE.Mesh( waterGeometry, waterMaterial );
         waterSphere.name = "Water";
         sphereGroup.add(waterSphere);
+
+        const markerGroup = new THREE.Group();
+        markerGroup.name = 'Markers';
+        sphereGroup.add(markerGroup);
 
         this.scene.add(sphereGroup);
         // this.objectsInScene.push(sphereGroup);
@@ -205,7 +239,8 @@ export class ThreeSetup2 {
 
     //static function to create news article markers
     createNewsMarkers = (articles) => {
-        const sphereGroup = this.scene.getObjectByName('Sphere');
+        const markerGroup = this.scene.getObjectByName('Sphere').getObjectByName('Markers');
+        
         const circleGeometry = new THREE.CircleBufferGeometry(0.5, 32);
         // const loader = new THREE.TextureLoader();
         const material = new THREE.MeshBasicMaterial({color: new THREE.Color('#c70039')})
@@ -220,11 +255,11 @@ export class ThreeSetup2 {
                 // }
                 let marker = new THREE.Mesh(circleGeometry, material);
                 marker.name = 'news' + index; 
-                sphereGroup.add(marker);
-                let markerCoords = getCoordsFromSource(article.source);
+                markerGroup.add(marker);
+                let markerCoords = this.getCoordsFromSource(article.source);
                 marker.position.setFromSphericalCoords( 22, markerCoords.phi, markerCoords.theta );
             }
-        })
+        });
     } 
 
     //global function to retrieve coodinates of a country by their name
@@ -259,7 +294,7 @@ export class ThreeSetup2 {
         this.scene.children[2].rotation.y = -0.005 * elapsedTime;
         this.scene.children[2].rotation.x = -0.005 * elapsedTime;
 
-        this.controls.update();
+        // this.controls.update();
 
         if (this.movement.camera){ //camera movement 
             this.camera.position.x = 4 * Math.cos(elapsedTime * 0.1);
