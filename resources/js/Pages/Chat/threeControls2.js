@@ -3,7 +3,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import {nameToCoords, soucresToCountry} from "./countries.js";
 
 //class for setting up three js 
-export class ThreeSetup {
+export class ThreeSetup2 {
     constructor(width, height, canvas) {
         this.width = width;
         this.height = height;
@@ -14,12 +14,24 @@ export class ThreeSetup {
             alpha: false, 
             antialias: true,
         });
-        this.controls = new OrbitControls(this.camera, this.canvas);
+        // this.controls = new OrbitControls(this.camera, this.canvas);
         this.raycaster = new THREE.Raycaster();
         this.mouse = new THREE.Vector2();
+        this.objectsInScene = [];
+        this.clock = new THREE.Clock();
+        this.axis = new THREE.Vector3();
+        this.up = new THREE.Vector3(0,1,0);
+        this.target = new THREE.Vector3(50,0,0);
+        this.movement = { //setting trusy values here will trigger corresponding animations 
+            camera: false,
+            user: [],
+            water: true,
+            payloads: [],
+            news: [],
+        };
     }
     init = () => {
-        this.camera.position.set(15, 0, 50);
+        this.camera.position.set(0, 0, 50);
         this.camera.lookAt(15,0,0);
 
         this.renderer.setSize(this.width, this.height);
@@ -27,60 +39,44 @@ export class ThreeSetup {
         this.renderer.setClearColor(new THREE.Color('#1d2951'),1);
         this.canvas.appendChild(this.renderer.domElement);
 
-        this.controls.enableDamping = true;
-        this.controls.target.set(15,0,0);
+        // this.controls.enableDamping = true;
+        // this.controls.target.set(15,0,0);
 
-        // this.raycaster.setFromCamera( this.mouse, this.camera );
+        this.canvas.addEventListener('click', (event) => this.meshClicked(event));
+        this.canvas.addEventListener('mousemove', (event) => this.mouseMove(event))
     }
-}
 
-//class for creating and adding Object3D to scene
-export class ThreeGeometries {
-    //static function to create plane with world map texture (Not used currently)
-    static createPlane(scene){
-        const loader = new THREE.TextureLoader();
-        const planeGroup = new THREE.Group();
-        planeGroup.name = "Plane";
+    meshClicked = (event) => {
+        let rect = this.canvas.getBoundingClientRect();
+        this.mouse.x = ( (event.clientX - rect.left) / this.width ) * 2 - 1;
+        this.mouse.y = - ( (event.clientY - rect.top) / this.height ) * 2 + 1;
+        let raycasterClick = new THREE.Raycaster();
+        raycasterClick.setFromCamera(this.mouse, this.camera);
+        let intersects = raycasterClick.intersectObjects(this.scene.getObjectByName('Sphere').getObjectByName('Markers').children, true);
+        if (intersects.length > 0){
+            console.log(intersects)
+            let topPos = document.getElementById(intersects[0].object.name).offsetTop;
+            console.log(topPos)
+            document.getElementById("articles").scrollTop = topPos;
+            console.log(document.getElementById("articles").scrollTop)
+        }
+    }
 
-        let height = loader.load('/textures/monochrome-height.jpg');
-        let texture = loader.load('/textures/monochrome-height.jpg'); 
+    mouseMove = (event) => {
+        let rect = this.canvas.getBoundingClientRect();
+        this.mouse.x = ( (event.clientX - rect.left) / this.width ) * 2 - 1;
+        this.mouse.y = - ( (event.clientY - rect.top) / this.height ) * 2 + 1;
+        this.raycaster.setFromCamera(this.mouse, this.camera);
+        let intersects = this.raycaster.intersectObjects(this.scene.getObjectByName('Sphere').getObjectByName('Markers').children, true);
+        if(intersects.length > 0){
+            this.canvas.classList.add('cursor-pointer');
+        }else if(this.canvas.classList.contains('cursor-pointer')){
+            this.canvas.classList.remove('cursor-pointer');
+        }
+    }
     
-        const landGeometry = new THREE.PlaneBufferGeometry( 100, 50, 1012, 1012 );
-        let landMaterial = new THREE.MeshStandardMaterial( {
-            map: texture,
-            displacementMap: height,
-            displacementScale: 1.5,
-        } );
-        let landPlane = new THREE.Mesh( landGeometry, landMaterial );
-        landPlane.name = "Land";
-        planeGroup.add( landPlane );
-
-        const waterGeometry = new THREE.PlaneBufferGeometry( 150, 75, 16, 16);
-
-       
-        let waterMap = loader.load('/textures/water-normal-map.jpg');
-        
-        waterMap.wrapS = THREE.RepeatWrapping;
-        waterMap.wrapT = THREE.RepeatWrapping;
-        waterMap.repeat.set(4,2);
-
-        let waterMaterial = new THREE.MeshStandardMaterial({
-            color: new THREE.Color('skyblue'),
-            normalMap: waterMap
-        })
-
-        let waterPlane = new THREE.Mesh( waterGeometry, waterMaterial );
-        waterPlane.position.z=0.5;
-        waterPlane.name = "Water";
-        planeGroup.add(waterPlane);
-        const gridHelper = new THREE.GridHelper( 100, 10 );
-        gridHelper.rotateX(Math.PI / 2);
-        planeGroup.add(gridHelper);
-
-        scene.add(planeGroup);
-    }
     //static function to create a sphere with world map texture wrapped. (Used over createPlane)
-    static createGlobe(scene){
+    createGlobe = () => {
         const sphereGroup = new THREE.Group();
         sphereGroup.name = "Sphere";
 
@@ -117,11 +113,16 @@ export class ThreeGeometries {
         waterSphere.name = "Water";
         sphereGroup.add(waterSphere);
 
-        scene.add(sphereGroup);
+        const markerGroup = new THREE.Group();
+        markerGroup.name = 'Markers';
+        sphereGroup.add(markerGroup);
+
+        this.scene.add(sphereGroup);
+        // this.objectsInScene.push(sphereGroup);
     }
 
     //static function to create background particles to represent stars
-    static createParticles(scene){
+    createParticles(){
         const particleGeometry = new THREE.BufferGeometry;
         const particleCount = 5000;
 
@@ -138,11 +139,11 @@ export class ThreeGeometries {
         })
         const particles = new THREE.Points(particleGeometry, material);
         particles.name = "Stars";
-        scene.add(particles);
+        this.scene.add(particles);
     }
 
     // static function to create light sources including sun light, ambient light, and point light for the message payload animation    
-    static createPointLight(scene){
+    createPointLight = () => {
         const lightsGroup = new THREE.Group();
         lightsGroup.name = "Lights";
 
@@ -154,18 +155,18 @@ export class ThreeGeometries {
         sunLight.target.position.set(0,0,0);
         lightsGroup.add(sunLight, sunLight.target);
 
-        scene.add(lightsGroup);
+        this.scene.add(lightsGroup);
 
         for (let i = 0; i < 3; i++){
             let pointLight = new THREE.PointLight(new THREE.Color("#a7d8de"),0.5);
             pointLight.name = `light${i}`;
-            scene.add(pointLight);
+            this.scene.add(pointLight);
         }
     }
 
     //static function to create user model when user joins the room, the model generated is a placeholder at the moment, planning to develop more complex models in the future
-    static createUserModel = (scene, user) =>{
-        const coords = getCoords(user.region);
+    createUserModel = (user) =>{
+        const coords = this.getCoords(user.region);
         const userModel = new THREE.Group;
         userModel.name = user.user.id;
 
@@ -185,13 +186,13 @@ export class ThreeGeometries {
         userModel.position.setFromSphericalCoords(20, coords.phi, coords.theta);
         userModel.lookAt(0,0,0);
 
-        scene.children[0].add(userModel);
-    }
+        this.scene.children[0].add(userModel);
+    } 
 
     //static function to create message payload object and its path for message sent animation. 
     //returns a curve that reprsents the path of the payload that it travels on
-    static createMessagePayload = (scene, message) =>{
-        const userModel = scene.getObjectByName('Sphere').getObjectByName(message.user.id);
+    createMessagePayload = (message) =>{
+        const userModel = this.scene.getObjectByName('Sphere').getObjectByName(message.user.id);
         const position = new THREE.Vector3();
         position.setFromMatrixPosition(userModel.matrixWorld);
 
@@ -209,7 +210,7 @@ export class ThreeGeometries {
         trailGroup.add(trail);
         trailGroup.add(trail2);
         trailGroup.position.set(position.x, position.y, position.z);
-        scene.add(trailGroup);
+        this.scene.add(trailGroup);
 
         const target = new THREE.Vector3(80,0,0);
         let p1 = new THREE.Vector3();
@@ -232,13 +233,14 @@ export class ThreeGeometries {
             p1.copy(px).multiplyScalar(30*(angle / (Math.PI/2))).add(p.copy(py).multiplyScalar(5));
             p2.copy(px).multiplyScalar(30*(angle / (Math.PI/2))).add(p.copy(py).multiplyScalar(30));
         }
-        console.log(p0,p1,p2,p3)
+        // console.log(p0,p1,p2,p3)
         return new THREE.CubicBezierCurve3(p0,p1,p2,p3);
     }
 
     //static function to create news article markers
-    static createNewsMarkers(scene, articles){
-        const sphereGroup = scene.getObjectByName('Sphere');
+    createNewsMarkers = (articles) => {
+        const markerGroup = this.scene.getObjectByName('Sphere').getObjectByName('Markers');
+        
         const circleGeometry = new THREE.CircleBufferGeometry(0.5, 32);
         // const loader = new THREE.TextureLoader();
         const material = new THREE.MeshBasicMaterial({color: new THREE.Color('#c70039')})
@@ -253,65 +255,46 @@ export class ThreeGeometries {
                 // }
                 let marker = new THREE.Mesh(circleGeometry, material);
                 marker.name = 'news' + index; 
-                sphereGroup.add(marker);
-                let markerCoords = getCoordsFromSource(article.source);
+                markerGroup.add(marker);
+                let markerCoords = this.getCoordsFromSource(article.source);
                 marker.position.setFromSphericalCoords( 22, markerCoords.phi, markerCoords.theta );
             }
-        })
+        });
     } 
-}
 
-//global function to retrieve coodinates of a country by their name
-const getCoords = (region) => {
-    const coords = nameToCoords[region];
-    return {
-        phi: (90 - coords[0]) * Math.PI / 180,
-        theta: (90 + coords[1]) * Math.PI / 180,
+    //global function to retrieve coodinates of a country by their name
+    getCoords = (region) => {
+        const coords = nameToCoords[region];
+        const jittering = this.createJittering();
+        return {
+            phi: (90 - coords[0] + jittering.phiJit) * Math.PI / 180,
+            theta: (90 + coords[1] + jittering.thetaJit) * Math.PI / 180,
+        }
     }
-}
 
-const getCoordsFromSource = (source) => {
-    const coords = soucresToCountry[source.name];
-    const jittering = createJittering();
-    return {
-        phi: ((90 - coords.coords[0] + jittering.phiJit) * Math.PI / 180),
-        theta: ((90 + coords.coords[1] + jittering.thetaJit) * Math.PI / 180) ,
+    getCoordsFromSource = (source) => {
+        const coords = soucresToCountry[source.name];
+        const jittering = this.createJittering();
+        return {
+            phi: ((90 - coords.coords[0] + jittering.phiJit) * Math.PI / 180),
+            theta: ((90 + coords.coords[1] + jittering.thetaJit) * Math.PI / 180) ,
+        }
     }
-}
+    
+    createJittering = () => {
+        return {
+            phiJit: Math.floor(Math.random() * (5 + 5) - 5),
+            thetaJit: Math.floor(Math.random() * (5 + 5) - 5), 
+        }
+    }
 
-const createJittering = () => {
-    return {
-        phiJit: Math.floor(Math.random() * (5 + 5) - 5),
-        thetaJit: Math.floor(Math.random() * (5 + 5) - 5), 
-    }
-}
-
-//class to instantiate animation
-export class ThreeAnimation {
-    constructor(scene, renderer, camera, controls){
-        this.movement = { //setting trusy values here will trigger corresponding animations 
-            camera: false,
-            user: [],
-            water: true,
-            payloads: [],
-            news: [],
-        };
-        this.clock = new THREE.Clock();
-        this.scene = scene;
-        this.renderer = renderer;
-        this.camera = camera;
-        this.controls = controls;
-        this.axis = new THREE.Vector3();
-        this.up = new THREE.Vector3(0,1,0);
-        this.target = new THREE.Vector3(50,0,0);
-    }
     tick = () => {
         const elapsedTime = this.clock.getElapsedTime();
         this.scene.children[0].rotation.y = 0.3 * elapsedTime;
         this.scene.children[2].rotation.y = -0.005 * elapsedTime;
         this.scene.children[2].rotation.x = -0.005 * elapsedTime;
 
-        this.controls.update();
+        // this.controls.update();
 
         if (this.movement.camera){ //camera movement 
             this.camera.position.x = 4 * Math.cos(elapsedTime * 0.1);
@@ -372,59 +355,5 @@ export class ThreeAnimation {
         this.renderer.render(this.scene, this.camera);
         window.requestAnimationFrame(this.tick);
     }
-
 }
 
-//set in polar coords
-//center = 90, -90 
-//in map: 90 - real lat, 90 + real long 
-export const WorldRegionsCoors = {
-    'Asia': {
-        maxLat: 75,
-        minLat: 30,
-        maxLon: 240,
-        minLon: 150
-    },
-    'Oceania': {
-        maxLat: 90,
-        minLat: 135,
-        maxLon: -120,
-        minLon: -150
-    }, 
-    'North America': {
-        maxLat: 75,
-        minLat: 20,
-        maxLon: 30,
-        minLon: -30
-    }, 
-    'South America': {
-        maxLat: 135,
-        minLat: 90,
-        maxLon: 60,
-        minLon: 15
-    }, 
-    'Europe': {
-        maxLat: 60,
-        minLat: 20,
-        maxLon: 150,
-        minLon: 75
-    }, 
-    'Africa (North)': {
-        maxLat: 75,
-        minLat: 60,
-        maxLon: 120,
-        minLon: 75
-    }, 
-    'Africa (South)': {
-        maxLat: 120,
-        minLat: 75,
-        maxLon: 135,
-        minLon: 75
-    }, 
-    'Middle East': {
-        maxLat: 75,
-        minLat: 45,
-        maxLon: 150,
-        minLon: 120
-    }
-}
