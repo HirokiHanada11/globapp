@@ -30,7 +30,7 @@ export class ThreeSetup2 {
             news: [],
             sphereControl: false,
             sphereControlOrigin: new THREE.Vector2(),
-            sphereRotation: new THREE.Vector2(0, 0),
+            sphereRotation: new THREE.Vector2(0.1, 0),
         };
     }
     init = () => {
@@ -169,7 +169,7 @@ export class ThreeSetup2 {
 
         this.scene.add(lightsGroup);
 
-        for (let i = 0; i < 3; i++){
+        for (let i = 0; i < 10; i++){
             let pointLight = new THREE.PointLight(new THREE.Color("#a7d8de"),0.5);
             pointLight.name = `light${i}`;
             this.scene.add(pointLight);
@@ -209,7 +209,7 @@ export class ThreeSetup2 {
     //static function to create message payload object and its path for message sent animation. 
     //returns a curve that reprsents the path of the payload that it travels on
     createMessagePayload = (message) =>{
-        const userModel = this.scene.getObjectByName('Sphere').getObjectByName(message.user.id);
+        const userModel = this.scene.getObjectByName('Sphere').getObjectByName(message.user.name);
         const position = new THREE.Vector3();
         position.setFromMatrixPosition(userModel.matrixWorld);
 
@@ -361,7 +361,8 @@ export class ThreeSetup2 {
                 }
             });
             if(f){
-                this.movement.payloads = this.movement.payloads.filter(payload => payload !== null);
+                this.movement.payloads = this.movement.payloads.filter(payload => payload.fraction < 1);
+                console.log(this.movement.payloads)
                 f = false;
             }
         }
