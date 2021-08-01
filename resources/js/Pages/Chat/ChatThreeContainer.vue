@@ -30,7 +30,7 @@ export default {
             let filtered = newVal.filter(user => !(oldVal.includes(user)));
             console.log('filtered array',filtered)
             filtered.forEach((user)=>{
-                this.generateUserModel(user);
+                this.generateUserModel(user, this.$page.props.user.name);
             })
             
             // console.log(threeSetup.scene.getObjectByName('Sphere').getObjectByName(1));
@@ -79,10 +79,10 @@ export default {
             this.createPlane();
             this.animate();
         },
-        generateUserModel(user) {
+        generateUserModel(user, sessionUser) {
             // ThreeGeometries.createUserModel(threeSetup.scene, user);
             // threeAnimation.movement.user.push(user.user.id);
-            threeSetup2.createUserModel(user);
+            threeSetup2.createUserModel(user, sessionUser);
             // threeSetup2.movement.user.push(user.user.id);
         },
         createMessagePayload(message){
@@ -103,7 +103,6 @@ export default {
             // ThreeGeometries.createNewsMarkers(threeSetup.scene, articles);
             // threeAnimation.movement.news = articles;
             threeSetup2.createNewsMarkers(articles);
-            threeSetup2.movement.news = articles;
         }
         
     },

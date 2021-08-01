@@ -28,6 +28,9 @@ export class ThreeSetup2 {
             water: true,
             payloads: [],
             news: [],
+            sphereControl: false,
+            sphereControlOrigin: new THREE.Vector2(),
+            sphereRotation: new THREE.Vector2(0, 0),
         };
     }
     init = () => {
@@ -59,6 +62,13 @@ export class ThreeSetup2 {
             console.log(topPos)
             document.getElementById("articles").scrollTop = topPos;
             console.log(document.getElementById("articles").scrollTop)
+        }else {
+            this.movement.sphereControl = !this.movement.sphereControl;
+            this.movement.sphereControlOrigin.x = this.mouse.x;
+            this.movement.sphereControlOrigin.y = this.mouse.y;
+            if(!this.movement.sphereControl){
+                this.movement.sphereRotation.set(0,0);
+            }
         }
     }
 
@@ -72,6 +82,8 @@ export class ThreeSetup2 {
             this.canvas.classList.add('cursor-pointer');
         }else if(this.canvas.classList.contains('cursor-pointer')){
             this.canvas.classList.remove('cursor-pointer');
+        }else if(this.movement.sphereControl){
+            this.movement.sphereRotation.copy(this.mouse.addScaledVector(this.movement.sphereControlOrigin, -1));
         }
     }
     
@@ -165,16 +177,21 @@ export class ThreeSetup2 {
     }
 
     //static function to create user model when user joins the room, the model generated is a placeholder at the moment, planning to develop more complex models in the future
-    createUserModel = (user) =>{
+    createUserModel = (user, sessionUser) =>{
         const coords = this.getCoords(user.region);
         const userModel = new THREE.Group;
-        userModel.name = user.user.id;
+        userModel.name = user.user.name;
 
         let cylinderGeometry = new THREE.CylinderGeometry( 1.2, 0.2, 3, 32);
         let sphereGeometry = new THREE.SphereGeometry( 1, 32, 32 );
 
         let material = new THREE.MeshBasicMaterial();
-        material.color = new THREE.Color(0xff0000);
+        if(userModel.name === sessionUser){
+            material.color = new THREE.Color(0xff0000);
+        }else {
+            material.color = new THREE.Color("#808080");
+        }
+        
 
         const sphere = new THREE.Mesh(sphereGeometry,material);
         const cylinder = new THREE.Mesh(cylinderGeometry,material);
@@ -241,23 +258,21 @@ export class ThreeSetup2 {
     createNewsMarkers = (articles) => {
         const markerGroup = this.scene.getObjectByName('Sphere').getObjectByName('Markers');
         
-        const circleGeometry = new THREE.CircleBufferGeometry(0.5, 32);
-        // const loader = new THREE.TextureLoader();
-        const material = new THREE.MeshBasicMaterial({color: new THREE.Color('#c70039')})
+        const circleGeometry = new THREE.CircleBufferGeometry(0.75, 32);
+        const loader = new THREE.TextureLoader();
         articles.forEach((article, index) => {
             if(typeof soucresToCountry[article.source.name] !== 'undefined'){
-                // let material;
-                // if(article.urlToImage !== null){
-                //     let texture = loader.load(article.urlToImage);
-                //     material = new THREE.MeshStandardMaterial({texture: texture});
-                // }else{
-                //     material = new THREE.MeshBasicMaterial({color: new THREE.Color('#c70039')})
-                // }
+                let pngNum = index + 1;
+                let numberTexture = loader.load("/textures/numbers/number" + pngNum + ".png");
+                const material = new THREE.MeshStandardMaterial({
+                    map: numberTexture
+                });
                 let marker = new THREE.Mesh(circleGeometry, material);
                 marker.name = 'news' + index; 
                 markerGroup.add(marker);
                 let markerCoords = this.getCoordsFromSource(article.source);
                 marker.position.setFromSphericalCoords( 22, markerCoords.phi, markerCoords.theta );
+                this.movement.news.push(index);
             }
         });
     } 
@@ -283,14 +298,21 @@ export class ThreeSetup2 {
     
     createJittering = () => {
         return {
-            phiJit: Math.floor(Math.random() * (5 + 5) - 5),
-            thetaJit: Math.floor(Math.random() * (5 + 5) - 5), 
+            phiJit: Math.floor(Math.random() * (10 + 10) - 10),
+            thetaJit: Math.floor(Math.random() * (10 + 10) - 10), 
         }
     }
 
     tick = () => {
         const elapsedTime = this.clock.getElapsedTime();
-        this.scene.children[0].rotation.y = 0.3 * elapsedTime;
+        let sphere = this.scene.children[0]
+        sphere.rotation.y += this.movement.sphereRotation.x / 40;
+        sphere.rotation.x -= this.movement.sphereRotation.y / 60;
+        if(sphere.rotation.x > Math.PI / 4){
+            sphere.rotation.x = Math.PI / 4;
+        } else if(sphere.rotation.x < - Math.PI / 4){
+            sphere.rotation.x = - Math.PI / 4;
+        }
         this.scene.children[2].rotation.y = -0.005 * elapsedTime;
         this.scene.children[2].rotation.x = -0.005 * elapsedTime;
 
@@ -302,7 +324,7 @@ export class ThreeSetup2 {
             this.camera.lookAt(0,0,0);
         }
         if (this.movement.water){ //wave animation
-            this.scene.children[0].children[1].material.normalScale.set( Math.sin(elapsedTime*0.3), Math.cos(elapsedTime*0.3));
+            sphere.children[1].material.normalScale.set( Math.sin(elapsedTime*0.3), Math.cos(elapsedTime*0.3));
         }
 
         if(this.movement.user.length > 0){ //user animation, currenty unset
@@ -346,8 +368,8 @@ export class ThreeSetup2 {
 
         if(this.movement.news.length > 0){
             // console.log(this.camera.position)
-            this.movement.news.forEach((article, index) => {
-                let marker = this.scene.getObjectByName('Sphere').getObjectByName('news' + index);
+            this.movement.news.forEach((index) => {
+                let marker = this.scene.getObjectByName('Sphere').getObjectByName('Markers').getObjectByName('news' + index);
                 marker.lookAt(this.camera.position);
             })
         }
