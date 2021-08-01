@@ -5,9 +5,9 @@
         </span>
     </div>
     <div v-else>
-        <span>
+        <div class="text-sm py-1 mx-4 text-white">
             {{ message.user.name }}
-        </span>
+        </div>
         <span class="bg-gray-300 w-3/4 mx-4 my-4 px-2 py-1 rounded-lg">
             {{ message.message }}
         </span>

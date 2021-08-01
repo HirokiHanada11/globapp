@@ -4,16 +4,16 @@
             <img :src="currentRoom.photo" class="grid-col-1 h-12 w-12 mx-4 float-left" style="border-radius: 50%"/>
             <h2 class="font-semibold text-xl text-gray-800 leading-tight p-3">
                 <b>{{currentRoom.name}}</b> -- {{currentRoom.description}} 
-            <button v-if='!showActive' @click="toggleShowActive" class="float-right place-self-end bg-blue-500 hover:bg-gray-500 py-1 px-2 mt-1 rounded text-white text-sm">
+            <button v-if='!showActive' @click="toggleShowActive" class="float-right place-self-end bg-blue-500 hover:bg-gray-500 py-1 px-2 mt-1  rounded text-white text-sm">
                 Show Active Users
             </button>
             <button v-if='showActive' @click="toggleShowActive" class="float-right place-self-end bg-blue-500 hover:bg-gray-500 py-1 px-2 mt-1 rounded text-white text-sm">
                 Hide Active Users
             </button>
             <button
-                @click="fetchNews()"
-                class="float-right place-self-end bg-blue-500 hover:bg-gray-500 py-1 px-2 mt-1 rounded text-white text-sm">
-                Fetch News
+                @click="fetchNews(currentRoom.topic)"
+                class="float-right place-self-end bg-blue-500 hover:bg-gray-500 py-1 px-2 mt-1 rounded text-white text-sm mr-1">
+                Fetch News On Room Topic
             </button>
             </h2>
         </template>
@@ -25,6 +25,15 @@
                         <active-users-container v-show="showActive" :activeUsers="activeUsers"/>
                         <message-container :messages="messages" />
                         <news-container :v-if="showNews" :news="news" />
+                    </div> 
+                    <div class="bg-transparent absolute top-0 w-full flex justify-center ">
+                        <input 
+                            type="text"
+                            v-model="topic"
+                            @keyup.enter="fetchNews(topic)"
+                            placeholder="Search News by keyword"
+                            class="bg-blue-900 border border-transparent focus:outline-none focus:border-none rounded-full text-white"
+                        />
                     </div> 
                     <chat-three-container :messages="messages" :room="currentRoom" :activeUsers="activeUsers" :news="news" />
                 </div>
@@ -64,6 +73,7 @@
                 sortBy: 'popularity',
                 news: [],
                 showNews: false,
+                topic: '',
             }
         },
         watch: {
@@ -72,17 +82,19 @@
             }
         },
         methods: {
-            fetchNews() {
-                console.log(this.currentRoom.topic);
+            fetchNews(topic) {
                 this.showNews = !this.showNews;
-                axios.get(`/chat/room/news/${this.currentRoom.topic}`)
-                .then( response => {
-                    console.log(response.data.articles);
-                    this.news = response.data.articles;
-                })
-                .catch( error => {
-                    console.error(error);
-                })
+                if(topic != ''){
+                    axios.get(`/chat/room/news/${encodeURI(topic)}`)
+                    .then( response => {
+                        console.log(response.data.articles);
+                        this.news = response.data.articles;
+                        this.topic = '';
+                    })
+                    .catch( error => {
+                        console.error(error);
+                    })
+                }
             },
             getCurrentRoom(){
                 axios.get(`/chat/room/${this.roomId}`)
