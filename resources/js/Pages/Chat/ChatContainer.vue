@@ -4,7 +4,7 @@
             <img :src="currentRoom.photo" class="grid-col-1 h-12 w-12 mx-4 float-left" style="border-radius: 50%"/>
             <h2 class="font-semibold text-xl text-gray-800 leading-tight p-3">
                 <b>{{currentRoom.name}}</b> -- {{currentRoom.description}} 
-            <button v-if='!showActive' @click="toggleShowActive" class="float-right place-self-end bg-blue-500 hover:bg-gray-500 py-1 px-2 mt-1 rounded text-white text-sm">
+            <button v-if='!showActive' @click="toggleShowActive" class="float-right place-self-end bg-blue-500 hover:bg-gray-500 py-1 px-2 mt-1  rounded text-white text-sm">
                 Show Active Users
             </button>
             <button v-if='showActive' @click="toggleShowActive" class="float-right place-self-end bg-blue-500 hover:bg-gray-500 py-1 px-2 mt-1 rounded text-white text-sm">
@@ -12,7 +12,7 @@
             </button>
             <button
                 @click="fetchNews(currentRoom.topic)"
-                class="float-right place-self-end bg-blue-500 hover:bg-gray-500 py-1 px-2 mt-1 rounded text-white text-sm">
+                class="float-right place-self-end bg-blue-500 hover:bg-gray-500 py-1 px-2 mt-1 rounded text-white text-sm mr-1">
                 Fetch News On Room Topic
             </button>
             </h2>
@@ -85,7 +85,7 @@
             fetchNews(topic) {
                 this.showNews = !this.showNews;
                 if(topic != ''){
-                    axios.get(`/chat/room/news/${topic}`)
+                    axios.get(`/chat/room/news/${encodeURI(topic)}`)
                     .then( response => {
                         console.log(response.data.articles);
                         this.news = response.data.articles;
