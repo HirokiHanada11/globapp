@@ -1,6 +1,14 @@
 <template>
-    <div v-if="message.user.name == $page.props.user.name" class='float-right my-2 bg-blue-300 w-3/4 mx-4 my-4 px-2 py-0.5 rounded-lg overflow-x-hidden'>
-        <a v-if="message.link" :href="message.message" target="_blank">{{ article.title }}</a>
+    <div v-if="message.user.name == $page.props.user.name" class='float-right my-2 bg-blue-300 w-3/4 mx-4 my-4 px-2 py-0.5 rounded-lg overflow-x-hidden hover:underline'>
+        <a v-if="message.link" :href="article.url" target="_blank">
+            <div class="text-left">
+                {{this.article.source.name}} -- {{this.article.publishedAt.slice(0,-10)}}
+            </div>
+            <span class="text-lg">
+                {{this.article.title}}
+                <img :src="article.urlToImage" class="rounded my-1 w-full">
+            </span>
+        </a>
         <span v-else >{{ message.message }}</span>
     </div>
     <div v-else>
@@ -29,8 +37,16 @@ export default {
         }
     },
     created () {
-        this.setLocalTime();
-        this.article = JSON.parse(this.message.article);
+        // this.setLocalTime();
+        if(this.message.link){
+            this.article = JSON.parse(this.message.article);
+        }
+    },
+    beforeUpdate () {
+        // this.setLocalTime();
+        if(this.message.link){
+            this.article = JSON.parse(this.message.article);
+        }
     }
 }
 </script>

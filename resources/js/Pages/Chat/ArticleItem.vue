@@ -27,14 +27,14 @@ export default {
     methods: {
         shareNews(article){
             axios.post(`/chat/room/${this.roomId}/message`, {
-                message: article.url,
+                message: "news"+this.index,
                 link: true,
                 article: this.newsArticle,
                 replyTo: null,
             })
             .then( response => {
                 if( response.status == 201 ){
-                    this.$emit('messagesent'); //emit event messagesent which can be accessed by the parent component
+                    this.$emit('articlesent'); //emit event messagesent which can be accessed by the parent component
                 }
             })
             .catch( error => {

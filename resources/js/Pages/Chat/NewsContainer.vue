@@ -1,7 +1,7 @@
 <template>
     <div class="h-1/2 p-2 flex flex-col overflow-y-scroll no-scrollbar" id="articles">
         <div v-for="(newsArticle, index) in news" :key="index"  >
-            <article-item :newsArticle="newsArticle" :index="index" :roomId="roomId" v-on:messagesent="passEvent()"/>
+            <article-item :newsArticle="newsArticle" :index="index" :roomId="roomId" v-on:articlesent="passEvent()"/>
         </div>
     </div>
 </template>
@@ -13,7 +13,7 @@ export default {
     props: ['news',  'roomId'],
     methods: {
         passEvent (){
-            this.$emit('messagesent');
+            this.$emit('articlesent');
         }
     }
 }
