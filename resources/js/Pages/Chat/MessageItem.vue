@@ -1,16 +1,16 @@
 <template>
-    <div v-if="message.user.name == $page.props.user.name" class='float-right my-2'>
-        <span class="bg-blue-300 w-3/4 mx-4 my-4 px-2 py-0.5 rounded-lg">
-            {{ message.message }}
-        </span>
+    <div v-if="message.user.name == $page.props.user.name" class='float-right my-2 bg-blue-300 w-3/4 mx-4 my-4 px-2 py-0.5 rounded-lg overflow-x-hidden'>
+        <a v-if="message.link" :href="message.message" target="_blank">{{ article.title }}</a>
+        <span v-else >{{ message.message }}</span>
     </div>
     <div v-else>
         <div class="text-sm py-1 mx-4 text-white">
             {{ message.user.name }}
         </div>
-        <span class="bg-gray-300 w-3/4 mx-4 my-4 px-2 py-1 rounded-lg">
-            {{ message.message }}
-        </span>
+        <div class="bg-gray-300 w-3/4 mx-4 my-4 px-2 py-1 rounded-lg">
+            <a v-if="message.link" :href="message.message">{{ message.message }}</a>
+            <span v-else >{{ message.message }}</span>
+        </div>
     </div>
 </template>
 
@@ -19,7 +19,8 @@ export default {
     props: ['message'],
     data: () => {
         return {
-            localTime: null
+            localTime: null,
+            article: {}
         }
     },
     methods: {
@@ -29,6 +30,7 @@ export default {
     },
     created () {
         this.setLocalTime();
+        this.article = JSON.parse(this.message.article);
     }
 }
 </script>

@@ -24,7 +24,7 @@
                     <div class="h-full w-1/4 absolute top-0 right-0">
                         <active-users-container v-show="showActive" :activeUsers="activeUsers"/>
                         <message-container :messages="messages" />
-                        <news-container :v-if="showNews" :news="news" />
+                        <news-container :v-if="showNews" :news="news" :roomId="currentRoom.id" v-on:messagesent="getMessages()"/>
                     </div> 
                     <div class="bg-transparent absolute top-0 w-full flex justify-center ">
                         <input 
