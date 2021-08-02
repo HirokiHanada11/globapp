@@ -36,6 +36,8 @@ export default {
 
             axios.post(`/chat/room/${this.room.id}/message`, {
                 message: this.message,
+                link: false,
+                article: null,
                 replyTo: this.replyTo,
             })
             .then( response => {

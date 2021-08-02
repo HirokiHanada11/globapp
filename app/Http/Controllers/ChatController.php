@@ -71,6 +71,8 @@ class ChatController extends Controller
         $newMessage->user_id = Auth::id();
         $newMessage->chat_room_id = $roomId;
         $newMessage->message = $request->message;
+        $newMessage->link = $request->link;
+        $newMessage->article = json_encode($request->article);
         $newMessage->replying_to = $request->replyTo;
         $newMessage->save();
 

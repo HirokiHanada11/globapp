@@ -10,6 +10,6 @@
 import MessageItem from './MessageItem.vue'
 export default {
     components: { MessageItem },
-    props: ['messages']
+    props: ['messages'],
 }
 </script>

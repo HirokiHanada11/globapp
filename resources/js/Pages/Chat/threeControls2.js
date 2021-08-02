@@ -209,9 +209,22 @@ export class ThreeSetup2 {
     //static function to create message payload object and its path for message sent animation. 
     //returns a curve that reprsents the path of the payload that it travels on
     createMessagePayload = (message) =>{
+        const curvePath = new THREE.CurvePath();
         const userModel = this.scene.getObjectByName('Sphere').getObjectByName(message.user.name);
         const position = new THREE.Vector3();
         position.setFromMatrixPosition(userModel.matrixWorld);
+
+        if (message.link){
+            let article = JSON.parse(message.article);
+            console.log('new Link')
+            if(typeof soucresToCountry[article.source.name] !== 'undefined'){
+                const marker = this.scene.getObjectByName('Sphere').getObjectByName('Markers').getObjectByName(message.message);
+                console.log(marker)
+                const origin = new THREE.Vector3();
+                origin.setFromMatrixPosition(marker.matrixWorld);
+                curvePath.add(this.createPayloadPath(position, origin));
+            }
+        }
 
         const tarilGeometry = new THREE.CylinderBufferGeometry(0.2,0.7, 1, 8, 8, false);
         const trailMaterial = new THREE.PointsMaterial({size:0.0005}) 
@@ -251,7 +264,19 @@ export class ThreeSetup2 {
             p2.copy(px).multiplyScalar(30*(angle / (Math.PI/2))).add(p.copy(py).multiplyScalar(30));
         }
         // console.log(p0,p1,p2,p3)
-        return new THREE.CubicBezierCurve3(p0,p1,p2,p3);
+        curvePath.add(new THREE.CubicBezierCurve3(p0,p1,p2,p3));
+        return curvePath;
+    }
+
+    //function to create payload path from point on globe to another point on globe
+    createPayloadPath = (target, origin) => {
+        let p = new THREE.Vector3();
+        let p1 = new THREE.Vector3();
+        let p0 = origin;
+        let p2 = target;
+        p1.copy(p0).add(p.copy(p2)).normalize().multiplyScalar(30);
+        console.log(p0,p1,p2)
+        return new THREE.QuadraticBezierCurve3(p0,p1,p2);
     }
 
     //static function to create news article markers
