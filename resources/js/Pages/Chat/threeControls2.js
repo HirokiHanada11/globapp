@@ -15,7 +15,7 @@ export class ThreeSetup2 {
             alpha: false, 
             antialias: true,
         });
-        // this.controls = new OrbitControls(this.camera, this.canvas);
+        this.controls = new OrbitControls(this.camera, this.canvas);
         this.raycaster = new THREE.Raycaster();
         this.mouse = new THREE.Vector2();
         this.objectsInScene = [];
@@ -25,7 +25,7 @@ export class ThreeSetup2 {
         this.target = new THREE.Vector3(50,0,0);
         this.movement = { //setting trusy values here will trigger corresponding animations 
             camera: false,
-            user: [],
+            user: true,
             water: true,
             payloads: [],
             news: [],
@@ -36,8 +36,8 @@ export class ThreeSetup2 {
         };
     }
     init = () => {
-        this.camera.position.set(0, -12, 9);
-        this.camera.lookAt(0,0,0);
+        this.camera.position.set(0, -12, 9);//this.camera.position.set(0, -12, 30);
+        this.camera.lookAt(0, 0, 0);//this.camera.lookAt(0, 70, 30);
 
         this.renderer.setSize(this.width, this.height);
         this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -45,7 +45,7 @@ export class ThreeSetup2 {
         this.canvas.appendChild(this.renderer.domElement);
 
         // this.controls.enableDamping = true;
-        // this.controls.target.set(0,0,70);
+        this.controls.target.set(0,0,0);
 
         // this.canvas.addEventListener('click', (event) => this.meshClicked(event));
         // this.canvas.addEventListener('mousemove', (event) => this.mouseMove(event))
@@ -130,8 +130,8 @@ export class ThreeSetup2 {
         const markerGroup = new THREE.Group();
         markerGroup.name = 'Markers';
         sphereGroup.add(markerGroup);
-        sphereGroup.position.z = 70;
-        // sphereGroup.rotateX(Math.PI);
+        sphereGroup.position.set(0, 70, 30);
+        sphereGroup.lookAt(this.camera.position);
 
         this.scene.add(sphereGroup);
 
@@ -148,6 +148,8 @@ export class ThreeSetup2 {
         const loader = new THREE.TextureLoader();
         const planeGroup = new THREE.Group();
         planeGroup.name = "Plane";
+        const userModels = new THREE.Group();
+        userModels.name = "UserModels";
         // let planeAsia = new THREE.PlaneBufferGeometry(40,30, 2048, 1536);
         // let asiaHeight = loader.load("/textures/asia-without-japan.jpg");
         // let asiaTexture = loader.load("/textures/asia-without-japan.jpg");
@@ -197,7 +199,7 @@ export class ThreeSetup2 {
         // const circle = new THREE.Mesh( landCircle, material );
 
 
-        planeGroup.add(japanPlane, waterPlane ); //planeGroup.add(asiaPlane, japanPlane, waterPlane, circle);
+        planeGroup.add(japanPlane, waterPlane, userModels ); //planeGroup.add(asiaPlane, japanPlane, waterPlane, circle);
         this.scene.add(planeGroup);
     }
 
@@ -247,31 +249,38 @@ export class ThreeSetup2 {
 
     //static function to create user model when user joins the room, the model generated is a placeholder at the moment, planning to develop more complex models in the future
     createUserModel = (user, sessionUser) =>{
+        const loader = new THREE.TextureLoader();
         const userModelPlane = new THREE.Group;
         userModelPlane.name = user.user.name;
 
-        const sphereGeometry = new THREE.SphereBufferGeometry( 0.1, 32, 32 );
-        const cylinderGeometry = new THREE.CylinderBufferGeometry( 0.12, 0.02, 0.3, 32);
+        const circleGeometry = new THREE.CircleBufferGeometry( 0.3, 16 );
+        const pyramidGeometry = new THREE.ConeBufferGeometry( 0.3, 0.6, 3);
 
-        let material = new THREE.MeshBasicMaterial();
+        let bodyMaterial = new THREE.MeshBasicMaterial();
+        let headMaterial = new THREE.MeshBasicMaterial();
         if(userModelPlane.name === sessionUser){
-            material.color = new THREE.Color(0xff0000);
+            // headMaterial.color = new THREE.Color(0xff0000);
+            bodyMaterial.color = new THREE.Color(0xff0000);
         }else {
-            material.color = new THREE.Color("#808080");
+            // headMaterial.color = new THREE.Color("#808080");
+            bodyMaterial.color = new THREE.Color(0xff0000);
         }
         
+        const body = new THREE.Mesh(pyramidGeometry,bodyMaterial);
+        body.name = 'Body';
+        headMaterial.map = loader.load(user.user.profile_photo_url);
+        const head = new THREE.Mesh(circleGeometry,headMaterial);
+        head.name = 'Head';
+        head.position.z = 2;
+        head.lookAt(this.camera.position);
+        body.position.z = 1.25;
+        body.rotateX(-Math.PI /2)
 
-        const sphere = new THREE.Mesh(sphereGeometry,material);
-        const cylinder = new THREE.Mesh(cylinderGeometry,material);
-        sphere.position.z = 0.65;
-        cylinder.position.z = 0.5;
-        cylinder.rotateX(-Math.PI / 2)
-
-        userModelPlane.add(sphere, cylinder);
+        userModelPlane.add(head, body);
         userModelPlane.position.x = (prefecToCoords[user.region][1] - 136.261570) * 43/45
         userModelPlane.position.y = (prefecToCoords[user.region][0] - 35.837181) * 30/25
 
-        this.scene.getObjectByName('Plane').add(userModelPlane);
+        this.scene.getObjectByName('Plane').getObjectByName('UserModels').add(userModelPlane);
 
     } 
     
@@ -476,7 +485,7 @@ export class ThreeSetup2 {
 
     tick = () => {
         const elapsedTime = this.clock.getElapsedTime();
-        let sphere = this.scene.children[0]
+        let sphere =  this.scene.getObjectByName('Sphere');
         sphere.rotation.y += this.movement.sphereRotation.x / 40;
         sphere.rotation.x -= this.movement.sphereRotation.y / 60;
         if(sphere.rotation.x > Math.PI / 4){
@@ -484,10 +493,9 @@ export class ThreeSetup2 {
         } else if(sphere.rotation.x < - Math.PI / 4){
             sphere.rotation.x = - Math.PI / 4;
         }
-        this.scene.children[2].rotation.y = -0.005 * elapsedTime;
-        this.scene.children[2].rotation.x = -0.005 * elapsedTime;
+        this.scene.getObjectByName('Stars').rotation.y = -0.005 * elapsedTime;
+        this.scene.getObjectByName('Stars').rotation.x = -0.005 * elapsedTime;
 
-        // this.controls.update();
 
         if (this.movement.camera){ //camera movement 
             this.camera.position.x = 4 * Math.cos(elapsedTime * 0.1);
@@ -495,13 +503,16 @@ export class ThreeSetup2 {
             this.camera.lookAt(0,0,0);
         }
         if (this.movement.water){ //wave animation
-            sphere.children[1].material.normalScale.set( Math.sin(elapsedTime*0.3), Math.cos(elapsedTime*0.3));
+            sphere.getObjectByName('Water').material.normalScale.set( Math.sin(elapsedTime*0.3), Math.cos(elapsedTime*0.3));
+            this.scene.getObjectByName('Plane').getObjectByName('Water').material.normalScale.set( Math.sin(elapsedTime*0.3), Math.cos(elapsedTime*0.3));
         }
 
-        if(this.movement.user.length > 0){ //user animation, currenty unset
-            let userModel = this.scene.children[0].getObjectByName(this.movement.user[0]);
-            let position = new THREE.Vector3();
-            position.setFromMatrixPosition(userModel.matrixWorld);
+        if(this.movement.user){ //user animation, currenty unset
+            let userModels = this.scene.getObjectByName('Plane').getObjectByName('UserModels');
+            userModels.children.forEach(model => {
+                model.position.z = 0.3*Math.sin(elapsedTime) 
+                model.getObjectByName('Body').rotation.y = 0.5*elapsedTime;
+            })
         }
 
         if(this.movement.payloads.length > 0){ //message sent animation
