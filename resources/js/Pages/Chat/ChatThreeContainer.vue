@@ -65,6 +65,7 @@ export default {
             // ThreeGeometries.createPointLight(threeSetup.scene);
             // ThreeGeometries.createParticles(threeSetup.scene);
             threeSetup2.createGlobe();
+            threeSetup2.createPlane();
             threeSetup2.createPointLight();
             threeSetup2.createParticles();
         },
@@ -80,24 +81,21 @@ export default {
             this.animate();
         },
         generateUserModel(user, sessionUser) {
-            // ThreeGeometries.createUserModel(threeSetup.scene, user);
-            // threeAnimation.movement.user.push(user.user.id);
             threeSetup2.createUserModel(user, sessionUser);
-            // threeSetup2.movement.user.push(user.user.id);
         },
         createMessagePayload(message){
-            // let payloadPath = ThreeGeometries.createMessagePayload(threeSetup.scene, message);
-            // threeAnimation.movement.payloads.push({
-            //     payloadId: message.id,
-            //     curve: payloadPath,
-            //     fraction: 0.03,
-            // });
-            let payloadPath = threeSetup2.createMessagePayload(message);
-            threeSetup2.movement.payloads.push({
-                payloadId: message.id,
-                curve: payloadPath,
-                fraction: 0.03,
-            });
+            if(message.link){
+                let payloadPath = threeSetup2.createNewsPayload(message);
+                threeSetup2.movement.payloads.push({
+                    payloadId: message.id,
+                    curve: payloadPath,
+                    fraction: 0.03,
+                });
+            }else {
+                let user = this.activeUsers.find(activeUser => activeUser['user_id'] == message.user.id);
+                console.log("from ", user);
+                threeSetup2.createMessageAnimation(message, user.region);
+            }
         },
         createNewsMarkers(articles){
             // ThreeGeometries.createNewsMarkers(threeSetup.scene, articles);

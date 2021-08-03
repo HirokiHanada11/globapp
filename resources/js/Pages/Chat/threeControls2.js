@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import {nameToCoords, soucresToCountry} from "./countries.js";
+import { prefecToCoords } from './japanPrefecture.js';
 
 //class for setting up three js 
 export class ThreeSetup2 {
@@ -14,7 +15,7 @@ export class ThreeSetup2 {
             alpha: false, 
             antialias: true,
         });
-        // this.controls = new OrbitControls(this.camera, this.canvas);
+        this.controls = new OrbitControls(this.camera, this.canvas);
         this.raycaster = new THREE.Raycaster();
         this.mouse = new THREE.Vector2();
         this.objectsInScene = [];
@@ -24,18 +25,19 @@ export class ThreeSetup2 {
         this.target = new THREE.Vector3(50,0,0);
         this.movement = { //setting trusy values here will trigger corresponding animations 
             camera: false,
-            user: [],
+            user: true,
             water: true,
             payloads: [],
             news: [],
             sphereControl: false,
             sphereControlOrigin: new THREE.Vector2(),
             sphereRotation: new THREE.Vector2(0.1, 0),
+            fireworks:[],
         };
     }
     init = () => {
-        this.camera.position.set(0, 0, 50);
-        this.camera.lookAt(15,0,0);
+        this.camera.position.set(0, -12, 9);//this.camera.position.set(0, -12, 30);
+        this.camera.lookAt(0, 0, 0);//this.camera.lookAt(0, 70, 30);
 
         this.renderer.setSize(this.width, this.height);
         this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -43,10 +45,10 @@ export class ThreeSetup2 {
         this.canvas.appendChild(this.renderer.domElement);
 
         // this.controls.enableDamping = true;
-        // this.controls.target.set(15,0,0);
+        this.controls.target.set(0,0,0);
 
-        this.canvas.addEventListener('click', (event) => this.meshClicked(event));
-        this.canvas.addEventListener('mousemove', (event) => this.mouseMove(event))
+        // this.canvas.addEventListener('click', (event) => this.meshClicked(event));
+        // this.canvas.addEventListener('mousemove', (event) => this.mouseMove(event))
     }
 
     meshClicked = (event) => {
@@ -128,9 +130,77 @@ export class ThreeSetup2 {
         const markerGroup = new THREE.Group();
         markerGroup.name = 'Markers';
         sphereGroup.add(markerGroup);
+        sphereGroup.position.set(0, 70, 30);
+        sphereGroup.lookAt(this.camera.position);
 
         this.scene.add(sphereGroup);
-        // this.objectsInScene.push(sphereGroup);
+
+        const japanGeometry = new THREE.PlaneBufferGeometry(1,1);
+        const userModelGlobe = new THREE.Mesh(japanGeometry,new THREE.MeshBasicMaterial());
+        userModelGlobe.name = 'Japan'; 
+        sphereGroup.add(userModelGlobe);
+        let coords = this.getCoords('Japan');
+        userModelGlobe.position.setFromSphericalCoords(20,coords.phi,coords.theta);
+    }
+
+    //function to create base plane
+    createPlane = () => {
+        const loader = new THREE.TextureLoader();
+        const planeGroup = new THREE.Group();
+        planeGroup.name = "Plane";
+        const userModels = new THREE.Group();
+        userModels.name = "UserModels";
+        // let planeAsia = new THREE.PlaneBufferGeometry(40,30, 2048, 1536);
+        // let asiaHeight = loader.load("/textures/asia-without-japan.jpg");
+        // let asiaTexture = loader.load("/textures/asia-without-japan.jpg");
+
+        // let asiaMaterial = new THREE.MeshStandardMaterial( {
+        //     map: asiaTexture,
+        //     color: new THREE.Color('#90ee90'),
+        //     displacementMap: asiaHeight,
+        //     displacementScale: 0.5,
+        // } );
+
+        // let asiaPlane = new THREE.Mesh(planeAsia, asiaMaterial);
+        // asiaPlane.name = 'Asia';
+        
+        let planeJapan = new THREE.PlaneBufferGeometry(40,30, 1024, 768); //new THREE.PlaneBufferGeometry(40,30, 2048, 1536);
+        let japanHeight = loader.load("/textures/JP-EPS-01-0001.jpg");
+        let japanTexture = loader.load("/textures/JP-EPS-01-0001.jpg");
+
+        let japanMaterial = new THREE.MeshStandardMaterial( {
+            map: japanTexture,
+            color: new THREE.Color('#90ee90'),
+            displacementMap: japanHeight,
+            displacementScale: 0.5,
+        } );
+
+        let japanPlane = new THREE.Mesh(planeJapan, japanMaterial);
+        japanPlane.name = "Japan";
+
+        const waterGeometry = new THREE.CircleBufferGeometry(28, 32, ); //new THREE.PlaneBufferGeometry(40, 30, 32, 24);
+
+        let waterMap = loader.load('/textures/water-normal-map.jpg');
+        waterMap.wrapS = THREE.RepeatWrapping;
+        waterMap.wrapT = THREE.RepeatWrapping;
+        waterMap.repeat.set(4,2);
+
+        let waterMaterial = new THREE.MeshStandardMaterial({
+            color: new THREE.Color('skyblue'),
+            normalMap: waterMap
+        });
+
+        let waterPlane = new THREE.Mesh( waterGeometry, waterMaterial );
+        waterPlane.name = 'Water';
+        waterPlane.position.z = 0.3;
+
+        // let landCircle = new THREE.CircleBufferGeometry(28, 16, 0, Math.PI);
+        // const material = new THREE.MeshBasicMaterial( { color: new THREE.Color('#90ee90') } );
+        // const circle = new THREE.Mesh( landCircle, material );
+
+
+        planeGroup.add(japanPlane, waterPlane, userModels ); //planeGroup.add(asiaPlane, japanPlane, waterPlane, circle);
+        this.scene.add(planeGroup);
     }
 
     //static function to create background particles to represent stars
@@ -169,103 +239,188 @@ export class ThreeSetup2 {
 
         this.scene.add(lightsGroup);
 
-        for (let i = 0; i < 10; i++){
-            let pointLight = new THREE.PointLight(new THREE.Color("#a7d8de"),0.5);
-            pointLight.name = `light${i}`;
-            this.scene.add(pointLight);
-        }
+        // for (let i = 0; i < 3; i++){
+        //     let pointLight = new THREE.PointLight(new THREE.Color("#a7d8de"),0.5);
+        //     pointLight.name = `light${i}`;
+        //     pointLight.position.z = 70
+        //     this.scene.add(pointLight);
+        // }
     }
 
     //static function to create user model when user joins the room, the model generated is a placeholder at the moment, planning to develop more complex models in the future
     createUserModel = (user, sessionUser) =>{
-        const coords = this.getCoords(user.region);
-        const userModel = new THREE.Group;
-        userModel.name = user.user.name;
+        const loader = new THREE.TextureLoader();
+        const userModelPlane = new THREE.Group;
+        userModelPlane.name = user.user.name;
 
-        let cylinderGeometry = new THREE.CylinderGeometry( 1.2, 0.2, 3, 32);
-        let sphereGeometry = new THREE.SphereGeometry( 1, 32, 32 );
+        const circleGeometry = new THREE.CircleBufferGeometry( 0.3, 16 );
+        const pyramidGeometry = new THREE.ConeBufferGeometry( 0.3, 0.6, 3);
 
-        let material = new THREE.MeshBasicMaterial();
-        if(userModel.name === sessionUser){
-            material.color = new THREE.Color(0xff0000);
+        let bodyMaterial = new THREE.MeshBasicMaterial();
+        let headMaterial = new THREE.MeshBasicMaterial();
+        if(userModelPlane.name === sessionUser){
+            // headMaterial.color = new THREE.Color(0xff0000);
+            bodyMaterial.color = new THREE.Color(0xff0000);
         }else {
-            material.color = new THREE.Color("#808080");
+            // headMaterial.color = new THREE.Color("#808080");
+            bodyMaterial.color = new THREE.Color(0xff0000);
         }
         
+        const body = new THREE.Mesh(pyramidGeometry,bodyMaterial);
+        body.name = 'Body';
+        headMaterial.map = loader.load(user.user.profile_photo_url);
+        const head = new THREE.Mesh(circleGeometry,headMaterial);
+        head.name = 'Head';
+        head.position.z = 2;
+        head.lookAt(this.camera.position);
+        body.position.z = 1.25;
+        body.rotateX(-Math.PI /2)
 
-        const sphere = new THREE.Mesh(sphereGeometry,material);
-        const cylinder = new THREE.Mesh(cylinderGeometry,material);
-        sphere.position.z = -4;
-        cylinder.position.z = -2;
-        cylinder.rotateX( Math.PI / 2);
+        userModelPlane.add(head, body);
+        userModelPlane.position.x = (prefecToCoords[user.region][1] - 136.261570) * 43/45
+        userModelPlane.position.y = (prefecToCoords[user.region][0] - 35.837181) * 30/25
 
-        userModel.add(sphere, cylinder);
-        userModel.position.setFromSphericalCoords(20, coords.phi, coords.theta);
-        userModel.lookAt(0,0,0);
+        this.scene.getObjectByName('Plane').getObjectByName('UserModels').add(userModelPlane);
 
-        this.scene.children[0].add(userModel);
     } 
+    
+    //funtion to convert prefecture name to position on map
+    prefecToCoordsOnMap = (prefec) => {
+        return {
+            x:(prefecToCoords[prefec][1] - 136.261570) * 43/45,
+            y: (prefecToCoords[prefec][0] - 35.837181) * 30/25
+        }
+    }
 
     //static function to create message payload object and its path for message sent animation. 
     //returns a curve that reprsents the path of the payload that it travels on
-    createMessagePayload = (message) =>{
-        const curvePath = new THREE.CurvePath();
-        const userModel = this.scene.getObjectByName('Sphere').getObjectByName(message.user.name);
-        const position = new THREE.Vector3();
-        position.setFromMatrixPosition(userModel.matrixWorld);
-
+    createNewsPayload = (message) =>{        
         if (message.link){
+            const curvePath = new THREE.CurvePath();
+            const position = new THREE.Vector3();
+            let japan = this.scene.getObjectByName('Sphere').getObjectByName('Japan');
+            position.setFromMatrixPosition(japan.matrixWorld);
             let article = JSON.parse(message.article);
             console.log('new Link')
             if(typeof soucresToCountry[article.source.name] !== 'undefined'){
                 const marker = this.scene.getObjectByName('Sphere').getObjectByName('Markers').getObjectByName(message.message);
-                console.log(marker)
                 const origin = new THREE.Vector3();
                 origin.setFromMatrixPosition(marker.matrixWorld);
                 curvePath.add(this.createPayloadPath(position, origin));
+                
+                const tarilGeometry = new THREE.CylinderBufferGeometry(0.2,0.7, 1, 8, 8, false);
+                const trailMaterial = new THREE.PointsMaterial({size:0.0005}) 
+                const trail = new THREE.Points(tarilGeometry, trailMaterial);
+                
+                const tarilGeometry2 = new THREE.CylinderBufferGeometry(0.4,0.1, 3.5, 8, 8, false);
+                const trailMaterial2 = new THREE.PointsMaterial({size:0.0005}) 
+                const trail2 = new THREE.Points(tarilGeometry2, trailMaterial2);
+                trail2.position.y = -2;
+                
+                const trailGroup = new THREE.Group();
+                trailGroup.name = message.id;
+                trailGroup.add(trail);
+                trailGroup.add(trail2);
+                trailGroup.position.set(position.x, position.y, position.z);
+                this.scene.add(trailGroup);
+                
+                const target = new THREE.Vector3(20,0,0);
+                let p1 = new THREE.Vector3();
+                let p2 = new THREE.Vector3();
+                let px = new THREE.Vector3();
+                let py = new THREE.Vector3();
+                let p = new THREE.Vector3();
+                let p0 = position;
+                let p3 = target;
+                let angle = Math.abs(position.angleTo(target));
+                if (angle > Math.PI/2){
+                    px.set(0, p0.y, p0 .z).normalize();
+                    py.copy(p3).normalize();
+                    p2.copy(px).multiplyScalar(40*angle/Math.PI);
+                    p1.copy(p0).add(p.copy(px).multiplyScalar(40*angle/Math.PI)).add(py.multiplyScalar(-5));
+                }
+                else{
+                    px.set(0, p0.y, p0 .z).normalize();
+                    py.copy(p3).normalize();
+                    p1.copy(px).multiplyScalar(30*(angle / (Math.PI/2))).add(p.copy(py).multiplyScalar(5));
+                    p2.copy(px).multiplyScalar(30*(angle / (Math.PI/2))).add(p.copy(py).multiplyScalar(30));
+                }
+                // console.log(p0,p1,p2,p3)
+                curvePath.add(new THREE.CubicBezierCurve3(p0,p1,p2,p3));
+                return curvePath;
             }
         }
+    }
 
-        const tarilGeometry = new THREE.CylinderBufferGeometry(0.2,0.7, 1, 8, 8, false);
-        const trailMaterial = new THREE.PointsMaterial({size:0.0005}) 
-        const trail = new THREE.Points(tarilGeometry, trailMaterial);
+    createMessageAnimation = (message, userRegion) => {
+        let coords = this.prefecToCoordsOnMap(userRegion);
+        let mainColor = new THREE.Color("#" + Math.floor(Math.random() * 0xFFFFFF).toString(16));
+        let subColor = new THREE.Color("#" + Math.floor(Math.random() * 0xFFFFFF).toString(16));
+        let randomColor = new THREE.Color("gray");
+        let fireworkGroup = new THREE.Group();
+        fireworkGroup.name = message.id;
+        let payloadLight = new THREE.PointLight(randomColor, 0.5);
+        let payloadStarGeometry = new THREE.SphereBufferGeometry(0.1, 16, 16);
+        let material = new THREE.PointsMaterial({
+            color: randomColor,
+            size: 0.005,
+        });
+        let payloadStar = new THREE.Points(payloadStarGeometry, material);
+        let subPayloadStar = new THREE.Points(payloadStarGeometry, material);
+        subPayloadStar.material.color = new THREE.Color("gray");
+        fireworkGroup.add(payloadLight, subPayloadStar, payloadStar);
+        this.scene.add(fireworkGroup);
+        fireworkGroup.position.set(coords.x, coords.y, 0);
 
-        const tarilGeometry2 = new THREE.CylinderBufferGeometry(0.4,0.1, 3.5, 8, 8, false);
-        const trailMaterial2 = new THREE.PointsMaterial({size:0.0005}) 
-        const trail2 = new THREE.Points(tarilGeometry2, trailMaterial2);
-        trail2.position.y = -2;
+        this.movement.fireworks.push({
+            name: message.id,
+            frame: 0,
+            colors: [mainColor, subColor],
+            animation: this.fireworkAnimation
+        })
+    }
 
-        const trailGroup = new THREE.Group();
-        trailGroup.name = message.id;
-        trailGroup.add(trail);
-        trailGroup.add(trail2);
-        trailGroup.position.set(position.x, position.y, position.z);
-        this.scene.add(trailGroup);
-
-        const target = new THREE.Vector3(80,0,0);
-        let p1 = new THREE.Vector3();
-        let p2 = new THREE.Vector3();
-        let px = new THREE.Vector3();
-        let py = new THREE.Vector3();
-        let p = new THREE.Vector3();
-        let p0 = position;
-        let p3 = target;
-        let angle = Math.abs(position.angleTo(target));
-        if (angle > Math.PI/2){
-            px.set(0, p0.y, p0 .z).normalize();
-            py.copy(p3).normalize();
-            p2.copy(px).multiplyScalar(40*angle/Math.PI);
-            p1.copy(p0).add(p.copy(px).multiplyScalar(40*angle/Math.PI)).add(py.multiplyScalar(-5));
+    //funciton for firework animation
+    fireworkAnimation = () =>{
+        let f = false;
+        this.movement.fireworks.map(firework => {
+            let fireworkObj = this.scene.getObjectByName(firework.name);
+            firework.frame += 1;
+            if (firework.frame < 60){           
+                fireworkObj.position.z += Math.max(0.3 + 1/2*(-0.011)*firework.frame, 0);
+                fireworkObj.lookAt(this.camera.position);
+                fireworkObj.children[0].power *= 0.9;
+                console.log(fireworkObj.position.z)
+                return firework;
+            }else if(firework.frame == 60){
+                fireworkObj.children[0].power = 0;
+                return firework;
+            }else if(firework.frame == 90){
+                fireworkObj.children[1].position.set(-0.1,-0.1,-0.1);
+                fireworkObj.children[0].power = 3*Math.PI;
+                fireworkObj.children[1].material.color = firework.colors[0];
+                fireworkObj.children[2].material.color = firework.colors[1];
+                fireworkObj.children[2].material.size = 0.05;
+                fireworkObj.children[1].material.size = 0.05;
+                return firework;
+            }else if(firework.frame > 90 && firework.frame < 130){
+                fireworkObj.scale.multiplyScalar(1.1);
+                fireworkObj.lookAt(this.camera.position);
+                return firework;
+            }else if(firework.frame == 130){
+                fireworkObj.remove(fireworkObj.children[0]);
+                return firework;
+            }else if(firework.frame == 160){
+                this.scene.remove(fireworkObj);
+                f = true;
+                return null;
+            }
+        });
+        if(f) {
+            this.movement.fireworks = this.movement.fireworks.filter(firework => firework !== null);
+            f = false;
+            console.log(this.scene.children);
         }
-        else{
-            px.set(0, p0.y, p0 .z).normalize();
-            py.copy(p3).normalize();
-            p1.copy(px).multiplyScalar(30*(angle / (Math.PI/2))).add(p.copy(py).multiplyScalar(5));
-            p2.copy(px).multiplyScalar(30*(angle / (Math.PI/2))).add(p.copy(py).multiplyScalar(30));
-        }
-        // console.log(p0,p1,p2,p3)
-        curvePath.add(new THREE.CubicBezierCurve3(p0,p1,p2,p3));
-        return curvePath;
     }
 
     //function to create payload path from point on globe to another point on globe
@@ -330,7 +485,7 @@ export class ThreeSetup2 {
 
     tick = () => {
         const elapsedTime = this.clock.getElapsedTime();
-        let sphere = this.scene.children[0]
+        let sphere =  this.scene.getObjectByName('Sphere');
         sphere.rotation.y += this.movement.sphereRotation.x / 40;
         sphere.rotation.x -= this.movement.sphereRotation.y / 60;
         if(sphere.rotation.x > Math.PI / 4){
@@ -338,10 +493,9 @@ export class ThreeSetup2 {
         } else if(sphere.rotation.x < - Math.PI / 4){
             sphere.rotation.x = - Math.PI / 4;
         }
-        this.scene.children[2].rotation.y = -0.005 * elapsedTime;
-        this.scene.children[2].rotation.x = -0.005 * elapsedTime;
+        this.scene.getObjectByName('Stars').rotation.y = -0.005 * elapsedTime;
+        this.scene.getObjectByName('Stars').rotation.x = -0.005 * elapsedTime;
 
-        // this.controls.update();
 
         if (this.movement.camera){ //camera movement 
             this.camera.position.x = 4 * Math.cos(elapsedTime * 0.1);
@@ -349,13 +503,16 @@ export class ThreeSetup2 {
             this.camera.lookAt(0,0,0);
         }
         if (this.movement.water){ //wave animation
-            sphere.children[1].material.normalScale.set( Math.sin(elapsedTime*0.3), Math.cos(elapsedTime*0.3));
+            sphere.getObjectByName('Water').material.normalScale.set( Math.sin(elapsedTime*0.3), Math.cos(elapsedTime*0.3));
+            this.scene.getObjectByName('Plane').getObjectByName('Water').material.normalScale.set( Math.sin(elapsedTime*0.3), Math.cos(elapsedTime*0.3));
         }
 
-        if(this.movement.user.length > 0){ //user animation, currenty unset
-            let userModel = this.scene.children[0].getObjectByName(this.movement.user[0]);
-            let position = new THREE.Vector3();
-            position.setFromMatrixPosition(userModel.matrixWorld);
+        if(this.movement.user){ //user animation, currenty unset
+            let userModels = this.scene.getObjectByName('Plane').getObjectByName('UserModels');
+            userModels.children.forEach(model => {
+                model.position.z = 0.3*Math.sin(elapsedTime) 
+                model.getObjectByName('Body').rotation.y = 0.5*elapsedTime;
+            })
         }
 
         if(this.movement.payloads.length > 0){ //message sent animation
@@ -390,6 +547,9 @@ export class ThreeSetup2 {
                 console.log(this.movement.payloads)
                 f = false;
             }
+        }
+        if(this.movement.fireworks.length > 0){
+            this.fireworkAnimation();
         }
 
         if(this.movement.news.length > 0){
