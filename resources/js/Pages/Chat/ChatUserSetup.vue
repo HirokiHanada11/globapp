@@ -28,6 +28,7 @@
 
 <script>
 import { nameToCoords } from "./countries.js";
+import { prefecToCoords } from "./japanPrefecture.js";
 
 
 export default {
@@ -59,7 +60,7 @@ export default {
     },
     mounted() {
         // console.log(this.room)
-        this.userRegions = Object.keys(nameToCoords);
+        this.userRegions = Object.keys(prefecToCoords);
         // console.log(this.userRegions);
         this.selected = this.userRegions[0];
 
