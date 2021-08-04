@@ -11,7 +11,7 @@ import { ThreeSetup2 } from './threeControls2';
 let threeSetup2, threeAnimation;
 
 export default {
-    props: ['messages', 'room', 'activeUsers', 'news'],
+    props: ['messages', 'room', 'activeUsers', 'news', 'cameraNum'],
     data () {
         return {
             roomRegion: '',
@@ -46,6 +46,9 @@ export default {
                 console.log('new fetched', newVal);
                 this.createNewsMarkers(newVal);
             }
+        },
+        cameraNum(newVal, oldVal){
+            this.setCamera(newVal);
         }
     },
     methods: {
@@ -102,6 +105,9 @@ export default {
             // ThreeGeometries.createNewsMarkers(threeSetup.scene, articles);
             // threeAnimation.movement.news = articles;
             threeSetup2.createNewsMarkers(articles);
+        },
+        setCamera(cameraNum){
+            threeSetup2.moveCamera(cameraNum);
         }
         
     },

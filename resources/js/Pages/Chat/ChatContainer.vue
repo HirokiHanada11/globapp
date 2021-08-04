@@ -10,11 +10,6 @@
             <button v-if='showActive' @click="toggleShowActive" class="float-right place-self-end bg-blue-500 hover:bg-gray-500 py-1 px-2 mt-1 rounded text-white text-sm">
                 Hide Active Users
             </button>
-            <button
-                @click="fetchNews(currentRoom.topic)"
-                class="float-right place-self-end bg-blue-500 hover:bg-gray-500 py-1 px-2 mt-1 rounded text-white text-sm mr-1">
-                Fetch News On Room Topic
-            </button>
             </h2>
         </template>
 
@@ -28,14 +23,29 @@
                     </div> 
                     <div class="bg-transparent absolute top-0 w-full flex justify-center ">
                         <input 
+                            v-if="!camera"
                             type="text"
                             v-model="topic"
                             @keyup.enter="fetchNews(topic)"
                             placeholder="Search News by keyword"
                             class="bg-blue-900 border border-transparent focus:outline-none focus:border-none rounded-full text-white"
                         />
+                        <button
+                            v-if="camera"
+                            @click="fetchNews(currentRoom.topic)"
+                            class="bg-blue-900 border border-transparent hover:outline-2 hover:border-none rounded-full text-white p-2">
+                            Fetch News On Room Topic
+                        </button>
                     </div> 
-                    <chat-three-container :messages="messages" :room="currentRoom" :activeUsers="activeUsers" :news="news" />
+                    <div class="bg-transparent absolute bottom-0 w-full flex justify-center ">
+                        <button
+                            v-if="!camera"
+                            @click="setBackCamera()"
+                            class="bg-blue-900 border border-transparent hover:outline-2 hover:border-none rounded-full text-white p-2">
+                            Back To Chat
+                        </button>
+                    </div> 
+                    <chat-three-container :messages="messages" :room="currentRoom" :activeUsers="activeUsers" :news="news" :cameraNum="camera" />
                 </div>
                 <input-message 
                     :room="currentRoom" 
@@ -74,6 +84,7 @@
                 news: [],
                 showNews: false,
                 topic: '',
+                camera: true,
             }
         },
         watch: {
@@ -82,9 +93,13 @@
             }
         },
         methods: {
+            setBackCamera() {
+                this.camera = !this.camera;
+            },
             fetchNews(topic) {
                 this.showNews = !this.showNews;
                 if(topic != ''){
+                    this.setBackCamera();
                     axios.get(`/chat/room/news/${encodeURI(topic)}`)
                     .then( response => {
                         console.log(response.data.articles);

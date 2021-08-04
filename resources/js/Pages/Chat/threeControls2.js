@@ -36,8 +36,8 @@ export class ThreeSetup2 {
         };
     }
     init = () => {
-        this.camera.position.set(0, -12, 30);//this.camera.position.set(0, -12, 9);
-        this.camera.lookAt(0, 70, 30);//this.camera.lookAt(0, 0, 0);
+        this.camera.position.set(0, -18, 79);//this.camera.position.set(0, -12, 9);
+        this.camera.lookAt(0, -30, 70);//this.camera.lookAt(0, 0, 0);
 
         this.renderer.setSize(this.width, this.height);
         this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -130,7 +130,7 @@ export class ThreeSetup2 {
         const markerGroup = new THREE.Group();
         markerGroup.name = 'Markers';
         sphereGroup.add(markerGroup);
-        sphereGroup.position.set(0, 70, 30);
+        // sphereGroup.position.set(0, 70, 30);
         sphereGroup.lookAt(this.camera.position);
 
         this.scene.add(sphereGroup);
@@ -199,7 +199,9 @@ export class ThreeSetup2 {
         // const circle = new THREE.Mesh( landCircle, material );
 
 
-        planeGroup.add(japanPlane, waterPlane, userModels ); //planeGroup.add(asiaPlane, japanPlane, waterPlane, circle);
+        planeGroup.add(japanPlane, waterPlane, userModels );
+        planeGroup.position.set(0,-30, 70); //planeGroup.add(asiaPlane, japanPlane, waterPlane, circle);
+        planeGroup.rotateX(-Math.PI/2);
         this.scene.add(planeGroup);
     }
 
@@ -232,10 +234,15 @@ export class ThreeSetup2 {
         const ambientLight = new THREE.AmbientLight(0xffffed, 0.1);
         lightsGroup.add(ambientLight);
 
-        const sunLight = new THREE.DirectionalLight(0xffffed, 1);
+        const sunLight = new THREE.DirectionalLight(0xffffed, 0.75);
         sunLight.position.set(0,0,150);
         sunLight.target.position.set(0,0,0);
         lightsGroup.add(sunLight, sunLight.target);
+
+        const sunLight2 = new THREE.DirectionalLight(0xffffed, 0.9);
+        sunLight2.position.set(0,75,70);
+        sunLight2.target.position.set(0,-30,70);
+        lightsGroup.add(sunLight2, sunLight2.target);
 
         this.scene.add(lightsGroup);
 
@@ -411,7 +418,7 @@ export class ThreeSetup2 {
         let subPayloadStar = new THREE.Points(payloadStarGeometry, material);
         subPayloadStar.material.color = new THREE.Color("gray");
         fireworkGroup.add(payloadLight, subPayloadStar, payloadStar);
-        this.scene.add(fireworkGroup);
+        this.scene.getObjectByName('Plane').add(fireworkGroup);
         fireworkGroup.position.set(coords.x, coords.y, 0);
 
         this.movement.fireworks.push({
@@ -426,7 +433,7 @@ export class ThreeSetup2 {
     fireworkAnimation = () =>{
         let f = false;
         this.movement.fireworks.map(firework => {
-            let fireworkObj = this.scene.getObjectByName(firework.name);
+            let fireworkObj = this.scene.getObjectByName('Plane').getObjectByName(firework.name);
             firework.frame += 1;
             if (firework.frame < 60){           
                 fireworkObj.position.z += Math.max(0.3 + 1/2*(-0.011)*firework.frame, 0);
@@ -453,7 +460,7 @@ export class ThreeSetup2 {
                 fireworkObj.remove(fireworkObj.children[0]);
                 return firework;
             }else if(firework.frame == 160){
-                this.scene.remove(fireworkObj);
+                this.scene.getObjectByName('Plane').remove(fireworkObj);
                 f = true;
                 return null;
             }
@@ -523,6 +530,11 @@ export class ThreeSetup2 {
             phiJit: Math.floor(Math.random() * (10 + 10) - 10),
             thetaJit: Math.floor(Math.random() * (10 + 10) - 10), 
         }
+    }
+
+    //function for moveing camera from plane to sphere and vise versa
+    moveCamera = (cameraNum) => {
+        console.log(cameraNum);
     }
 
     tick = () => {
