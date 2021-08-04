@@ -15,7 +15,7 @@ export class ThreeSetup2 {
             alpha: false, 
             antialias: true,
         });
-        this.controls = new OrbitControls(this.camera, this.canvas);
+        // this.controls = new OrbitControls(this.camera, this.canvas);
         this.raycaster = new THREE.Raycaster();
         this.mouse = new THREE.Vector2();
         this.objectsInScene = [];
@@ -24,7 +24,7 @@ export class ThreeSetup2 {
         this.up = new THREE.Vector3(0,1,0);
         this.target = new THREE.Vector3(50,0,0);
         this.movement = { //setting trusy values here will trigger corresponding animations 
-            camera: false,
+            camera: new Object(),
             user: true,
             water: true,
             payloads: [],
@@ -38,17 +38,67 @@ export class ThreeSetup2 {
     init = () => {
         this.camera.position.set(0, -18, 79);//this.camera.position.set(0, -12, 9);
         this.camera.lookAt(0, -30, 70);//this.camera.lookAt(0, 0, 0);
+        this.movement.camera['init'] = false;
+        this.movement.camera['targetPath'] = new THREE.QuadraticBezierCurve3(
+            new THREE.Vector3(0, -30, 70),
+            new THREE.Vector3(0,-30,20),
+            new THREE.Vector3(0,0,0)
+        );
+        this.movement.camera['positionPath'] = new THREE.QuadraticBezierCurve3(
+            new THREE.Vector3(0, -18, 79),
+            new THREE.Vector3(0,-18, 60),
+            new THREE.Vector3(0,0,60)
+        );
+        this.movement.camera['fraction'] = 0;
+        this.movement.camera['animation'] = () => {};
 
         this.renderer.setSize(this.width, this.height);
         this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
         this.renderer.setClearColor(new THREE.Color('#1d2951'),1);
         this.canvas.appendChild(this.renderer.domElement);
 
-        // this.controls.enableDamping = true;
-        this.controls.target.set(0,0,0);
+    }
 
-        // this.canvas.addEventListener('click', (event) => this.meshClicked(event));
-        // this.canvas.addEventListener('mousemove', (event) => this.mouseMove(event))
+    //function for moveing camera from plane to sphere and vise versa
+    moveCamera = (cameraNum) => {
+        if(!cameraNum){
+            this.movement.camera.init = true;
+            this.movement.camera.fraction = 0.01;
+            this.movement.camera['animation'] = this.cameraForward;
+            this.canvas.addEventListener('click', this.meshClicked);
+            this.canvas.addEventListener('mousemove', this.mouseMove);
+        }else{
+            this.movement.camera.init = true;
+            this.movement.camera.fraction = 0.99;
+            this.movement.camera['animation'] = this.cameraBackward;
+            this.canvas.removeEventListener('click', this.meshClicked);
+            this.canvas.removeEventListener('mousemove', this.mouseMove);
+        }
+    }
+
+    //function for moving camera forward
+    cameraForward = () => {
+        if(this.movement.camera.fraction < 1){
+            this.camera.position.copy(this.movement.camera.positionPath.getPoint(this.movement.camera.fraction));
+            this.camera.lookAt(this.movement.camera.targetPath.getPoint(this.movement.camera.fraction));
+            this.movement.camera.fraction += 0.01;
+        }else if(this.movement.camera.fraction = 1){
+            this.movement.camera.init = false;
+            this.movement.camera.fraction = 0;
+            this.movement.camera.animation = () => {};
+        }
+    }
+    //function for moving camera backwards
+    cameraBackward = () => {
+        if(this.movement.camera.fraction > 0){
+            this.camera.position.copy(this.movement.camera.positionPath.getPoint(this.movement.camera.fraction));
+            this.camera.lookAt(this.movement.camera.targetPath.getPoint(this.movement.camera.fraction));
+            this.movement.camera.fraction -= 0.01;
+        }else if(this.movement.camera.fraction = 0){
+            this.movement.camera.init = false;
+            this.movement.camera.fraction = 0;
+            this.movement.camera.animation = () => {};
+        }
     }
 
     meshClicked = (event) => {
@@ -331,7 +381,7 @@ export class ThreeSetup2 {
                 trailGroup.position.set(position.x, position.y, position.z);
                 this.scene.add(trailGroup);
                 
-                const target = new THREE.Vector3(20,70,30);
+                const target = new THREE.Vector3(50,0,0);
                 let p1 = new THREE.Vector3();
                 let p2 = new THREE.Vector3();
                 let px = new THREE.Vector3();
@@ -498,6 +548,9 @@ export class ThreeSetup2 {
                 });
                 let marker = new THREE.Mesh(circleGeometry, material);
                 marker.name = 'news' + index; 
+                if(markerGroup.getObjectByName(marker.name) !== undefined){
+                    markerGroup.remove(markerGroup.getObjectByName(marker.name));
+                }
                 markerGroup.add(marker);
                 let markerCoords = this.getCoordsFromSource(article.source);
                 marker.position.setFromSphericalCoords( 22, markerCoords.phi, markerCoords.theta );
@@ -532,30 +585,24 @@ export class ThreeSetup2 {
         }
     }
 
-    //function for moveing camera from plane to sphere and vise versa
-    moveCamera = (cameraNum) => {
-        console.log(cameraNum);
-    }
-
     tick = () => {
         const elapsedTime = this.clock.getElapsedTime();
         let sphere =  this.scene.getObjectByName('Sphere');
         sphere.rotation.y += this.movement.sphereRotation.x / 40;
         sphere.rotation.x -= this.movement.sphereRotation.y / 60;
-        // if(sphere.rotation.x > Math.PI / 4){
-        //     sphere.rotation.x = Math.PI / 4;
-        // } else if(sphere.rotation.x < - Math.PI / 4){
-        //     sphere.rotation.x = - Math.PI / 4;
-        // }
+        if(sphere.rotation.x > Math.PI / 4){
+            sphere.rotation.x = Math.PI / 4;
+        } else if(sphere.rotation.x < - Math.PI / 4){
+            sphere.rotation.x = - Math.PI / 4;
+        }
         this.scene.getObjectByName('Stars').rotation.y = -0.005 * elapsedTime;
         this.scene.getObjectByName('Stars').rotation.x = -0.005 * elapsedTime;
 
 
-        if (this.movement.camera){ //camera movement 
-            this.camera.position.x = 4 * Math.cos(elapsedTime * 0.1);
-            this.camera.position.y = 2 * Math.sin(elapsedTime * 0.1) - 20; 
-            this.camera.lookAt(0,0,0);
+        if (this.movement.camera.init){ //camera movement 
+            this.movement.camera.animation();
         }
+
         if (this.movement.water){ //wave animation
             sphere.getObjectByName('Water').material.normalScale.set( Math.sin(elapsedTime*0.3), Math.cos(elapsedTime*0.3));
             this.scene.getObjectByName('Plane').getObjectByName('Water').material.normalScale.set( Math.sin(elapsedTime*0.3), Math.cos(elapsedTime*0.3));
@@ -571,44 +618,13 @@ export class ThreeSetup2 {
 
         if(this.movement.payloads.length > 0){ //message sent animation
             this.newsPayloadAnimation();
-            // let f = false;
-            // this.movement.payloads.map((payload, index) => {
-            //     let payloadModel = new THREE.Object3D();
-            //     payloadModel = this.scene.getObjectByName(payload.payloadId);
-            //     if (typeof payload.light === 'undefined'){
-            //         payload.light = this.scene.getObjectByName(`light${index}`)
-            //     }
-            //     if(payload.fraction < 1){
-            //         let lightPosition = payload.curve.getPoint(payload.fraction);
-            //         payload.light.position.copy(lightPosition);
-
-            //         let newPostion = payload.curve.getPoint(payload.fraction-0.02);
-            //         let tangent = payload.curve.getTangent(payload.fraction-0.02);
-            //         let radians = this.up.angleTo(this.target);
-            //         this.axis.crossVectors(this.up,tangent).normalize();
-            //         payloadModel.position.copy(newPostion);
-            //         payloadModel.quaternion.setFromAxisAngle(this.axis,radians);
-            //         payload.fraction += 0.01;
-            //         return payload;
-            //     } else{
-            //         this.scene.remove(payloadModel);
-            //         payload.light.position.set(0,0,0);
-            //         f = true;
-            //         return null;
-            //     }
-            // });
-            // if(f){
-            //     this.movement.payloads = this.movement.payloads.filter(payload => payload.fraction < 1);
-            //     console.log(this.movement.payloads)
-            //     f = false;
-            // }
         }
+
         if(this.movement.fireworks.length > 0){
             this.fireworkAnimation();
         }
 
         if(this.movement.news.length > 0){
-            // console.log(this.camera.position)
             this.movement.news.forEach((index) => {
                 let marker = this.scene.getObjectByName('Sphere').getObjectByName('Markers').getObjectByName('news' + index);
                 marker.lookAt(this.camera.position);
