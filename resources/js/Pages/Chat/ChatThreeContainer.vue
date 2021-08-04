@@ -11,7 +11,7 @@ import { ThreeSetup2 } from './threeControls2';
 let threeSetup2, threeAnimation;
 
 export default {
-    props: ['messages', 'room', 'activeUsers', 'news'],
+    props: ['messages', 'room', 'activeUsers', 'news', 'cameraNum'],
     data () {
         return {
             roomRegion: '',
@@ -46,6 +46,9 @@ export default {
                 console.log('new fetched', newVal);
                 this.createNewsMarkers(newVal);
             }
+        },
+        cameraNum(newVal, oldVal){
+            this.setCamera(newVal);
         }
     },
     methods: {
@@ -85,12 +88,13 @@ export default {
         },
         createMessagePayload(message){
             if(message.link){
-                let payloadPath = threeSetup2.createNewsPayload(message);
-                threeSetup2.movement.payloads.push({
-                    payloadId: message.id,
-                    curve: payloadPath,
-                    fraction: 0.03,
-                });
+                threeSetup2.createNewsPayload(message);
+                // let payloadPath = threeSetup2.createNewsPayload(message);
+                // threeSetup2.movement.payloads.push({
+                //     payloadId: message.id,
+                //     curve: payloadPath,
+                //     fraction: 0.03,
+                // });
             }else {
                 let user = this.activeUsers.find(activeUser => activeUser['user_id'] == message.user.id);
                 console.log("from ", user);
@@ -101,6 +105,9 @@ export default {
             // ThreeGeometries.createNewsMarkers(threeSetup.scene, articles);
             // threeAnimation.movement.news = articles;
             threeSetup2.createNewsMarkers(articles);
+        },
+        setCamera(cameraNum){
+            threeSetup2.moveCamera(cameraNum);
         }
         
     },
