@@ -1,5 +1,5 @@
 <template>
-    <div class="h-1/2 p-2 flex flex-col-reverse overflow-y-scroll no-scrollbar" >
+    <div class="p-2 flex flex-col-reverse overflow-y-scroll no-scrollbar" >
         <div v-for="(message, index) in messages" :key="index" class="space-y-20">
             <message-item :message="message" />
         </div>

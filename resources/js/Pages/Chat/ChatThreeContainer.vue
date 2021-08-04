@@ -1,6 +1,5 @@
 <template>
     <div ref="canvas" class="h-full w-full">
-        <h1 class="absolute text-white left-2 top-2">Topic: {{room.topic}}</h1>
     </div>
 </template>
 

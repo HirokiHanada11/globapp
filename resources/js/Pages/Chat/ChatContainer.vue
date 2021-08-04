@@ -16,11 +16,15 @@
         <div class="py-12">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 relative" style="height:70vh">               
                 <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg h-full w-full relative">
-                    <div class="h-full w-1/4 absolute top-0 right-0">
+                    <div class="h-full w-1/4 absolute top-0 right-0 flex flex-col">
                         <active-users-container v-show="showActive" :activeUsers="activeUsers"/>
-                        <message-container :messages="messages" />
-                        <news-container :v-if="showNews" :news="news" :roomId="currentRoom.id" v-on:articlesent="getMessages()"/>
+                        <message-container v-show="showMessages" :messages="messages" />
+                        <div class="h-full w-1/4 absolute top-0 right-0 bg-gray-300 opacity-0 hover:opacity-50" @click="toggleMessage"></div>
                     </div> 
+                    <div class="h-full w-1/4 absolute top-0 left-0">
+                        <news-container v-show="showNews" :news="news" :roomId="currentRoom.id" v-on:articlesent="getMessages()"/>
+                        <div class="h-full w-1/4 absolute top-0 left-0 bg-gray-300 opacity-0 hover:opacity-50" @click="toggleNews"></div>
+                    </div>
                     <div class="bg-transparent absolute top-0 w-full flex justify-center ">
                         <input 
                             v-if="!camera"
@@ -31,10 +35,16 @@
                             class="bg-blue-900 border border-transparent focus:outline-none focus:border-none rounded-full text-white"
                         />
                         <button
-                            v-if="camera"
+                            v-if="!camera"
                             @click="fetchNews(currentRoom.topic)"
                             class="bg-blue-900 border border-transparent hover:outline-2 hover:border-none rounded-full text-white p-2">
                             Fetch News On Room Topic
+                        </button>
+                        <button
+                            v-if="camera"
+                            @click="setBackCamera()"
+                            class="bg-blue-900 border border-transparent hover:outline-2 hover:border-none rounded-full text-white p-2">
+                            Fetch News
                         </button>
                     </div> 
                     <div class="bg-transparent absolute bottom-0 w-full flex justify-center ">
@@ -80,6 +90,7 @@
                 messages: [],
                 activeUsers: [],
                 showActive: false,
+                showMessages: true,
                 sortBy: 'popularity',
                 news: [],
                 showNews: false,
@@ -96,10 +107,18 @@
             setBackCamera() {
                 this.camera = !this.camera;
             },
-            fetchNews(topic) {
+            toggleMessage() {
+                this.showMessages = !this.showMessages;
+            },
+            toggleNews() {
                 this.showNews = !this.showNews;
+            },
+            toggleShowActive() {
+                this.showActive = !this.showActive;
+            },
+            fetchNews(topic) {
+                this.showNews = true;
                 if(topic != ''){
-                    this.setBackCamera();
                     axios.get(`/chat/room/news/${encodeURI(topic)}`)
                     .then( response => {
                         console.log(response.data.articles);
@@ -165,9 +184,6 @@
                 .catch( error => {
                     console.error(error);
                 })
-            },
-            toggleShowActive() {
-                this.showActive = !this.showActive;
             },
             
         },
