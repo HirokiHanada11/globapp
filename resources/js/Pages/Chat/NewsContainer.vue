@@ -1,5 +1,5 @@
 <template>
-    <div class="h-1/2 p-2 flex flex-col overflow-y-scroll no-scrollbar" id="articles">
+    <div class="h-full p-2 flex flex-col overflow-y-scroll no-scrollbar" id="articles">
         <div v-for="(newsArticle, index) in news" :key="index"  >
             <article-item :newsArticle="newsArticle" :index="index" :roomId="roomId" v-on:articlesent="passEvent()"/>
         </div>

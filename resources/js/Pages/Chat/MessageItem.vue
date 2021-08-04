@@ -1,24 +1,37 @@
 <template>
-    <div v-if="message.user.name == $page.props.user.name" class='float-right my-2 bg-blue-300 max-w-3/4 mx-4 my-4 px-2 py-0.5 rounded-lg overflow-x-hidden hover:underline'>
-        <a v-if="message.link" :href="article.url" target="_blank">
-            <div class="text-left">
-                {{this.article.source.name}} -- {{this.article.publishedAt.slice(0,-10)}}
-            </div>
-            <span class="text-lg">
-                {{this.article.title}}
-                <img :src="article.urlToImage" class="rounded my-1 w-full">
-            </span>
-        </a>
-        <span v-else >{{ message.message }}</span>
+    <div v-if="message.user.name == $page.props.user.name" :id="message.id" >
+        <div class="text-sm py-1 mx-4 text-white w-1/4 float-right">
+            <span class='flex'>{{ message.user.name }}<img :src="message.user.profile_photo_url" class="float-right rounded-full h-4 mx-1"></span>
+        </div>
+        <div v-if="message.link" class='float-right my-2 bg-blue-300 mx-4 my-4 px-2 py-0.5 rounded-lg w-3/4'>
+            <a :href="article.url" target="_blank" class='hover:underline w-3/4'>
+                <div class="text-left">
+                    {{this.article.source.name}} -- {{this.article.publishedAt.slice(0,-10)}}
+                </div>
+                <div class="text-md">
+                    {{this.article.title}}
+                    <img :src="article.urlToImage" class="rounded my-1 w-full">
+                </div>
+            </a>
+        </div>
+        <div v-else class='float-right bg-blue-300 mx-2 mb-4 px-2 py-0.5 rounded-lg flex '>{{ message.message }}</div>
     </div>
-    <div v-else>
-        <div class="text-sm py-1 mx-4 text-white">
-            {{ message.user.name }}
+    <div v-else :id="message.id">
+        <div class="text-sm py-1 mx-4 text-white w-1/4 ">
+            <span class='flex'><img :src="message.user.profile_photo_url" class="rounded-full h-4 mx-1">{{ message.user.name }}</span>
         </div>
-        <div class="bg-gray-300 max-w-3/4 mx-4 my-4 px-2 py-1 rounded-lg">
-            <a v-if="message.link" :href="message.message">{{ message.message }}</a>
-            <span v-else >{{ message.message }}</span>
+        <div v-if="message.link" class="float-left bg-gray-300 mx-2 mb-4 px-2 py-0.5 rounded-lg w-3/4 ">
+            <a  :href="article.url" target="_blank" class='hover:underline w-3/4'>
+                <div class="text-left">
+                    {{this.article.source.name}} -- {{this.article.publishedAt.slice(0,-10)}}
+                </div>
+                <span class="text-md">
+                    {{this.article.title}}
+                    <img :src="article.urlToImage" class="rounded my-1 w-full">
+                </span>
+            </a>
         </div>
+        <div v-else class="float-left bg-gray-300 mx-2 mb-4 px-2 py-0.5 rounded-lg flex ">{{ message.message }}</div>
     </div>
 </template>
 

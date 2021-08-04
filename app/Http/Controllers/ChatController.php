@@ -20,15 +20,21 @@ class ChatController extends Controller
             'X-Api-Key' => 'b3223848c6a34470867e3961b2db38be'
         ])->get($newsApiEndPoint, [
             'q' => $topic
-        ]);
+        ]);      
 
-        // $sources = Http::withHeaders([
-        //     'X-Api-Key' => 'b3223848c6a34470867e3961b2db38be'
-        // ])->get('https://newsapi.org/v2/top-headlines/sources', [
-        //         'language' => 'en',
-        //     ]);
+        return $response->json();
+    }
 
-        
+    public function searchNews( Request $request, $topic ){
+        $newsApiEndPoint = 'https://newsapi.org/v2/everything';
+
+        $response = Http::withHeaders([
+            'X-Api-Key' => 'b3223848c6a34470867e3961b2db38be'
+        ])->get($newsApiEndPoint, [
+            'qInTitle' => $topic,
+            'sortBy' => 'popularity',
+            'pageSize' => 20,
+        ]);      
 
         return $response->json();
     }
@@ -78,6 +84,7 @@ class ChatController extends Controller
 
         broadcast(new NewChatMessage( $newMessage ))->toOthers();
 
+
         return $newMessage;
     }
 
@@ -110,5 +117,37 @@ class ChatController extends Controller
         $newActiveUser->save();
         
         return $newActiveUser;
+    }
+
+    public function newDemoActiveUser( Request $request, $roomId ){
+        $newDemoActiveUser = new ActiveUSer;
+        $newDemoActiveUser->chat_room_id = $roomId;
+        $newDemoActiveUser->user_id = $request->userId;
+        $newDemoActiveUser->region = $request->region;
+        $newDemoActiveUser->model_id = 1;
+        $newDemoActiveUser->save();
+        
+        return $newDemoActiveUser;
+    }
+
+    public function deactivateDemoUser( Request $request, $roomId ){
+        return ActiveUser::where('chat_room_id', $roomId)
+            ->where('model_id', 1)
+            ->delete();
+    }
+
+    public function newDemoMessage( Request $request, $roomId ){
+        $newDemoMessage = new ChatMessage;
+        $newDemoMessage->user_id = $request->demoUserId;
+        $newDemoMessage->chat_room_id = $roomId;
+        $newDemoMessage->message = $request->message;
+        $newDemoMessage->link = $request->link;
+        $newDemoMessage->article = $request->article;
+        $newDemoMessage->replying_to = $request->replyTo;
+        $newDemoMessage->save();
+
+        // broadcast(new NewChatMessage( $newDemoMessage ))->toOthers();
+
+        return $newDemoMessage;
     }
 }

@@ -1,5 +1,5 @@
 <template>
-    <div class="h-30 p-2 flex flex-col rounded overflow-y-scroll absolute right-0 top-0 bg-blue-300 no-scrollbar">
+    <div class="h-30 max-w-1/4 p-2 flex flex-col rounded overflow-y-scroll absolute left-0 top-0 bg-gray-300 no-scrollbar">
         <div 
             v-for="(user, index) in activeUsers"
             v-bind:key="index"> 

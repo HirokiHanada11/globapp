@@ -16,11 +16,15 @@
         <div class="py-12">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 relative" style="height:70vh">               
                 <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg h-full w-full relative">
-                    <div class="h-full w-1/4 absolute top-0 right-0">
+                    <div class="h-full w-1/4 absolute top-0 right-0 flex flex-col">
                         <active-users-container v-show="showActive" :activeUsers="activeUsers"/>
-                        <message-container :messages="messages" />
-                        <news-container :v-if="showNews" :news="news" :roomId="currentRoom.id" v-on:articlesent="getMessages()"/>
+                        <message-container v-show="showMessages" :messages="messages" />
+                        <div class="h-full w-1/4 absolute top-0 right-0 bg-gray-300 opacity-0 hover:opacity-50" @click="toggleMessage"></div>
                     </div> 
+                    <div class="h-full w-1/4 absolute top-0 left-0">
+                        <news-container v-show="showNews" :news="news" :roomId="currentRoom.id" v-on:articlesent="getMessages()"/>
+                        <div class="h-full w-1/4 absolute top-0 left-0 bg-gray-300 opacity-0 hover:opacity-50" @click="toggleNews"></div>
+                    </div>
                     <div class="bg-transparent absolute top-0 w-full flex justify-center ">
                         <input 
                             v-if="!camera"
@@ -31,10 +35,16 @@
                             class="bg-blue-900 border border-transparent focus:outline-none focus:border-none rounded-full text-white"
                         />
                         <button
-                            v-if="camera"
+                            v-if="!camera"
                             @click="fetchNews(currentRoom.topic)"
                             class="bg-blue-900 border border-transparent hover:outline-2 hover:border-none rounded-full text-white p-2">
                             Fetch News On Room Topic
+                        </button>
+                        <button
+                            v-if="camera"
+                            @click="setBackCamera()"
+                            class="bg-blue-900 border border-transparent hover:outline-2 hover:border-none rounded-full text-white p-2">
+                            Fetch News
                         </button>
                     </div> 
                     <div class="bg-transparent absolute bottom-0 w-full flex justify-center ">
@@ -49,7 +59,10 @@
                 </div>
                 <input-message 
                     :room="currentRoom" 
-                    v-on:messagesent="getMessages()" />
+                    v-on:messagesent="getMessages()" 
+                    v-on:demostarted="startDemo()"
+                    v-on:demostopped="stopDemo()"
+                    />
                 
             </div>
         </div>
@@ -63,6 +76,7 @@
     import ChatThreeContainer from './ChatThreeContainer.vue'
     import ActiveUsersContainer from './ActiveUsersContainer.vue'
     import NewsContainer from './NewsContainer.vue'
+import { prefecToCoords } from './japanPrefecture'
 
     export default {
         props: ['roomId'],
@@ -80,11 +94,14 @@
                 messages: [],
                 activeUsers: [],
                 showActive: false,
+                showMessages: true,
                 sortBy: 'popularity',
                 news: [],
                 showNews: false,
                 topic: '',
                 camera: true,
+                demoInterval: 0,
+                
             }
         },
         watch: {
@@ -93,14 +110,96 @@
             }
         },
         methods: {
+            startDemo(){
+                const randomComment = ['こんにちは！','すごい！','アメンボ赤いな愛ゆえに','そんなばなな','OMG!!'];
+                for(let i = 2; i < 6; i++){
+                    let demoRegion = Object.keys(prefecToCoords)[Math.floor(Math.random() * 46)]
+                    axios.post(`/chat/room/${this.currentRoom.id}/newdemoactiveuser`, {
+                        userId: i,
+                        region: demoRegion,
+                    })
+                    .then( response => {
+                        if( response.status == 201 ){
+                            console.log('activated new demo user', response.data);
+                        }
+                    })
+                    .catch( error => {
+                        console.error(error);
+                    })
+                }
+                this.getActiveUsers();
+                this.demoInterval = setInterval(()=>{
+                    let id = Math.floor(Math.random() * (6 - 2) + 2);
+                    let randomIndex = Math.floor(Math.random()* (randomComment.length - 1));
+                    let comment = randomComment[randomIndex];
+                    console.log(comment)
+                    axios.post(`/chat/room/${this.currentRoom.id}/demomessage`, {
+                        demoUserId: id,
+                        message: comment,
+                        link: false,
+                        article: null,
+                        replyTo: null,
+                    })
+                    .then( response => {
+                        if( response.status == 201 ){
+                            console.log('Dummy message', response.data);
+                            this.getMessages();
+                        }
+                    })
+                    .catch( error => {
+                        console.error(error);
+                    })
+                },3000);
+            },
+            stopDemo(){
+                clearInterval(this.demoInterval);
+                this.demoInterval = 0;
+                axios.post(`/chat/room/deactivatedemo/${this.currentRoom.id}`)
+                .then( response => {
+                    if( response.status == 201 ){
+                        console.log('deactivated demo users');
+                        this.getActiveUsers();
+                    }
+                })
+                .catch( error => {
+                    console.error(error);
+                })
+            },
             setBackCamera() {
                 this.camera = !this.camera;
             },
-            fetchNews(topic) {
+            toggleMessage() {
+                this.showMessages = !this.showMessages;
+                if(this.showMessages){
+                    let container = document.getElementById(this.messages[0].id);
+                    console.log(container.scrollHeight)
+                    container.scrollTop = container.scrollHeight;
+                }
+            },
+            toggleNews() {
                 this.showNews = !this.showNews;
+            },
+            toggleShowActive() {
+                this.showActive = !this.showActive;
+            },
+            fetchNews(topic) {
+                this.showNews = true;
                 if(topic != ''){
-                    this.setBackCamera();
                     axios.get(`/chat/room/news/${encodeURI(topic)}`)
+                    .then( response => {
+                        console.log(response.data.articles);
+                        this.news = response.data.articles;
+                        this.topic = '';
+                    })
+                    .catch( error => {
+                        console.error(error);
+                    })
+                }
+            },
+            searchNews(topic) {
+                this.showNews = true;
+                if(topic != ''){
+                    axios.get(`/chat/room/news/search/${encodeURI(topic)}`)
                     .then( response => {
                         console.log(response.data.articles);
                         this.news = response.data.articles;
@@ -165,9 +264,6 @@
                 .catch( error => {
                     console.error(error);
                 })
-            },
-            toggleShowActive() {
-                this.showActive = !this.showActive;
             },
             
         },
