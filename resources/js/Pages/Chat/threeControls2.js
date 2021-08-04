@@ -36,8 +36,8 @@ export class ThreeSetup2 {
         };
     }
     init = () => {
-        this.camera.position.set(0, -12, 9);//this.camera.position.set(0, -12, 30);
-        this.camera.lookAt(0, 0, 0);//this.camera.lookAt(0, 70, 30);
+        this.camera.position.set(0, -12, 30);//this.camera.position.set(0, -12, 9);
+        this.camera.lookAt(0, 70, 30);//this.camera.lookAt(0, 0, 0);
 
         this.renderer.setSize(this.width, this.height);
         this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -324,7 +324,7 @@ export class ThreeSetup2 {
                 trailGroup.position.set(position.x, position.y, position.z);
                 this.scene.add(trailGroup);
                 
-                const target = new THREE.Vector3(20,0,0);
+                const target = new THREE.Vector3(20,70,30);
                 let p1 = new THREE.Vector3();
                 let p2 = new THREE.Vector3();
                 let px = new THREE.Vector3();
@@ -347,11 +347,53 @@ export class ThreeSetup2 {
                 }
                 // console.log(p0,p1,p2,p3)
                 curvePath.add(new THREE.CubicBezierCurve3(p0,p1,p2,p3));
-                return curvePath;
+                // return curvePath;
+                this.movement.payloads.push({
+                    payloadId: message.id,
+                    curve: curvePath,
+                    fraction: 0.03,
+                    animation: this.newsPayloadAnimation,
+                });
             }
         }
     }
 
+    //function to animate news payload
+    newsPayloadAnimation = () => {
+        let f = false;
+            this.movement.payloads.map((payload, index) => {
+                let payloadModel = new THREE.Object3D();
+                payloadModel = this.scene.getObjectByName(payload.payloadId);
+                // if (typeof payload.light === 'undefined'){
+                //     payload.light = this.scene.getObjectByName(`light${index}`)
+                // }
+                if(payload.fraction < 1){
+                    // let lightPosition = payload.curve.getPoint(payload.fraction);
+                    // payload.light.position.copy(lightPosition);
+
+                    let newPostion = payload.curve.getPoint(payload.fraction-0.02);
+                    let tangent = payload.curve.getTangent(payload.fraction-0.02);
+                    let radians = this.up.angleTo(this.target);
+                    this.axis.crossVectors(this.up,tangent).normalize();
+                    payloadModel.position.copy(newPostion);
+                    payloadModel.quaternion.setFromAxisAngle(this.axis,radians);
+                    payload.fraction += 0.01;
+                    return payload;
+                } else{
+                    this.scene.remove(payloadModel);
+                    // payload.light.position.set(0,0,0);
+                    f = true;
+                    return null;
+                }
+            });
+            if(f){
+                this.movement.payloads = this.movement.payloads.filter(payload => payload.fraction < 1);
+                console.log(this.movement.payloads)
+                f = false;
+            }
+    }
+
+    //function to set up animation for fireworks
     createMessageAnimation = (message, userRegion) => {
         let coords = this.prefecToCoordsOnMap(userRegion);
         let mainColor = new THREE.Color("#" + Math.floor(Math.random() * 0xFFFFFF).toString(16));
@@ -488,11 +530,11 @@ export class ThreeSetup2 {
         let sphere =  this.scene.getObjectByName('Sphere');
         sphere.rotation.y += this.movement.sphereRotation.x / 40;
         sphere.rotation.x -= this.movement.sphereRotation.y / 60;
-        if(sphere.rotation.x > Math.PI / 4){
-            sphere.rotation.x = Math.PI / 4;
-        } else if(sphere.rotation.x < - Math.PI / 4){
-            sphere.rotation.x = - Math.PI / 4;
-        }
+        // if(sphere.rotation.x > Math.PI / 4){
+        //     sphere.rotation.x = Math.PI / 4;
+        // } else if(sphere.rotation.x < - Math.PI / 4){
+        //     sphere.rotation.x = - Math.PI / 4;
+        // }
         this.scene.getObjectByName('Stars').rotation.y = -0.005 * elapsedTime;
         this.scene.getObjectByName('Stars').rotation.x = -0.005 * elapsedTime;
 
@@ -516,37 +558,38 @@ export class ThreeSetup2 {
         }
 
         if(this.movement.payloads.length > 0){ //message sent animation
-            let f = false;
-            this.movement.payloads.map((payload, index) => {
-                let payloadModel = new THREE.Object3D();
-                payloadModel = this.scene.getObjectByName(payload.payloadId);
-                if (typeof payload.light === 'undefined'){
-                    payload.light = this.scene.getObjectByName(`light${index}`)
-                }
-                if(payload.fraction < 1){
-                    let lightPosition = payload.curve.getPoint(payload.fraction);
-                    payload.light.position.copy(lightPosition);
+            this.newsPayloadAnimation();
+            // let f = false;
+            // this.movement.payloads.map((payload, index) => {
+            //     let payloadModel = new THREE.Object3D();
+            //     payloadModel = this.scene.getObjectByName(payload.payloadId);
+            //     if (typeof payload.light === 'undefined'){
+            //         payload.light = this.scene.getObjectByName(`light${index}`)
+            //     }
+            //     if(payload.fraction < 1){
+            //         let lightPosition = payload.curve.getPoint(payload.fraction);
+            //         payload.light.position.copy(lightPosition);
 
-                    let newPostion = payload.curve.getPoint(payload.fraction-0.02);
-                    let tangent = payload.curve.getTangent(payload.fraction-0.02);
-                    let radians = this.up.angleTo(this.target);
-                    this.axis.crossVectors(this.up,tangent).normalize();
-                    payloadModel.position.copy(newPostion);
-                    payloadModel.quaternion.setFromAxisAngle(this.axis,radians);
-                    payload.fraction += 0.01;
-                    return payload;
-                } else{
-                    this.scene.remove(payloadModel);
-                    payload.light.position.set(0,0,0);
-                    f = true;
-                    return null;
-                }
-            });
-            if(f){
-                this.movement.payloads = this.movement.payloads.filter(payload => payload.fraction < 1);
-                console.log(this.movement.payloads)
-                f = false;
-            }
+            //         let newPostion = payload.curve.getPoint(payload.fraction-0.02);
+            //         let tangent = payload.curve.getTangent(payload.fraction-0.02);
+            //         let radians = this.up.angleTo(this.target);
+            //         this.axis.crossVectors(this.up,tangent).normalize();
+            //         payloadModel.position.copy(newPostion);
+            //         payloadModel.quaternion.setFromAxisAngle(this.axis,radians);
+            //         payload.fraction += 0.01;
+            //         return payload;
+            //     } else{
+            //         this.scene.remove(payloadModel);
+            //         payload.light.position.set(0,0,0);
+            //         f = true;
+            //         return null;
+            //     }
+            // });
+            // if(f){
+            //     this.movement.payloads = this.movement.payloads.filter(payload => payload.fraction < 1);
+            //     console.log(this.movement.payloads)
+            //     f = false;
+            // }
         }
         if(this.movement.fireworks.length > 0){
             this.fireworkAnimation();

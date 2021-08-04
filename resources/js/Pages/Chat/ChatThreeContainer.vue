@@ -85,12 +85,13 @@ export default {
         },
         createMessagePayload(message){
             if(message.link){
-                let payloadPath = threeSetup2.createNewsPayload(message);
-                threeSetup2.movement.payloads.push({
-                    payloadId: message.id,
-                    curve: payloadPath,
-                    fraction: 0.03,
-                });
+                threeSetup2.createNewsPayload(message);
+                // let payloadPath = threeSetup2.createNewsPayload(message);
+                // threeSetup2.movement.payloads.push({
+                //     payloadId: message.id,
+                //     curve: payloadPath,
+                //     fraction: 0.03,
+                // });
             }else {
                 let user = this.activeUsers.find(activeUser => activeUser['user_id'] == message.user.id);
                 console.log("from ", user);
