@@ -59,7 +59,10 @@
                 </div>
                 <input-message 
                     :room="currentRoom" 
-                    v-on:messagesent="getMessages()" />
+                    v-on:messagesent="getMessages()" 
+                    v-on:demostarted="startDemo()"
+                    v-on:demostopped="stopDemo()"
+                    />
                 
             </div>
         </div>
@@ -73,6 +76,7 @@
     import ChatThreeContainer from './ChatThreeContainer.vue'
     import ActiveUsersContainer from './ActiveUsersContainer.vue'
     import NewsContainer from './NewsContainer.vue'
+import { prefecToCoords } from './japanPrefecture'
 
     export default {
         props: ['roomId'],
@@ -96,6 +100,8 @@
                 showNews: false,
                 topic: '',
                 camera: true,
+                demoInterval: 0,
+                
             }
         },
         watch: {
@@ -104,6 +110,61 @@
             }
         },
         methods: {
+            startDemo(){
+                const randomComment = ['こんにちは！','すごい！','アメンボ赤いな愛ゆえに','そんなばなな','OMG!!'];
+                for(let i = 2; i < 6; i++){
+                    let demoRegion = Object.keys(prefecToCoords)[Math.floor(Math.random() * 46)]
+                    axios.post(`/chat/room/${this.currentRoom.id}/newdemoactiveuser`, {
+                        userId: i,
+                        region: demoRegion,
+                    })
+                    .then( response => {
+                        if( response.status == 201 ){
+                            console.log('activated new demo user', response.data);
+                        }
+                    })
+                    .catch( error => {
+                        console.error(error);
+                    })
+                }
+                this.getActiveUsers();
+                this.demoInterval = setInterval(()=>{
+                    let id = Math.floor(Math.random() * (6 - 2) + 2);
+                    let randomIndex = Math.floor(Math.random()* (randomComment.length - 1));
+                    let comment = randomComment[randomIndex];
+                    console.log(comment)
+                    axios.post(`/chat/room/${this.currentRoom.id}/demomessage`, {
+                        demoUserId: id,
+                        message: comment,
+                        link: false,
+                        article: null,
+                        replyTo: null,
+                    })
+                    .then( response => {
+                        if( response.status == 201 ){
+                            console.log('Dummy message', response.data);
+                            this.getMessages();
+                        }
+                    })
+                    .catch( error => {
+                        console.error(error);
+                    })
+                },3000);
+            },
+            stopDemo(){
+                clearInterval(this.demoInterval);
+                this.demoInterval = 0;
+                axios.post(`/chat/room/deactivatedemo/${this.currentRoom.id}`)
+                .then( response => {
+                    if( response.status == 201 ){
+                        console.log('deactivated demo users');
+                        this.getActiveUsers();
+                    }
+                })
+                .catch( error => {
+                    console.error(error);
+                })
+            },
             setBackCamera() {
                 this.camera = !this.camera;
             },

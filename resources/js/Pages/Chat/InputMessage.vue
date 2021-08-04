@@ -32,6 +32,14 @@ export default {
         sendMessage() {
             if( this.message == '' ){
                 return;
+            }else if( this.message == '/demostart'){
+                this.$emit('demostarted');
+                this.message = '';
+                return;
+            }else if ( this.message == '/demostop'){
+                this.$emit('demostopped');
+                this.message = '';
+                return;
             }
 
             axios.post(`/chat/room/${this.room.id}/message`, {

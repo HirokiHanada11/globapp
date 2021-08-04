@@ -476,12 +476,12 @@ export class ThreeSetup2 {
                 fireworkObj.position.z += Math.max(0.3 + 1/2*(-0.011)*firework.frame, 0);
                 fireworkObj.lookAt(this.camera.position);
                 fireworkObj.children[0].power *= 0.9;
-                console.log(fireworkObj.position.z)
+                // console.log(fireworkObj.position.z)
                 return firework;
             }else if(firework.frame == 60){
                 fireworkObj.children[0].power = 0;
                 return firework;
-            }else if(firework.frame == 90){
+            }else if(firework.frame == 75){
                 fireworkObj.children[1].position.set(-0.1,-0.1,-0.1);
                 fireworkObj.children[0].power = 3*Math.PI;
                 fireworkObj.children[1].material.color = firework.colors[0];
@@ -489,14 +489,14 @@ export class ThreeSetup2 {
                 fireworkObj.children[2].material.size = 0.05;
                 fireworkObj.children[1].material.size = 0.05;
                 return firework;
-            }else if(firework.frame > 90 && firework.frame < 130){
+            }else if(firework.frame > 75 && firework.frame < 130){
                 fireworkObj.scale.multiplyScalar(1.1);
                 fireworkObj.lookAt(this.camera.position);
                 return firework;
             }else if(firework.frame == 130){
                 fireworkObj.remove(fireworkObj.children[0]);
                 return firework;
-            }else if(firework.frame == 160){
+            }else if(firework.frame == 140){
                 this.scene.getObjectByName('Plane').remove(fireworkObj);
                 f = true;
                 return null;
@@ -505,7 +505,7 @@ export class ThreeSetup2 {
         if(f) {
             this.movement.fireworks = this.movement.fireworks.filter(firework => firework !== null);
             f = false;
-            console.log(this.scene.children);
+            // console.log(this.scene.children);
         }
     }
 
