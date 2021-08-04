@@ -113,7 +113,6 @@ export class ThreeSetup2 {
             let topPos = document.getElementById(intersects[0].object.name).offsetTop;
             console.log(topPos)
             document.getElementById("articles").scrollTop = topPos;
-            console.log(document.getElementById("articles").scrollTop)
         }else {
             this.movement.sphereControl = !this.movement.sphereControl;
             this.movement.sphereControlOrigin.x = this.mouse.x;
@@ -244,13 +243,8 @@ export class ThreeSetup2 {
         waterPlane.name = 'Water';
         waterPlane.position.z = 0.3;
 
-        // let landCircle = new THREE.CircleBufferGeometry(28, 16, 0, Math.PI);
-        // const material = new THREE.MeshBasicMaterial( { color: new THREE.Color('#90ee90') } );
-        // const circle = new THREE.Mesh( landCircle, material );
-
-
         planeGroup.add(japanPlane, waterPlane, userModels );
-        planeGroup.position.set(0,-30, 70); //planeGroup.add(asiaPlane, japanPlane, waterPlane, circle);
+        planeGroup.position.set(0,-30, 70); 
         planeGroup.rotateX(-Math.PI/2);
         this.scene.add(planeGroup);
     }
@@ -295,13 +289,6 @@ export class ThreeSetup2 {
         lightsGroup.add(sunLight2, sunLight2.target);
 
         this.scene.add(lightsGroup);
-
-        // for (let i = 0; i < 3; i++){
-        //     let pointLight = new THREE.PointLight(new THREE.Color("#a7d8de"),0.5);
-        //     pointLight.name = `light${i}`;
-        //     pointLight.position.z = 70
-        //     this.scene.add(pointLight);
-        // }
     }
 
     //static function to create user model when user joins the room, the model generated is a placeholder at the moment, planning to develop more complex models in the future

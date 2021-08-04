@@ -109,6 +109,11 @@
             },
             toggleMessage() {
                 this.showMessages = !this.showMessages;
+                if(this.showMessages){
+                    let container = document.getElementById(this.messages[0].id);
+                    console.log(container.scrollHeight)
+                    container.scrollTop = container.scrollHeight;
+                }
             },
             toggleNews() {
                 this.showNews = !this.showNews;
@@ -120,6 +125,20 @@
                 this.showNews = true;
                 if(topic != ''){
                     axios.get(`/chat/room/news/${encodeURI(topic)}`)
+                    .then( response => {
+                        console.log(response.data.articles);
+                        this.news = response.data.articles;
+                        this.topic = '';
+                    })
+                    .catch( error => {
+                        console.error(error);
+                    })
+                }
+            },
+            searchNews(topic) {
+                this.showNews = true;
+                if(topic != ''){
+                    axios.get(`/chat/room/news/search/${encodeURI(topic)}`)
                     .then( response => {
                         console.log(response.data.articles);
                         this.news = response.data.articles;

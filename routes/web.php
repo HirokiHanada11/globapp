@@ -58,6 +58,9 @@ Route::middleware('auth:sanctum')->get('/chat/room/{roomId}/activeusers', [ChatC
 //Get news on the topic of the room
 Route::middleware('auth:sanctum')->get('/chat/room/news/{topic}', [ChatController::class, 'news']);
 
+//Get news on the topic of choice
+Route::middleware('auth:sanctum')->get('/chat/room/news/search/{topic}', [ChatController::class, 'searchNews']);
+
 //Post message to room
 Route::middleware('auth:sanctum')->post('/chat/room/{roomId}/message', [ChatController::class, 'newMessage']);
 
