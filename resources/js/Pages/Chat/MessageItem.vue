@@ -1,20 +1,17 @@
 <template>
     <div v-if="message.user.name == $page.props.user.name" :id="message.id" >
-        <div class="text-sm py-1 mx-4 text-white w-1/4 float-right">
-            <span class='flex'>{{ message.user.name }}<img :src="message.user.profile_photo_url" class="float-right rounded-full h-4 mx-1"></span>
-        </div>
-        <div v-if="message.link" class='float-right my-2 bg-blue-300 mx-4 my-4 px-2 py-0.5 rounded-lg w-3/4'>
+        <div v-if="message.link" class='float-right my-2 bg-blue-400 mx-4 mr-5 my-4 px-2 py-0.5 rounded-lg w-3/4'>
             <a :href="article.url" target="_blank" class='hover:underline w-3/4'>
                 <div class="text-left">
-                    {{this.article.source.name}} -- {{this.article.publishedAt.slice(0,-10)}}
+                    {{this.article.source.name}} -- <span class="text-xs">{{this.article.publishedAt.slice(0,10)}}</span>
                 </div>
-                <div class="text-md">
+                <div class="text-sm">
                     {{this.article.title}}
                     <img :src="article.urlToImage" class="rounded my-1 w-full">
                 </div>
             </a>
         </div>
-        <div v-else class='float-right bg-blue-300 mx-2 mb-4 px-2 py-0.5 rounded-lg flex '>{{ message.message }}</div>
+        <div v-else class='float-right bg-blue-400 mx-4 mr-5 mb-4 px-2 py-0.5 rounded-lg flex '>{{ message.message }}</div>
     </div>
     <div v-else :id="message.id">
         <div class="text-sm py-1 mx-4 text-white w-1/4 ">
@@ -23,7 +20,7 @@
         <div v-if="message.link" class="float-left bg-gray-300 mx-2 mb-4 px-2 py-0.5 rounded-lg w-3/4 ">
             <a  :href="article.url" target="_blank" class='hover:underline w-3/4'>
                 <div class="text-left">
-                    {{this.article.source.name}} -- {{this.article.publishedAt.slice(0,-10)}}
+                    {{this.article.source.name}} -- {{this.article.publishedAt.slice(0,10)}}
                 </div>
                 <span class="text-md">
                     {{this.article.title}}

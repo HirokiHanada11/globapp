@@ -275,7 +275,7 @@ export class ThreeSetup2 {
         const lightsGroup = new THREE.Group();
         lightsGroup.name = "Lights";
 
-        const ambientLight = new THREE.AmbientLight(0xffffed, 0.1);
+        const ambientLight = new THREE.AmbientLight(0xffffed, 0.25);
         lightsGroup.add(ambientLight);
 
         const sunLight = new THREE.DirectionalLight(0xffffed, 0.75);
@@ -283,7 +283,7 @@ export class ThreeSetup2 {
         sunLight.target.position.set(0,0,0);
         lightsGroup.add(sunLight, sunLight.target);
 
-        const sunLight2 = new THREE.DirectionalLight(0xffffed, 0.9);
+        const sunLight2 = new THREE.DirectionalLight(0xffffed, 0.7);
         sunLight2.position.set(0,75,70);
         sunLight2.target.position.set(0,-30,70);
         lightsGroup.add(sunLight2, sunLight2.target);
