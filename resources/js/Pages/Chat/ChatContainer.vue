@@ -17,13 +17,15 @@
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 relative" style="height:70vh">               
                 <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg h-full w-full relative">
                     <div class="h-full w-1/4 absolute top-0 right-0 flex flex-col">
-                        <active-users-container v-show="showActive" :activeUsers="activeUsers"/>
                         <message-container v-show="showMessages" :messages="messages" />
-                        <div class="h-full w-1/4 absolute top-0 right-0 bg-gray-300 opacity-0 hover:opacity-50" @click="toggleMessage"></div>
+                        <div class="h-full w-1/12 absolute top-0 right-0 bg-gray-300 opacity-5 hover:opacity-50" @click="toggleMessage"></div>               
                     </div> 
+                    <div class="h-1/2 w-1/4 absolute top-0 right-1/4">
+                        <active-users-container v-show="showActive" :activeUsers="activeUsers"/>
+                    </div>
                     <div class="h-full w-1/4 absolute top-0 left-0">
                         <news-container v-show="showNews" :news="news" :roomId="currentRoom.id" v-on:articlesent="getMessages()"/>
-                        <div class="h-full w-1/4 absolute top-0 left-0 bg-gray-300 opacity-0 hover:opacity-50" @click="toggleNews"></div>
+                        <div class="h-full w-1/12 absolute top-0 left-0 bg-gray-300 opacity-5 hover:opacity-50" @click="toggleNews"></div>
                     </div>
                     <div class="bg-transparent absolute top-0 w-full flex justify-center ">
                         <input 
