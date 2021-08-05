@@ -113,7 +113,7 @@ import { prefecToCoords } from './japanPrefecture'
         },
         methods: {
             startDemo(){
-                const randomComment = ['こんにちは！','すごい！','アメンボ赤いな愛ゆえに','そんなばなな','OMG!!'];
+                const randomComment = ['私は南極に行く','軽く死ねますね','アメンボ赤いな愛ゆえに','選択肢はずっとあったよでも選んだんだよ、ここを選んだんだよ自分で','うるかにしてください','プリンは飲み物'];
                 for(let i = 2; i < 6; i++){
                     let demoRegion = Object.keys(prefecToCoords)[Math.floor(Math.random() * 46)]
                     axios.post(`/chat/room/${this.currentRoom.id}/newdemoactiveuser`, {
