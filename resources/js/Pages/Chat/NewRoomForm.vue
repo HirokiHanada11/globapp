@@ -60,7 +60,7 @@
         </div>
         <div class="">
             <button
-                @click="back"
+                @click="createRoom"
                 class="place-self-center hover:bg-gray-500 bg-blue-700 p-1 px-3 mt-1 rounded text-white m-2 float-right">
                 Create
             </button>
