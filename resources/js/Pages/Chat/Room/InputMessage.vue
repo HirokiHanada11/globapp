@@ -18,7 +18,7 @@
 </template>
 
 <script>
-import Button from '../../Jetstream/Button.vue'
+import Button from '../../../Jetstream/Button.vue'
 export default {
   components: { Button },
     props: ['room'],

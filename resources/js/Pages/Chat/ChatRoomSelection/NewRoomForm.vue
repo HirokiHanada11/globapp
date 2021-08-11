@@ -69,8 +69,8 @@
 </template>
 
 <script>
-import Button from '../../Jetstream/Button.vue';
-import Input from '../../Jetstream/Input.vue'
+import Button from '../../../Jetstream/Button.vue';
+import Input from '../../../Jetstream/Input.vue'
 export default {
     components: { Input, Button },
     emits: ['roomcreated'],

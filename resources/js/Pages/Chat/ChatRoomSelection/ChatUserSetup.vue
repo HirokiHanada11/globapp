@@ -27,8 +27,8 @@
 </template>
 
 <script>
-import { nameToCoords } from "./countries.js";
-import { prefecToCoords } from "./japanPrefecture.js";
+import { nameToCoords } from "../ThreeJS/countries.js";
+import { prefecToCoords } from "../ThreeJS/japanPrefecture.js";
 
 
 export default {

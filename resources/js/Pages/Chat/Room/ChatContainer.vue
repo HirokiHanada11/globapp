@@ -78,7 +78,7 @@
     import ChatThreeContainer from './ChatThreeContainer.vue'
     import ActiveUsersContainer from './ActiveUsersContainer.vue'
     import NewsContainer from './NewsContainer.vue'
-import { prefecToCoords } from './japanPrefecture'
+    import { prefecToCoords } from '../ThreeJS/japanPrefecture'
 
     export default {
         props: ['roomId'],

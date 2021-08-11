@@ -4,11 +4,7 @@
 </template>
 
 <script>
-import Button from '../../Jetstream/Button.vue'
 export default {
-    components: {
-        Button,
-    },
     props: [
         'href'
     ],
