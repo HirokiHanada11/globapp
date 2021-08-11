@@ -5,7 +5,7 @@
 
 <script>
 import * as THREE from 'three';
-import { ThreeSetup, ThreeGeometries, ThreeAnimation, } from '../threeControls';
+// import { ThreeSetup, ThreeGeometries, ThreeAnimation, } from '../threeControls';
 import { ThreeSetup2 } from '../ThreeJS/threeControls2';
 let threeSetup2, threeAnimation;
 

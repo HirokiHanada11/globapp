@@ -3,7 +3,11 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
-use App\Http\Controllers\ChatController;
+use App\Http\Controllers\MessageController;
+use App\Http\Controllers\NewsController;
+use App\Http\Controllers\RoomController;
+use App\Http\Controllers\ActiveUsersController;
+use App\Http\Controllers\DemoController;
 
 /*
 |--------------------------------------------------------------------------
@@ -16,6 +20,7 @@ use App\Http\Controllers\ChatController;
 |
 */
 
+//View Routes
 Route::get('/', function () {
     return Inertia::render('Welcome', [
         'canLogin' => Route::has('login'),
@@ -30,54 +35,68 @@ Route::middleware(['auth:sanctum', 'verified'])->get('/dashboard', function () {
 })->name('dashboard');
 
 Route::middleware(['auth:sanctum', 'verified'])->get('/chat', function () {
-    return Inertia::render('Chat/ChatContainer');
+    return Inertia::render('Chat/Room/ChatContainer');
 })->name('chat');
 
 Route::middleware(['auth:sanctum', 'verified'])->get('/chatrooms', function () {
-    return Inertia::render('Chat/ChatRoomsContainer');
+    return Inertia::render('Chat/ChatRoomSelection/ChatRoomsContainer');
 })->name('chatrooms');
 
-Route::middleware('auth:sanctum')->get('/chatrooms/chatroom/{roomId}', [ChatController::class, 'chatroom']);
+Route::middleware('auth:sanctum')->get('/chatrooms/chatroom/{roomId}', [RoomController::class, 'chatroom']);
 
 Route::middleware(['auth:sanctum', 'verified'])->get('/chatrooms/newRoom', function () {
-    return Inertia::render('Chat/CreateNewContainer');
+    return Inertia::render('Chat/ChatRoomSelection/CreateNewContainer');
 })->name('newRoom');
 
+
+
+//Room
 //Get Chat rooms
-Route::middleware('auth:sanctum')->get('/chat/rooms', [ChatController::class, 'rooms']);
+Route::middleware('auth:sanctum')->get('/chat/rooms', [RoomController::class, 'rooms']);
 
 //Get current room
-Route::middleware('auth:sanctum')->get('/chat/room/{roomId}', [ChatController::class, 'currentRoom']);
-
-//Get messages in the room
-Route::middleware('auth:sanctum')->get('/chat/room/{roomId}/messages', [ChatController::class, 'messages']);
-
-//Get Active users in the room
-Route::middleware('auth:sanctum')->get('/chat/room/{roomId}/activeusers', [ChatController::class, 'activeUsers']);
-
-//Get news on the topic of the room
-Route::middleware('auth:sanctum')->get('/chat/room/news/{topic}', [ChatController::class, 'news']);
-
-//Get news on the topic of choice
-Route::middleware('auth:sanctum')->get('/chat/room/news/search/{topic}', [ChatController::class, 'searchNews']);
-
-//Post message to room
-Route::middleware('auth:sanctum')->post('/chat/room/{roomId}/message', [ChatController::class, 'newMessage']);
-
-//Post new active user
-Route::middleware('auth:sanctum')->post('/chat/room/{roomId}/newactiveuser', [ChatController::class, 'newActiveUser']);
-
-//Post deactivate user
-Route::middleware('auth:sanctum')->post('/chat/room/deactivate/{roomId}', [ChatController::class, 'deactivateUser']);
-
-//Post new active user
-Route::middleware('auth:sanctum')->post('/chat/room/{roomId}/newdemoactiveuser', [ChatController::class, 'newDemoActiveUser']);
-
-//Post deactivate user
-Route::middleware('auth:sanctum')->post('/chat/room/deactivatedemo/{roomId}', [ChatController::class, 'deactivateDemoUser']);
-
-//Post message to room
-Route::middleware('auth:sanctum')->post('/chat/room/{roomId}/demomessage', [ChatController::class, 'newDemoMessage']);
+Route::middleware('auth:sanctum')->get('/chat/room/{roomId}', [RoomController::class, 'currentRoom']);
 
 //post create new room
-Route::middleware('auth:sanctum')->post('/chat/newRoom/create', [ChatController::class, 'newRoom']);
+Route::middleware('auth:sanctum')->post('/chat/newRoom/create', [RoomController::class, 'newRoom']);
+
+
+
+//Messages
+//Get messages in the room
+Route::middleware('auth:sanctum')->get('/chat/room/{roomId}/messages', [MessageController::class, 'messages']);
+
+//Post message to room
+Route::middleware('auth:sanctum')->post('/chat/room/{roomId}/message', [MessageController::class, 'newMessage']);
+
+
+
+//ActiveUsers
+//Get Active users in the room
+Route::middleware('auth:sanctum')->get('/chat/room/{roomId}/activeusers', [ActiveUsersController::class, 'activeUsers']);
+
+//Post new active user
+Route::middleware('auth:sanctum')->post('/chat/room/{roomId}/newactiveuser', [ActiveUsersController::class, 'newActiveUser']);
+
+//Post deactivate user
+Route::middleware('auth:sanctum')->post('/chat/room/deactivate/{roomId}', [ActiveUsersController::class, 'deactivateUser']);
+
+
+//News
+//Get news on the topic of the room
+Route::middleware('auth:sanctum')->get('/chat/room/news/{topic}', [NewsController::class, 'news']);
+
+//Get news on the topic of choice
+Route::middleware('auth:sanctum')->get('/chat/room/news/search/{topic}', [NewsController::class, 'searchNews']);
+
+
+
+//Demo
+//Post new active user
+Route::middleware('auth:sanctum')->post('/chat/room/{roomId}/newdemoactiveuser', [DemoController::class, 'newDemoActiveUser']);
+
+//Post deactivate user
+Route::middleware('auth:sanctum')->post('/chat/room/deactivatedemo/{roomId}', [DemoController::class, 'deactivateDemoUser']);
+
+//Post message to room
+Route::middleware('auth:sanctum')->post('/chat/room/{roomId}/demomessage', [DemoController::class, 'newDemoMessage']);
