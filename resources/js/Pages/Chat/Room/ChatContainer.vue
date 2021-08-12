@@ -17,14 +17,20 @@
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 relative" style="height:70vh">               
                 <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg h-full w-full relative">
                     <div class="h-full w-1/4 absolute top-0 right-0 flex flex-col">
-                        <message-container v-show="showMessages" :messages="messages" />
+                        <message-container v-show="showMessages" :messages="messages" v-on:resend="resendMessage"/>
                         <div class="h-full w-1/12 absolute top-0 right-0 bg-gray-300 opacity-5 hover:opacity-50" @click="toggleMessage"></div>               
                     </div> 
                     <div class="h-1/2 w-1/4 absolute top-0 right-1/4">
                         <active-users-container v-show="showActive" :activeUsers="activeUsers"/>
                     </div>
                     <div class="h-full w-1/4 absolute top-0 left-0">
-                        <news-container v-show="showNews" :news="news" :roomId="currentRoom.id" v-on:articlesent="getMessages()"/>
+                        <news-container 
+                            v-show="showNews" 
+                            :news="news" 
+                            :roomId="currentRoom.id" 
+                            v-on:sending="appendNewMessage"
+                            v-on:messagefailed="messageFailedToSend"
+                        />
                         <div class="h-full w-1/12 absolute top-0 left-0 bg-gray-300 opacity-5 hover:opacity-50" @click="toggleNews"></div>
                     </div>
                     <div class="bg-transparent absolute top-0 w-full flex justify-center ">
@@ -61,7 +67,8 @@
                 </div>
                 <input-message 
                     :room="currentRoom" 
-                    v-on:messagesent="getMessages()" 
+                    v-on:sending="appendNewMessage"
+                    v-on:messagefailed="messageFailedToSend"
                     v-on:demostarted="startDemo()"
                     v-on:demostopped="stopDemo()"
                     />
@@ -104,6 +111,7 @@
                 camera: true,
                 demoInterval: 0,
                 pagination: 0,
+                newestMessageId: 0,
             }
         },
         watch: {
@@ -119,11 +127,6 @@
 
             toggleMessage() { //show and hide message column
                 this.showMessages = !this.showMessages;
-                if(this.showMessages){
-                    let container = document.getElementById(this.messages[0].id);
-                    console.log(container.scrollHeight)
-                    container.scrollTop = container.scrollHeight;
-                }
             },
 
             toggleNews() { //show and hide news column
@@ -138,11 +141,11 @@
             connect(){ //connects the user to the room channel
                 if( this.currentRoom.id ){
                     let vm = this;
-                    this.getMessages();
+                    this.getPaginatedMessages();
                     this.getActiveUsers();
                     window.Echo.private(`chat.${this.currentRoom.id}`)
                     .listen('.message.new', e => {
-                        vm.getMessages();
+                        vm.getNewestMessage();
                     });
                 }
             },
@@ -178,7 +181,10 @@
             getPaginatedMessages(){//called when user reachs max scroll                
                 axios.get(`/chat/room/${this.currentRoom.id}/paginated/${this.pagination}`)
                 .then( response => {
-                    this.messages.concat(response.data);
+                    this.messages = this.messages.concat(response.data);
+                    if (this.pagination == 0){
+                        this.newestMessageId = this.messages[0].id;
+                    }
                     this.pagination += 1;
                 })
                 .catch( error => {
@@ -186,10 +192,53 @@
                 })
             },
 
-            getNewMessage(){//gets the latest message when new message event occurs
+            getNewestMessage(){//gets the latest message when new message event occurs
                 axios.get(`/chat/room/${this.currentRoom.id}/newestmessage`)
                 .then( response => {
-                    this.messages = response.data.concat(this.messages);
+                    let newMessage = [response.data];
+                    this.messages = newMessage.concat(this.messages);
+                    this.newestMessageId = this.messages[0].id;
+                })
+                .catch( error => {
+                    console.error(error);
+                })
+            },
+
+            appendNewMessage(value){ //appends new message to the message data 
+                let newMessage = [{
+                    id: this.newestMessageId + 1,
+                    user: this.$page.props.user,
+                    user_id: this.$page.props.user.id,
+                    chat_room_id: this.currentRoom.id,
+                    message: value.message,
+                    link: value.link,
+                    article: value.article,
+                    replying_to: value.replyTo,
+                    created_at: Date.now(),
+                }];
+                this.messages = newMessage.concat(this.messages);
+                this.newestMessageId = this.messages[0].id;
+            },
+
+            messageFailedToSend(){//error display
+                let erroredMessage = this.messages.find(message => message.user_id === this.$page.props.user.id);
+                erroredMessage.error = true;
+            },
+
+            resendMessage(value){//ressend message
+                let payload = {
+                    message: value.message,
+                    link: value.link,
+                    article: value.article,
+                    replyTo: value.replyTo,
+                }
+                
+                axios.post(`/chat/room/${this.room.id}/message`, payload)
+                .then( response => {
+                    if( response.status == 201 ){
+                        console.log('message sent');
+                        this.messages.find(message => message.id === value.id).error = undefined;
+                    }
                 })
                 .catch( error => {
                     console.error(error);
@@ -283,7 +332,7 @@
                     .then( response => {
                         if( response.status == 201 ){
                             console.log('Dummy message', response.data);
-                            this.getMessages();
+                            this.getNewestMessage();
                         }
                     })
                     .catch( error => {

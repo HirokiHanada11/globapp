@@ -15,7 +15,7 @@
     </div>
     <span class="flex justify-center">
         <button class="hover:border-white hover:bg-transparent hover:text-white rounded border-2 mx-2 px-2 bg-white text-blue-900 "><a :href="newsArticle.url" target="_blank" >Visit</a></button>
-        <button class="hover:border-white hover:bg-transparent hover:text-white hover:border-2 rounded mx-2 px-2 bg-blue-500 text-white " v-on:click="shareNews(newsArticle)">Share</button>
+        <button class="hover:border-white hover:bg-transparent hover:text-white hover:border-2 rounded mx-2 px-2 bg-blue-500 text-white " v-on:click="shareNews()">Share</button>
     </span>
     
 </div>
@@ -25,20 +25,23 @@
 export default {
     props: ['newsArticle', 'index', 'roomId'],
     methods: {
-        shareNews(article){
-            axios.post(`/chat/room/${this.roomId}/message`, {
+        shareNews(){
+            let payload = {
                 message: "news"+this.index,
                 link: true,
                 article: this.newsArticle,
                 replyTo: null,
-            })
+            }
+            this.$emit('sending', payload)
+            axios.post(`/chat/room/${this.roomId}/message`, payload)
             .then( response => {
                 if( response.status == 201 ){
-                    this.$emit('articlesent'); //emit event messagesent which can be accessed by the parent component
+                    console.log('message sent'); //emit event messagesent which can be accessed by the parent component
                 }
             })
             .catch( error => {
                 console.error(error);
+                this.$emit('messagefailed');
             })
         }
     }

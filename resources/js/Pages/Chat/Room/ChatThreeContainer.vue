@@ -35,10 +35,14 @@ export default {
             // console.log(threeSetup.scene.getObjectByName('Sphere').getObjectByName(1));
         },
         messages(newVal, oldVal){
+            console.log(oldVal, 'from threecontainer')
             if(typeof oldVal[0] !== 'undefined'){
                 console.log('new message', newVal[0]);
                 this.createMessagePayload(newVal[0]);
             }
+        },
+        newMessage(newVal, oldVal){
+
         },
         news(newVal, oldVal){
             if(typeof newVal !== 'undefined'){

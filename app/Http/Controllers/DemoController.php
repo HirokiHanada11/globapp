@@ -39,7 +39,7 @@ class DemoController extends Controller
         $newDemoMessage->replying_to = $request->replyTo;
         $newDemoMessage->save();
 
-        broadcast(new NewChatMessage( $newDemoMessage ))->toOthers();
+        // broadcast(new NewChatMessage( $newDemoMessage ))->toOthers();
 
         return $newDemoMessage;
     }

@@ -42,20 +42,26 @@ export default {
                 return;
             }
 
-            axios.post(`/chat/room/${this.room.id}/message`, {
+            let payload = {
                 message: this.message,
                 link: false,
                 article: null,
                 replyTo: this.replyTo,
-            })
+            }
+
+            this.$emit('sending', payload);
+            this.message = '';
+            
+            axios.post(`/chat/room/${this.room.id}/message`, payload)
             .then( response => {
                 if( response.status == 201 ){
-                    this.message = '';
-                    this.$emit('messagesent'); //emit event messagesent which can be accessed by the parent component
+                    console.log('message sent');
+                    
                 }
             })
             .catch( error => {
                 console.error(error);
+                this.$emit('messagefailed');
             })
         }
     }
