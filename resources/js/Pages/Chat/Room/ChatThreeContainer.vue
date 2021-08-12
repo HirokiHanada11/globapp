@@ -4,10 +4,8 @@
 </template>
 
 <script>
-import * as THREE from 'three';
-// import { ThreeSetup, ThreeGeometries, ThreeAnimation, } from '../threeControls';
 import { ThreeSetup2 } from '../ThreeJS/threeControls2';
-let threeSetup2, threeAnimation;
+let threeSetup2;
 
 export default {
     props: ['messages', 'room', 'activeUsers', 'news', 'cameraNum'],
@@ -31,11 +29,8 @@ export default {
             filtered.forEach((user)=>{
                 this.generateUserModel(user, this.$page.props.user.name);
             })
-            
-            // console.log(threeSetup.scene.getObjectByName('Sphere').getObjectByName(1));
         },
         messages(newVal, oldVal){
-            console.log(oldVal, 'from threecontainer')
             if(typeof oldVal[0] !== 'undefined'){
                 console.log('new message', newVal[0]);
                 this.createMessagePayload(newVal[0]);
@@ -60,24 +55,17 @@ export default {
             this.componentWidth = this.$refs.canvas.clientWidth;
         },
         initThree() {
-            // threeSetup = new ThreeSetup( this.componentWidth, this.componentHeight, this.$refs.canvas );
-            // threeSetup.init();
             threeSetup2 = new ThreeSetup2( this.componentWidth, this.componentHeight, this.$refs.canvas );
             threeSetup2.init();
         },
 
         createPlane() {
-            // ThreeGeometries.createGlobe(threeSetup.scene);
-            // ThreeGeometries.createPointLight(threeSetup.scene);
-            // ThreeGeometries.createParticles(threeSetup.scene);
             threeSetup2.createGlobe();
             threeSetup2.createPlane();
             threeSetup2.createPointLight();
             threeSetup2.createParticles();
         },
         animate() {
-            // threeAnimation = new ThreeAnimation(threeSetup.scene,threeSetup.renderer, threeSetup.camera, threeSetup.controls);
-            // threeAnimation.tick();
             threeSetup2.tick()
         },
         renderThree() {
@@ -92,12 +80,6 @@ export default {
         createMessagePayload(message){
             if(message.link){
                 threeSetup2.createNewsPayload(message);
-                // let payloadPath = threeSetup2.createNewsPayload(message);
-                // threeSetup2.movement.payloads.push({
-                //     payloadId: message.id,
-                //     curve: payloadPath,
-                //     fraction: 0.03,
-                // });
             }else {
                 let user = this.activeUsers.find(activeUser => activeUser['user_id'] == message.user.id);
                 console.log("from ", user);
@@ -105,8 +87,6 @@ export default {
             }
         },
         createNewsMarkers(articles){
-            // ThreeGeometries.createNewsMarkers(threeSetup.scene, articles);
-            // threeAnimation.movement.news = articles;
             threeSetup2.createNewsMarkers(articles);
         },
         setCamera(cameraNum){
