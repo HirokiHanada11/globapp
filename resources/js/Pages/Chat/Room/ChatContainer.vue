@@ -103,7 +103,7 @@
                 topic: '',
                 camera: true,
                 demoInterval: 0,
-                
+                pagination: 0,
             }
         },
         watch: {
@@ -112,6 +112,144 @@
             }
         },
         methods: {
+            //toggling methods for view
+            setBackCamera() { //initiates the camera movement
+                this.camera = !this.camera;
+            },
+
+            toggleMessage() { //show and hide message column
+                this.showMessages = !this.showMessages;
+                if(this.showMessages){
+                    let container = document.getElementById(this.messages[0].id);
+                    console.log(container.scrollHeight)
+                    container.scrollTop = container.scrollHeight;
+                }
+            },
+
+            toggleNews() { //show and hide news column
+                this.showNews = !this.showNews;
+            },
+
+            toggleShowActive() { //show and hide active users column
+                this.showActive = !this.showActive;
+            },
+            
+            //Broadcasting methods
+            connect(){ //connects the user to the room channel
+                if( this.currentRoom.id ){
+                    let vm = this;
+                    this.getMessages();
+                    this.getActiveUsers();
+                    window.Echo.private(`chat.${this.currentRoom.id}`)
+                    .listen('.message.new', e => {
+                        vm.getMessages();
+                    });
+                }
+            },
+
+            disconnect( room ){//disconnect the user from the room channel 
+                console.log('disconnecting');
+                this.deactivateUser();
+                window.Echo.leave(`chat.${room.id}`);
+            },
+            
+            //room method
+            getCurrentRoom(){ //fetch the information about the current room
+                axios.get(`/chat/room/${this.roomId}`)
+                .then( response => {
+                    this.currentRoom = response.data[0];
+                })
+                .catch( error => {
+                    console.error(error);
+                })
+            },
+
+            //message methods
+            getMessages(){ // called once when user joins 
+                axios.get(`/chat/room/${this.currentRoom.id}/messages`)
+                .then( response => {
+                    this.messages = response.data;
+                })
+                .catch( error => {
+                    console.error(error);
+                })
+            },
+
+            getPaginatedMessages(){//called when user reachs max scroll                
+                axios.get(`/chat/room/${this.currentRoom.id}/paginated/${this.pagination}`)
+                .then( response => {
+                    this.messages.concat(response.data);
+                    this.pagination += 1;
+                })
+                .catch( error => {
+                    console.error(error);
+                })
+            },
+
+            getNewMessage(){//gets the latest message when new message event occurs
+                axios.get(`/chat/room/${this.currentRoom.id}/newestmessage`)
+                .then( response => {
+                    this.messages = response.data.concat(this.messages);
+                })
+                .catch( error => {
+                    console.error(error);
+                })
+            },
+
+            //news search methods
+            fetchNews(topic) {
+                this.showNews = true;
+                if(topic != ''){
+                    axios.get(`/chat/room/news/${encodeURI(topic)}`)
+                    .then( response => {
+                        console.log(response.data.articles);
+                        this.news = response.data.articles;
+                        this.topic = '';
+                    })
+                    .catch( error => {
+                        console.error(error);
+                    })
+                }
+            },
+            searchNews(topic) {
+                this.showNews = true;
+                if(topic != ''){
+                    axios.get(`/chat/room/news/search/${encodeURI(topic)}`)
+                    .then( response => {
+                        console.log(response.data.articles);
+                        this.news = response.data.articles;
+                        this.topic = '';
+                    })
+                    .catch( error => {
+                        console.error(error);
+                    })
+                }
+            },
+
+            //active users methods
+            getActiveUsers(){
+                axios.get(`/chat/room/${this.currentRoom.id}/activeusers`)
+                .then( response => {
+                    this.activeUsers = response.data;
+                    //console.log(response.data)
+                })
+                .catch( error => {
+                    console.error(error);
+                })
+            },
+            deactivateUser(){
+                axios.post(`/chat/room/deactivate/${this.currentRoom.id}`)
+                .then( response => {
+                    if( response.status == 201 ){
+                        console.log('deactivated user');
+                    }
+                })
+                .catch( error => {
+                    console.error(error);
+                })
+            },
+
+            //Demo Methods
             startDemo(){
                 const randomComment = ['私は南極に行く','軽く死ねますね','アメンボ赤いな愛ゆえに','選択肢はずっとあったよでも選んだんだよ、ここを選んだんだよ自分で','うるかにしてください','プリンは飲み物'];
                 for(let i = 2; i < 6; i++){
@@ -161,106 +299,6 @@
                     if( response.status == 201 ){
                         console.log('deactivated demo users');
                         this.getActiveUsers();
-                    }
-                })
-                .catch( error => {
-                    console.error(error);
-                })
-            },
-            setBackCamera() {
-                this.camera = !this.camera;
-            },
-            toggleMessage() {
-                this.showMessages = !this.showMessages;
-                if(this.showMessages){
-                    let container = document.getElementById(this.messages[0].id);
-                    console.log(container.scrollHeight)
-                    container.scrollTop = container.scrollHeight;
-                }
-            },
-            toggleNews() {
-                this.showNews = !this.showNews;
-            },
-            toggleShowActive() {
-                this.showActive = !this.showActive;
-            },
-            fetchNews(topic) {
-                this.showNews = true;
-                if(topic != ''){
-                    axios.get(`/chat/room/news/${encodeURI(topic)}`)
-                    .then( response => {
-                        console.log(response.data.articles);
-                        this.news = response.data.articles;
-                        this.topic = '';
-                    })
-                    .catch( error => {
-                        console.error(error);
-                    })
-                }
-            },
-            searchNews(topic) {
-                this.showNews = true;
-                if(topic != ''){
-                    axios.get(`/chat/room/news/search/${encodeURI(topic)}`)
-                    .then( response => {
-                        console.log(response.data.articles);
-                        this.news = response.data.articles;
-                        this.topic = '';
-                    })
-                    .catch( error => {
-                        console.error(error);
-                    })
-                }
-            },
-            getCurrentRoom(){
-                axios.get(`/chat/room/${this.roomId}`)
-                .then( response => {
-                    this.currentRoom = response.data[0];
-                })
-                .catch( error => {
-                    console.error(error);
-                })
-            },
-            connect(){
-                if( this.currentRoom.id ){
-                    let vm = this;
-                    this.getMessages();
-                    this.getActiveUsers();
-                    window.Echo.private(`chat.${this.currentRoom.id}`)
-                    .listen('.message.new', e => {
-                        vm.getMessages();
-                    });
-                }
-            },
-            disconnect( room ){
-                console.log('disconnecting');
-                this.deactivateUser();
-                window.Echo.leave(`chat.${room.id}`);
-            },
-            getMessages(){
-                axios.get(`/chat/room/${this.currentRoom.id}/messages`)
-                .then( response => {
-                    this.messages = response.data;
-                })
-                .catch( error => {
-                    console.error(error);
-                })
-            },
-            getActiveUsers(){
-                axios.get(`/chat/room/${this.currentRoom.id}/activeusers`)
-                .then( response => {
-                    this.activeUsers = response.data;
-                    //console.log(response.data)
-                })
-                .catch( error => {
-                    console.error(error);
-                })
-            },
-            deactivateUser(){
-                axios.post(`/chat/room/deactivate/${this.currentRoom.id}`)
-                .then( response => {
-                    if( response.status == 201 ){
-                        console.log('deactivated user');
                     }
                 })
                 .catch( error => {

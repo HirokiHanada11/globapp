@@ -17,6 +17,26 @@ class MessageController extends Controller
             ->get();
     }
 
+    /*Gets paginated message in ChatMessage model */
+    public function getPaginatedMessages( Request $request, $roomId, $pagination ){
+        $offset = $pagination * 20;
+        $limit = 20;
+        return ChatMessage::where('chat_room_id', $roomId)
+            ->with('user')
+            ->orderBy('created_at', "DESC")
+            ->offset($offset)
+            ->limit($limit)
+            ->get();
+    }
+
+    /*Gets the newest message in ChatMessage model */
+    public function getNewestMessage( Request $request, $roomId ){
+        return ChatMessage::where('chat_room_id', $roomId)
+            ->with('user')
+            ->latest()
+            ->first();
+    }
+
     /* Posts new message to the ChatMessages model and broadcast NewChatMessageEvent */
     public function newMessage( Request $request, $roomId ){
         $newMessage = new ChatMessage;

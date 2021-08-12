@@ -66,6 +66,12 @@ Route::middleware('auth:sanctum')->post('/chat/newRoom/create', [RoomController:
 //Get messages in the room
 Route::middleware('auth:sanctum')->get('/chat/room/{roomId}/messages', [MessageController::class, 'messages']);
 
+//Get paginated messages in the room
+Route::middleware('auth:sanctum')->get('/chat/room/{roomId}/moremessages/{pagination}', [MessageController::class, 'getPaginatedMessages']);
+
+//Get newest message in the room
+Route::middleware('auth:sanctum')->get('/chat/room/{roomId}/newestmessage', [MessageController::class, 'getNewestMessage']);
+
 //Post message to room
 Route::middleware('auth:sanctum')->post('/chat/room/{roomId}/message', [MessageController::class, 'newMessage']);
 
