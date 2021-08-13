@@ -23,7 +23,7 @@ class MessageController extends Controller
         $limit = 20;
         return ChatMessage::where('chat_room_id', $roomId)
             ->with('user')
-            ->orderBy('created_at', "DESC")
+            ->latest()
             ->offset($offset)
             ->limit($limit)
             ->get();

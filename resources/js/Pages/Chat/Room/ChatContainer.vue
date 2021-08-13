@@ -104,6 +104,7 @@
                 activeUsers: [],
                 showActive: false,
                 showMessages: true,
+                chatScrollPosition: 0,
                 sortBy: 'popularity',
                 news: [],
                 showNews: false,
@@ -126,7 +127,9 @@
             },
 
             toggleMessage() { //show and hide message column
+                
                 this.showMessages = !this.showMessages;
+                
             },
 
             toggleNews() { //show and hide news column
@@ -181,9 +184,9 @@
             getPaginatedMessages(){//called when user reachs max scroll                
                 axios.get(`/chat/room/${this.currentRoom.id}/paginated/${this.pagination}`)
                 .then( response => {
-                    this.messages = this.messages.concat(response.data);
+                    this.messages = response.data.reverse().concat(this.messages);
                     if (this.pagination == 0){
-                        this.newestMessageId = this.messages[0].id;
+                        this.newestMessageId = this.messages[this.messages.length-1].id;
                     }
                     this.pagination += 1;
                 })
@@ -196,8 +199,8 @@
                 axios.get(`/chat/room/${this.currentRoom.id}/newestmessage`)
                 .then( response => {
                     let newMessage = [response.data];
-                    this.messages = newMessage.concat(this.messages);
-                    this.newestMessageId = this.messages[0].id;
+                    this.messages = this.messages.concat(newMessage);
+                    this.newestMessageId = this.messages[this.messages.length-1].id;
                 })
                 .catch( error => {
                     console.error(error);
@@ -216,8 +219,8 @@
                     replying_to: value.replyTo,
                     created_at: Date.now(),
                 }];
-                this.messages = newMessage.concat(this.messages);
-                this.newestMessageId = this.messages[0].id;
+                this.messages = this.messages.concat(newMessage);
+                this.newestMessageId = this.messages[this.messages.length-1].id;
             },
 
             messageFailedToSend(){//error display
