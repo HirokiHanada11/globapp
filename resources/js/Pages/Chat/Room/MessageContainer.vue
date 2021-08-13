@@ -14,10 +14,12 @@ export default {
     watch:{
         messages(){
             console.log('updated',this.$refs.chat.scrollHeight, this.$refs.chat.scrollTop);
+            if(this.$refs.chat.scrollHeight - this.$refs.chat.clientHeight == this.$refs.chat.scrollTop){
                 this.$nextTick(()=>{
                     this.$refs.chat.scrollTop = this.$refs.chat.scrollHeight;
                     console.log(this.$refs.chat.scrollTop)
                 })
+            }
         }
     },
     methods: {
@@ -25,5 +27,8 @@ export default {
             this.$emit('resend',value);
         }
     },
+    mounted(){
+        this.$refs.chat.scrollTop = this.$refs.chat.scrollHeight; 
+    }
 }
 </script>
