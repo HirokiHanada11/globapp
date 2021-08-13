@@ -31,13 +31,10 @@ export default {
             })
         },
         messages(newVal, oldVal){
-            if(typeof oldVal[0] !== 'undefined'){
-                console.log('new message', newVal[0]);
-                this.createMessagePayload(newVal[0]);
+            if(oldVal.length > 0){
+                console.log('new message', newVal[newVal.length-1]);
+                this.createMessagePayload(newVal[newVal.length-1]);
             }
-        },
-        newMessage(newVal, oldVal){
-
         },
         news(newVal, oldVal){
             if(typeof newVal !== 'undefined'){

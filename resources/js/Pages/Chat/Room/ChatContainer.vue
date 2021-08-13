@@ -16,7 +16,7 @@
         <div class="py-12">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 relative" style="height:70vh">               
                 <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg h-full w-full relative">
-                    <div class="h-full w-1/4 absolute top-0 right-0 flex flex-col">
+                    <div class="h-full w-1/4 absolute top-0 right-0 flex flex-col ">
                         <message-container v-show="showMessages" :messages="messages" v-on:resend="resendMessage"/>
                         <div class="h-full w-1/12 absolute top-0 right-0 bg-gray-300 opacity-5 hover:opacity-50" @click="toggleMessage"></div>               
                     </div> 
