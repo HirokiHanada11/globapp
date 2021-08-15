@@ -27,16 +27,25 @@ export default {
             newMessagesCounter: -1,
             showNewMessage: false,
             newestMessage: new Object(),
+            ticking: false,
+            scrollPosition: 0,
+            prevHeight: 0,
+            newHeight: 0,
+            atBottom: true,
         }
     },
-    props: ['messages'],
+    props: ['messages', 'fetching'],
     watch:{
-        messages(newVal){
+        messages(newVal,oldVal){
             console.log('updated',this.$refs.chat.scrollHeight, this.$refs.chat.scrollTop);
-            if(this.$refs.chat.scrollHeight - this.$refs.chat.clientHeight == this.$refs.chat.scrollTop){
+            this.prevHeight = this.newHeight;
+            this.newHeight = this.$refs.chat.scrollHeight;
+            if(this.atBottom){
                 this.$nextTick(()=>{
                     this.scrollToBottom();
                 })
+            }else if(newVal[0].id !== oldVal[0].id){
+                this.$refs.chat.scrollTop = this.newHeight - this.prevHeight ;
             }else if(newVal[newVal.length-1].user.id !== this.$page.props.user.id){
                 this.showNewMessage = true;
                 this.newestMessage = newVal[newVal.length-1];
@@ -58,11 +67,36 @@ export default {
         },
         scrollToBottom(){
             this.$refs.chat.scrollTop = this.$refs.chat.scrollHeight;
+            this.atBottom = true;
             this.hideNewMessage();
+        },
+        scrollCheck(){
+            this.scrollPosition = this.$refs.chat.scrollTop;
+            console.log(this.scrollPosition);
+            if(!this.ticking){
+                window.requestAnimationFrame(() => {
+                    if(this.scrollPosition == 0){
+                        this.fetchMoreMessages();
+                        this.atBottom = false;
+                    }else{
+                        this.atBottom = false;
+                    }
+                    this.ticking = false;
+                });
+
+                this.ticking = true; 
+            }
+        },
+        fetchMoreMessages(){
+            if(!this.fetching){
+                this.$emit('fetchmoremessages');
+            }
         }
     },
     mounted(){
-        this.$refs.chat.scrollTop = this.$refs.chat.scrollHeight; 
+        this.newHeight = this.$refs.chat.scrollHeight; 
+        this.scrollToBottom();
+        this.$refs.chat.addEventListener('scroll', this.scrollCheck);
     }
 }
 </script>

@@ -31,7 +31,7 @@ export default {
             })
         },
         messages(newVal, oldVal){
-            if(oldVal.length > 0){
+            if(oldVal.length > 0 && newVal[0].id === oldVal[0].id){
                 console.log('new message', newVal[newVal.length-1]);
                 this.createMessagePayload(newVal[newVal.length-1]);
             }

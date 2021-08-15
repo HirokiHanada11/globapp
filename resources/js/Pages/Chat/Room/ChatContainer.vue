@@ -17,7 +17,7 @@
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 relative" style="height:70vh">               
                 <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg h-full w-full relative">
                     <div class="h-full w-1/4 absolute top-0 right-0 flex flex-col ">
-                        <message-container v-show="showMessages" :messages="messages" v-on:resend="resendMessage"/>
+                        <message-container v-show="showMessages" :messages="messages" :fetching="fetching" v-on:resend="resendMessage" v-on:fetchmoremessages="getPaginatedMessages"/>
                         <div class="h-full w-1/12 absolute top-0 right-0 bg-gray-300 opacity-5 hover:opacity-50" @click="toggleMessage"></div>               
                     </div> 
                     <div class="h-1/2 w-1/4 absolute top-0 right-1/4">
@@ -113,6 +113,7 @@
                 demoInterval: 0,
                 pagination: 0,
                 newestMessageId: 0,
+                fetching: false,
             }
         },
         watch: {
@@ -181,17 +182,22 @@
                 })
             },
 
-            getPaginatedMessages(){//called when user reachs max scroll                
+            getPaginatedMessages(){//called when user reachs max scroll       
+                this.fetching = true;         
                 axios.get(`/chat/room/${this.currentRoom.id}/paginated/${this.pagination}`)
                 .then( response => {
-                    this.messages = response.data.reverse().concat(this.messages);
-                    if (this.pagination == 0){
-                        this.newestMessageId = this.messages[this.messages.length-1].id;
+                    if(response.data.length > 0){
+                        this.messages = response.data.reverse().concat(this.messages);
+                        if (this.pagination == 0){
+                            this.newestMessageId = this.messages[this.messages.length-1].id;
+                        }
+                        this.pagination += 1;
                     }
-                    this.pagination += 1;
+                    this.fetching = false;  
                 })
                 .catch( error => {
                     console.error(error);
+                    this.fetching = false;  
                 })
             },
 
