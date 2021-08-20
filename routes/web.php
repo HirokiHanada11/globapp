@@ -54,6 +54,9 @@ Route::middleware(['auth:sanctum', 'verified'])->get('/chatrooms/newRoom', funct
 //Get Chat rooms
 Route::middleware('auth:sanctum')->get('/chat/rooms', [RoomController::class, 'rooms']);
 
+//Get Subbed Chat rooms
+Route::middleware('auth:sanctum')->get('/chat/subbedrooms', [RoomController::class, 'subbedRooms']);
+
 //Get current room
 Route::middleware('auth:sanctum')->get('/chat/room/{roomId}', [RoomController::class, 'currentRoom']);
 
@@ -112,3 +115,5 @@ Route::middleware('auth:sanctum')->post('/chat/room/{roomId}/demomessage', [Demo
 
 //Subbed rooms testing routes
 Route::middleware('auth:sanctum')->get('/subbed', [RoomController::class, 'subbed']);
+//Subbed users testing routes
+Route::middleware('auth:sanctum')->get('/subbedusers', [RoomController::class, 'subbedusers']);

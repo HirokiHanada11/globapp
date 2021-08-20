@@ -1,10 +1,11 @@
 <template>
     <app-layout>
         <template #header>
-            <div class="grid grid-cols-2">
+            <div class="flex justify-between items-center">
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
                 Chat Rooms
             </h2>
+            <toggle-switch v-on:toggled="getRooms"/>
             <new-chat-button 
                 :href="route('newRoom')"
                 class="float-right"
@@ -32,31 +33,39 @@
     import AppLayout from '@/Layouts/AppLayout'
     import ChatRoomOption from './ChatRoomOption.vue'
     import NewChatButton from './NewChatButton.vue' 
+    import ToggleSwitch from './ToggleSwitch.vue'
 
     export default {
         components: {
             AppLayout,
             ChatRoomOption,
             NewChatButton,
+            ToggleSwitch,
         },
         data: () => {
             return {
                 chatRooms: [],
+                toggleValue: false,
             }
         },
         methods: {
-            getRooms(){
-                axios.get('/chat/rooms')
-                .then( response => {
+            async getRooms(val){
+                this.toggleValue = val;
+                let endpoint = '/chat/rooms';
+                if(this.toggleValue){
+                    endpoint = '/chat/subbedrooms';
+                }
+                try{
+                    let response = await axios.get(endpoint);
+                    console.log(response.data);
                     this.chatRooms = response.data;
-                })
-                .catch( error => {
-                    console.error( error );
-                })
+                }catch(e){
+                    console.error(e);
+                }
             },
         },
         created() {
-            this.getRooms();
+            this.getRooms(this.toggleValue);
         }
                     
     }

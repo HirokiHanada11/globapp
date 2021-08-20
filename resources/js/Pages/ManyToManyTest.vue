@@ -10,15 +10,24 @@ export default {
     data() {
         return {
             rooms: new Array(),
+            users: new Array(),
         }
     },
-    created() {
-        axios.get('/subbed')
-        .then(response => {
+    async created() {
+        try{
+            let response = await axios.get('/subbed');
             console.log(response);
-            this.rooms = response.data[0].chatrooms;
-        })
-        .catch(error => console.error(error));
+            this.rooms = await response.data[0].chatrooms;
+        }catch(e){
+            console.error(e)
+        }
+        try{
+            let response = await axios.get('/subbedusers');
+            console.log(response);
+            this.users = await response.data;
+        }catch(e){
+            console.error(e)
+        }
     }
 }
 </script>

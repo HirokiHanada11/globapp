@@ -23,6 +23,13 @@ class RoomController extends Controller
         return ChatRoom::all();
     }
 
+    // get all the entries in ChatRoom Model that the user is subscribed to
+    public function subbedRooms( Request $request ){
+        $user = User::where('id', Auth::id())->first();
+        $user->load('chatrooms');
+        return $user->chatrooms; 
+    }
+
     // gets the currentroom from ChatRoom Model
     public function currentRoom( Request $request, $roomId ){
         return ChatRoom::where('id', $roomId)->get();
@@ -54,6 +61,13 @@ class RoomController extends Controller
         $user = User::where('id', Auth::id())->get();
         $user->load('chatrooms');
         return $user;             
+    }
+
+    //for retrieving subbed users
+    public function subbedusers( Request $request ){
+        $subbedUsers = ChatRoom::where('id', 1)->first();
+        $subbedUsers->load('users');
+        return $subbedUsers->users;             
     }
 
 }
