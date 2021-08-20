@@ -93,6 +93,8 @@ Route::middleware('auth:sanctum')->post('/chat/room/deactivate/{roomId}', [Activ
 //count active users
 Route::middleware('auth:sanctum')->get('/countactive/{roomId}', [ActiveUsersController::class, 'countActiveUsers']);
 
+//post new subscriber to pivot table
+Route::middleware('auth:sanctum')->post('/subscribeuser/{roomId}/{userId}', [ActiveUsersController::class, 'subscribeUser']);
 
 //News
 //Get news on the topic of the room

@@ -8,4 +8,6 @@ use Illuminate\Database\Eloquent\Model;
 class ChatRoomUser extends Model
 {
     use HasFactory;
+
+    protected $table = 'chat_room_user';
 }

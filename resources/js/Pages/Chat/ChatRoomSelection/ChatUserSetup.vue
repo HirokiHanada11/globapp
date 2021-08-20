@@ -5,7 +5,7 @@
         </label>
         <div id="region">
             <button
-                @click="openChatRoom()"
+                @click="joinClicked()"
                 class="place-self-end bg-gray-500 hover:bg-blue-700 py-1 px-2 ml-2 rounded text-white float-right">
                 Join
             </button>
@@ -54,9 +54,24 @@ export default {
             .catch( error => {
                 console.error(error);
             })
-            window.location = `/chatrooms/chatroom/${this.room.id}`;
+            // window.location = `/chatrooms/chatroom/${this.room.id}`;
         },
-        //need a method to update user model
+        async joinRoom () {
+            let userId = this.$page.props.user.id;
+            try {
+                let response = await axios.post(`/subscribeuser/${this.room.id}/${userId}`,{
+                    region: this.selected,
+                });
+                console.log(response);
+                window.location = `/chatrooms/chatroom/${this.room.id}`;
+            } catch (error) {
+                console.error(error);
+            }
+        },
+        async joinClicked() {
+            await this.openChatRoom();
+            await this.joinRoom();
+        }
     },
     mounted() {
         // console.log(this.room)

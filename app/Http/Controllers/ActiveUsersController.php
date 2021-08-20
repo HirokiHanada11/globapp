@@ -24,6 +24,24 @@ class ActiveUsersController extends Controller
             ->count();
     } 
 
+    //post new subscriber to pivot table
+    public function subscribeUser( Request $request, $roomId, $userId ){
+        if(ChatRoomUser::where('user_id', $userId)->where('chat_room_id', $roomId)->doesntExist()){
+            $newSubscriber = new ChatRoomUser;
+            $newSubscriber->user_id = $userId;
+            $newSubscriber->chat_room_id = $roomId;
+            $newSubscriber->region = $request->region;
+            $newSubscriber->active = false;
+            $newSubscriber->last_read = null;
+            $newSubscriber->save();
+            
+            return $newSubscriber;
+        }else {
+            return;
+        }
+
+    }
+
     //post new entry to ActiveUsers model
     public function newActiveUser( Request $request, $roomId ){
         $newActiveUser = new ActiveUser;
