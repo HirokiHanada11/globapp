@@ -106,3 +106,9 @@ Route::middleware('auth:sanctum')->post('/chat/room/deactivatedemo/{roomId}', [D
 
 //Post message to room
 Route::middleware('auth:sanctum')->post('/chat/room/{roomId}/demomessage', [DemoController::class, 'newDemoMessage']);
+
+
+
+
+//Subbed rooms testing routes
+Route::middleware('auth:sanctum')->get('/subbed', [RoomController::class, 'subbed']);

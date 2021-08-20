@@ -16,4 +16,10 @@ class ChatRoom extends Model
     public function activeusers() {
         return $this->hasMany('App\Models\ActiveUser');
     }
+
+    public function users() {
+        return $this->belongsToMany(User::class, 'chat_room_user')
+        ->withPivot('active', 'last_read')
+        ->withTimestamps();
+    }
 }

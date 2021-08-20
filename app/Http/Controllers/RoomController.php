@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Models\ChatRoom;
+use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 
 
 class RoomController extends Controller
@@ -46,4 +48,12 @@ class RoomController extends Controller
 
         return $newRoom;
     }
+
+    //for retrieving subbed rooms
+    public function subbed( Request $request ){
+        $user = User::where('id', Auth::id())->get();
+        $user->load('chatrooms');
+        return $user;             
+    }
+
 }

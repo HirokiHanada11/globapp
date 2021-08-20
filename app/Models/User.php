@@ -58,4 +58,10 @@ class User extends Authenticatable
     protected $appends = [
         'profile_photo_url',
     ];
+
+    public function chatrooms(){
+        return $this->belongsToMany(ChatRoom::class, 'chat_room_user')
+        ->withPivot('active', 'last_read')
+        ->withTimestamps();
+    }
 }
