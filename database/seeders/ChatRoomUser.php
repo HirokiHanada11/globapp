@@ -17,7 +17,8 @@ class ChatRoomUser extends Seeder
     {
         DB::table('chat_room_user')->insert([
             'user_id' => 1,
-            'chat_room_id' => 1,
+            'chat_room_id' => 2,
+            'region' => '北海道',
             'active' => false,
             'last_read' => null,
             'created_at' => Carbon::now()->format('Y-m-d H:i:s'),
