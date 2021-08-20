@@ -5,18 +5,20 @@
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
                 Chat Rooms
             </h2>
-            <toggle-switch v-on:toggled="getRooms"/>
-            <new-chat-button 
-                :href="route('newRoom')"
-                class="float-right"
-            />
             </div>
         </template>
 
         <div class="py-12">
-            <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg h-96">
-                    <div class="h-full p-2 flex flex-col overflow-y-scroll">
+            <div class="max-w-7xl mx-auto sm:px-6 lg:px-8" style="height:70vh">
+                <div class="w-full h-12 bg-blue-500 flex justify-between px-3 content-center items-center">
+                    <toggle-switch v-on:toggled="getRooms"/>
+                    <new-chat-button 
+                        :href="route('newRoom')"
+                        class="float-right"
+                    />
+                </div>
+                <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg h-full">
+                    <div class="p-2 flex flex-col overflow-y-scroll no-scrollbar">
                         <chat-room-option
                             v-for="(room, index) in chatRooms"
                             v-bind:key="index"

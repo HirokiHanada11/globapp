@@ -28,6 +28,14 @@ export default {
         }catch(e){
             console.error(e)
         }
+        try{
+            let roomId = 1;
+            let response = await axios.get(`/active/${roomId}`);
+            console.log(response);
+            // this.users = await response.data;
+        }catch(e){
+            console.error(e)
+        }
     }
 }
 </script>

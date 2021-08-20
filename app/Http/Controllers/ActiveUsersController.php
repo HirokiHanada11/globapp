@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\ActiveUser;
+use App\Models\ChatRoomUser;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class ActiveUsersController extends Controller
 {
@@ -14,6 +16,13 @@ class ActiveUsersController extends Controller
             ->with('user')
             ->get();
     }
+
+    //count the number of active users from pivot table
+    public function countActiveUsers( Request $request, $roomId ){
+        return DB::table('chat_room_user')->where('chat_room_id', $roomId)
+            ->where('active', 1)
+            ->count();
+    } 
 
     //post new entry to ActiveUsers model
     public function newActiveUser( Request $request, $roomId ){

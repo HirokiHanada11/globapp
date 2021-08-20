@@ -20,7 +20,9 @@ class RoomController extends Controller
 
     // gets all the entries in ChatRoom Model
     public function rooms( Request $request ){
-        return ChatRoom::all();
+        $chatRoomsAll = ChatRoom::all();
+        $chatRoomsAll->load('users');
+        return $chatRoomsAll;
     }
 
     // get all the entries in ChatRoom Model that the user is subscribed to

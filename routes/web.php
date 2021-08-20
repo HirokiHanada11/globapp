@@ -90,6 +90,9 @@ Route::middleware('auth:sanctum')->post('/chat/room/{roomId}/newactiveuser', [Ac
 //Post deactivate user
 Route::middleware('auth:sanctum')->post('/chat/room/deactivate/{roomId}', [ActiveUsersController::class, 'deactivateUser']);
 
+//count active users
+Route::middleware('auth:sanctum')->get('/countactive/{roomId}', [ActiveUsersController::class, 'countActiveUsers']);
+
 
 //News
 //Get news on the topic of the room

@@ -1,6 +1,6 @@
 <template>
     <div 
-        class="py-5 grid grid-cols-2 hover:bg-gray-300 cursor-pointer"
+        class="py-5 grid grid-cols-2 hover:bg-gray-300 cursor-pointer rounded"
         @click="toggleShow()">
         <span class="grid-col-1">
             <img :src="room.photo" class="grid-col-1 h-12 w-12 mx-4 float-left" style="border-radius: 50%"/>
@@ -26,7 +26,6 @@ export default {
     props: ['room'],
     data() {
         return {
-            activeUsers:[],
             activeUsersLen: '',
             userRegion: '',
             showPopUp: false,
@@ -39,20 +38,17 @@ export default {
         toggleShow() {
             this.showPopUp = !this.showPopUp;
         },
-        getActiveUsers(){
-                axios.get(`/chat/room/${this.room.id}/activeusers`)
-                .then( response => {
-                    this.activeUsers = response.data;
-                    this.activeUsersLen = response.data.length;
-                })
-                .catch( error => {
-                    console.error(error);
-                })
+        async getActiveUsers(){
+            try {
+                let response = await axios.get(`/countactive/${this.room.id}`);
+                this.activeUsersLen = await response.data;
+            } catch (e) {
+                console.error(e);
             }
+        }
     },
     mounted() {
         this.getActiveUsers();
-        // console.log(this.room.photo)
     }
 }
 </script>
