@@ -120,10 +120,10 @@
             this.deactivateUser();
             this.disconnect(this.currentRoom);
         },
-        mounted() {
-            this.activateUser();
-            this.getCurrentRoom();
-            this.connect();
+        async mounted() {
+            await this.activateUser();
+            await this.getCurrentRoom();
+            await this.connect();
             this.getPaginatedMessages();
         },
         methods: {
@@ -143,6 +143,7 @@
             connect(){ //connects the user to the room channel
                 if( this.currentRoom.id ){
                     let vm = this;
+                    console.log('connecting')
                     window.Echo.private(`chat.${this.currentRoom.id}`)
                     .listen('.message.new', e => {
                         vm.getNewestMessage();

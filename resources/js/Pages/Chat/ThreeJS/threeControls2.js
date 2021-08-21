@@ -295,7 +295,7 @@ export class ThreeSetup2 {
     createUserModel = (user, sessionUser) =>{
         const loader = new THREE.TextureLoader();
         const userModelPlane = new THREE.Group;
-        userModelPlane.name = user.user.name;
+        userModelPlane.name = user.name;
 
         const circleGeometry = new THREE.CircleBufferGeometry( 0.3, 16 );
         const pyramidGeometry = new THREE.ConeBufferGeometry( 0.3, 0.6, 3);
@@ -312,7 +312,7 @@ export class ThreeSetup2 {
         
         const body = new THREE.Mesh(pyramidGeometry,bodyMaterial);
         body.name = 'Body';
-        headMaterial.map = loader.load(user.user.profile_photo_url);
+        headMaterial.map = loader.load(user.profile_photo_url);
         const head = new THREE.Mesh(circleGeometry,headMaterial);
         head.name = 'Head';
         head.position.z = 2;
@@ -321,8 +321,8 @@ export class ThreeSetup2 {
         body.rotateX(-Math.PI /2)
 
         userModelPlane.add(head, body);
-        userModelPlane.position.x = (prefecToCoords[user.region][1] - 136.261570) * 43/45
-        userModelPlane.position.y = (prefecToCoords[user.region][0] - 35.837181) * 30/25
+        userModelPlane.position.x = (prefecToCoords[user.pivot.region][1] - 136.261570) * 43/45
+        userModelPlane.position.y = (prefecToCoords[user.pivot.region][0] - 35.837181) * 30/25
 
         this.scene.getObjectByName('Plane').getObjectByName('UserModels').add(userModelPlane);
 

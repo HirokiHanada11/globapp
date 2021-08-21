@@ -3,8 +3,8 @@
         <div 
             v-for="(user, index) in activeUsers"
             v-bind:key="index"> 
-            <span class="flex flex-row"><img :src="user.user.profile_photo_url" class="rounded-full h-6 mr-2"><b>{{user.user.name}}</b></span>
-            ---{{user.region}}
+            <span class="flex flex-row"><img :src="user.profile_photo_url" class="rounded-full h-6 mr-2"><b>{{user.name}}</b></span>
+            ---{{user.pivot.region}}
         </div>
     </div>
 </template>

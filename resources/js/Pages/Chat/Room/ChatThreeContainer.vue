@@ -78,9 +78,9 @@ export default {
             if(message.link){
                 threeSetup2.createNewsPayload(message);
             }else {
-                let user = this.activeUsers.find(activeUser => activeUser['user_id'] == message.user.id);
+                let user = this.activeUsers.find(activeUser => activeUser.id == message.user.id);
                 console.log("from ", user);
-                threeSetup2.createMessageAnimation(message, user.region);
+                threeSetup2.createMessageAnimation(message, user.pivot.region);
             }
         },
         createNewsMarkers(articles){
