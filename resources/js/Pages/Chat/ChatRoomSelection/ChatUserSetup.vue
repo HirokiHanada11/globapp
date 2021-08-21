@@ -63,10 +63,10 @@ export default {
                     region: this.selected,
                 });
                 console.log(response);
-                window.location = `/chatrooms/chatroom/${this.room.id}`;
             } catch (error) {
                 console.error(error);
             }
+            window.location = `/chatrooms/chatroom/${this.room.id}`;
         },
         async joinClicked() {
             await this.openChatRoom();

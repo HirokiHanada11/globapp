@@ -37,9 +37,10 @@ class ActiveUsersController extends Controller
             
             return $newSubscriber;
         }else {
-            return;
+            ChatRoomUser::where('user_id', $userId)
+                ->where('chat_room_id', $roomId)
+                ->update(['region' => $request->region]);
         }
-
     }
 
     //post new entry to ActiveUsers model
