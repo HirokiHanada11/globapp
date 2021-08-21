@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Auth;
 class RoomController extends Controller
 {
     // return chat room view
-    public function chatroom( Request $request, $roomId ){
+    public function chatroomView( Request $request, $roomId ){
         return Inertia::render('Chat/Room/ChatContainer', [
             'roomId' => $roomId
         ]);
@@ -20,21 +20,32 @@ class RoomController extends Controller
 
     // gets all the entries in ChatRoom Model
     public function rooms( Request $request ){
-        $chatRoomsAll = ChatRoom::all();
-        $chatRoomsAll->load('users');
-        return $chatRoomsAll;
+        return ChatRoom::with('users')
+            ->with('activeUsers')
+            ->get();
     }
 
     // get all the entries in ChatRoom Model that the user is subscribed to
     public function subbedRooms( Request $request ){
-        $user = User::where('id', Auth::id())->first();
-        $user->load('chatrooms');
-        return $user->chatrooms; 
+        $returnArray = array();
+        $user = User::where('id', Auth::id())
+            ->with('chatrooms')
+            ->first();
+        foreach($user->chatrooms as $chatroom){
+            $returnArray[] = ChatRoom::where('id', $chatroom->id)
+            ->with('users')
+            ->with('activeUsers')
+            ->first();
+        }
+        return $returnArray;
     }
 
     // gets the currentroom from ChatRoom Model
     public function currentRoom( Request $request, $roomId ){
-        return ChatRoom::where('id', $roomId)->get();
+        return ChatRoom::where('id', $roomId)
+            ->with('users')
+            ->with('activeUsers')
+            ->first();
     }
 
     // posts new entry to ChatRoom Model
@@ -60,9 +71,7 @@ class RoomController extends Controller
 
     //for retrieving subbed rooms
     public function subbed( Request $request ){
-        $user = User::where('id', Auth::id())->get();
-        $user->load('chatrooms');
-        return $user;             
+        return User::where('id', Auth::id())->with('chatrooms')->get();
     }
 
     //for retrieving subbed users

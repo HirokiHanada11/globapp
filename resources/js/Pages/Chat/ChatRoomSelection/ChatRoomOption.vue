@@ -11,7 +11,7 @@
             </div>
         </span>
         <div class="grid-col-2">
-            <div class="float-right p-3">Active Users: {{ activeUsersLen }}</div>
+            <div class="float-right p-3">Active Users: {{ room.active_users.length }}/{{room.users.length}}</div>
         </div>
     </div>
     <div v-show="showPopUp">
@@ -38,17 +38,6 @@ export default {
         toggleShow() {
             this.showPopUp = !this.showPopUp;
         },
-        async getActiveUsers(){
-            try {
-                let response = await axios.get(`/countactive/${this.room.id}`);
-                this.activeUsersLen = await response.data;
-            } catch (e) {
-                console.error(e);
-            }
-        }
     },
-    mounted() {
-        this.getActiveUsers();
-    }
 }
 </script>

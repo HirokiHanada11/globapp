@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\ActiveUser;
 use App\Models\ChatRoomUser;
+use App\Models\ChatRoom;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
@@ -15,6 +16,14 @@ class ActiveUsersController extends Controller
         return ActiveUser::where('chat_room_id', $roomId)
             ->with('user')
             ->get();
+    }
+
+    //get all active users in the room
+    public function allActiveUsers( Request $request, $roomId ){
+        return ChatRoom::where('id', $roomId)
+            ->with('activeUsers')
+            ->get();
+
     }
 
     //count the number of active users from pivot table
@@ -43,6 +52,22 @@ class ActiveUsersController extends Controller
         }
     }
 
+    //update method to activate user via pivot table
+    public function activateUser( Request $request, $roomId, $userId ){
+        if(ChatRoomUser::where('user_id', $userId)->where('chat_room_id', $roomId)->exists()){
+            ChatRoomUser::where('user_id', $userId)->where('chat_room_id', $roomId)
+                ->update(['active' => true]);
+        }
+    }
+
+    //update method to deactivate user via pivot table
+    public function deactivateUser( Request $request, $roomId, $userId ){
+        if(ChatRoomUser::where('user_id', $userID)->where('chat_room_id', $roomId)->exists()){
+            ChatRoomUser::where('user_id', $userID)->where('chat_room_id', $roomId)
+                ->update(['active' => false]);
+        }
+    }
+
     //post new entry to ActiveUsers model
     public function newActiveUser( Request $request, $roomId ){
         $newActiveUser = new ActiveUser;
@@ -55,10 +80,10 @@ class ActiveUsersController extends Controller
         return $newActiveUser;
     }
 
-    // removes an entry from ActiveUsers model
-    public function deactivateUser( Request $request, $roomId ){
-        return ActiveUser::where('chat_room_id', $roomId)
-            ->where('user_id', Auth::id())
-            ->delete();
-    }
+    // // removes an entry from ActiveUsers model
+    // public function deactivateUser( Request $request, $roomId ){
+    //     return ActiveUser::where('chat_room_id', $roomId)
+    //         ->where('user_id', Auth::id())
+    //         ->delete();
+    // }
 }

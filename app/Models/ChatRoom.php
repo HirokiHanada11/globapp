@@ -13,13 +13,21 @@ class ChatRoom extends Model
         return $this->hasMany('App\Models\Message');
     }
 
-    public function activeusers() {
-        return $this->hasMany('App\Models\ActiveUser');
-    }
+    // public function activeusers() {
+    //     return $this->hasMany('App\Models\ActiveUser');
+    // }
 
     public function users() {
         return $this->belongsToMany(User::class, 'chat_room_user')
-        ->withPivot('active', 'last_read')
-        ->withTimestamps();
+            ->withPivot('active', 'last_read', 'region')
+            ->withTimestamps();
     }
+
+    public function activeUsers() {
+        return $this->belongsToMany(User::class, 'chat_room_user')
+            ->withPivot('active', 'last_read', 'region')
+            ->withTimestamps()
+            ->wherePivot('active', true);
+    }
+
 }

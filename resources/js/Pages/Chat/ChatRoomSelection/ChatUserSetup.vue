@@ -36,26 +36,11 @@ export default {
     data () {
         return {
             selected: '',
-            userRegions: [],
+            userRegions: new Array(),
             modelId: 0,
         }
     },
     methods: {
-        openChatRoom () {
-            axios.post(`/chat/room/${this.room.id}/newactiveuser`, {
-                region: this.selected,
-                modelId: this.modelId,
-            })
-            .then( response => {
-                if( response.status == 201 ){
-                    console.log('activated new user');
-                }
-            })
-            .catch( error => {
-                console.error(error);
-            })
-            // window.location = `/chatrooms/chatroom/${this.room.id}`;
-        },
         async joinRoom () {
             let userId = this.$page.props.user.id;
             try {
@@ -69,16 +54,12 @@ export default {
             window.location = `/chatrooms/chatroom/${this.room.id}`;
         },
         async joinClicked() {
-            await this.openChatRoom();
             await this.joinRoom();
         }
     },
     mounted() {
-        // console.log(this.room)
         this.userRegions = Object.keys(prefecToCoords);
-        // console.log(this.userRegions);
         this.selected = this.userRegions[0];
-
     }
 }
 </script>

@@ -99,14 +99,14 @@
         },
         data: () => {
             return {
-                currentRoom: [],
-                messages: [],
-                activeUsers: [],
+                currentRoom: new Object(),
+                messages: new Array(),
+                activeUsers: new Array(),
                 showActive: false,
                 showMessages: true,
                 chatScrollPosition: 0,
                 sortBy: 'popularity',
-                news: [],
+                news: new Array(),
                 showNews: false,
                 topic: '',
                 camera: true,
@@ -116,12 +116,65 @@
                 fetching: false,
             }
         },
-        watch: {
-            currentRoom( val, oldVal ) {
-                this.connect();
-            }
+        beforeUnmount() {
+            this.deactivateUser();
+            this.disconnect(this.currentRoom);
+        },
+        mounted() {
+            this.activateUser();
+            this.getCurrentRoom();
+            this.connect();
+            this.getPaginatedMessages();
         },
         methods: {
+            //room method
+            async getCurrentRoom(){ //fetch the information about the current room
+                try { 
+                    let response = await axios.get(`/chat/currentroom/${this.roomId}`);
+                    this.currentRoom = await response.data;
+                    this.activeUsers = await response.data.active_users;
+                    this.subscribers = await response.data.users;
+                } catch (error) {
+                    console.error(error);
+                }
+            },
+            
+            //Broadcasting methods
+            connect(){ //connects the user to the room channel
+                if( this.currentRoom.id ){
+                    let vm = this;
+                    window.Echo.private(`chat.${this.currentRoom.id}`)
+                    .listen('.message.new', e => {
+                        vm.getNewestMessage();
+                    });
+                }
+            },
+            disconnect( room ){//disconnect the user from the room channel 
+                window.Echo.leave(`chat.${room.id}`);
+            },
+            
+            //activation methods
+            async activateUser(){
+                try{
+                    let response = await axios.post(`/activate/${this.roomId}/${this.$page.props.user.id}`)
+                    if(response.status == 201){
+                        console.log('activated user');
+                    }
+                }catch(error){
+                    console.error(error);
+                }
+            },
+            async deactivateUser(){
+                try {
+                    let response = await axios.post(`/deactivate/${this.currentRoom.id}/${this.$page.props.user.id}`);
+                    if(response.status == 201){
+                        console.log('deactivated user');
+                    }
+                } catch (error) {
+                    console.error(error);
+                }
+            },
+
             //toggling methods for view
             setBackCamera() { //initiates the camera movement
                 this.camera = !this.camera;
@@ -140,46 +193,15 @@
             toggleShowActive() { //show and hide active users column
                 this.showActive = !this.showActive;
             },
-            
-            //Broadcasting methods
-            connect(){ //connects the user to the room channel
-                if( this.currentRoom.id ){
-                    let vm = this;
-                    this.getPaginatedMessages();
-                    this.getActiveUsers();
-                    window.Echo.private(`chat.${this.currentRoom.id}`)
-                    .listen('.message.new', e => {
-                        vm.getNewestMessage();
-                    });
-                }
-            },
-
-            disconnect( room ){//disconnect the user from the room channel 
-                console.log('disconnecting');
-                this.deactivateUser();
-                window.Echo.leave(`chat.${room.id}`);
-            },
-            
-            //room method
-            getCurrentRoom(){ //fetch the information about the current room
-                axios.get(`/chat/room/${this.roomId}`)
-                .then( response => {
-                    this.currentRoom = response.data[0];
-                })
-                .catch( error => {
-                    console.error(error);
-                })
-            },
 
             //message methods
-            getMessages(){ // called once when user joins 
-                axios.get(`/chat/room/${this.currentRoom.id}/messages`)
-                .then( response => {
-                    this.messages = response.data;
-                })
-                .catch( error => {
+            async getMessages(){ // called once when user joins 
+                try { 
+                    let response = await axios.get(`/chat/room/${this.currentRoom.id}/messages`);
+                    this.messages = await response.data;
+                } catch (error) {
                     console.error(error);
-                })
+                }
             },
 
             getPaginatedMessages(){//called when user reachs max scroll       
@@ -284,28 +306,7 @@
                 }
             },
 
-            //active users methods
-            getActiveUsers(){
-                axios.get(`/chat/room/${this.currentRoom.id}/activeusers`)
-                .then( response => {
-                    this.activeUsers = response.data;
-                    //console.log(response.data)
-                })
-                .catch( error => {
-                    console.error(error);
-                })
-            },
-            deactivateUser(){
-                axios.post(`/chat/room/deactivate/${this.currentRoom.id}`)
-                .then( response => {
-                    if( response.status == 201 ){
-                        console.log('deactivated user');
-                    }
-                })
-                .catch( error => {
-                    console.error(error);
-                })
-            },
+            
 
             //Demo Methods
             startDemo(){
@@ -365,11 +366,6 @@
             },
             
         },
-        beforeUnmount() {
-            this.disconnect(this.currentRoom);
-        },
-        mounted() {
-            this.getCurrentRoom();
-        }
+        
     }
 </script>

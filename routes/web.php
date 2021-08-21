@@ -42,7 +42,7 @@ Route::middleware(['auth:sanctum', 'verified'])->get('/chatrooms', function () {
     return Inertia::render('Chat/ChatRoomSelection/ChatRoomsContainer');
 })->name('chatrooms');
 
-Route::middleware('auth:sanctum')->get('/chatrooms/chatroom/{roomId}', [RoomController::class, 'chatroom']);
+Route::middleware('auth:sanctum')->get('/chatrooms/chatroom/{roomId}', [RoomController::class, 'chatroomView']);
 
 Route::middleware(['auth:sanctum', 'verified'])->get('/chatrooms/newRoom', function () {
     return Inertia::render('Chat/ChatRoomSelection/CreateNewContainer');
@@ -58,7 +58,7 @@ Route::middleware('auth:sanctum')->get('/chat/rooms', [RoomController::class, 'r
 Route::middleware('auth:sanctum')->get('/chat/subbedrooms', [RoomController::class, 'subbedRooms']);
 
 //Get current room
-Route::middleware('auth:sanctum')->get('/chat/room/{roomId}', [RoomController::class, 'currentRoom']);
+Route::middleware('auth:sanctum')->get('/chat/currentroom/{roomId}', [RoomController::class, 'currentRoom']);
 
 //post create new room
 Route::middleware('auth:sanctum')->post('/chat/newRoom/create', [RoomController::class, 'newRoom']);
@@ -88,7 +88,10 @@ Route::middleware('auth:sanctum')->get('/chat/room/{roomId}/activeusers', [Activ
 Route::middleware('auth:sanctum')->post('/chat/room/{roomId}/newactiveuser', [ActiveUsersController::class, 'newActiveUser']);
 
 //Post deactivate user
-Route::middleware('auth:sanctum')->post('/chat/room/deactivate/{roomId}', [ActiveUsersController::class, 'deactivateUser']);
+Route::middleware('auth:sanctum')->post('/activate/{roomId}/{userId}', [ActiveUsersController::class, 'activateUser']);
+
+//Post deactivate user
+Route::middleware('auth:sanctum')->post('/deactivate/{roomId}/{userId}', [ActiveUsersController::class, 'deactivateUser']);
 
 //count active users
 Route::middleware('auth:sanctum')->get('/countactive/{roomId}', [ActiveUsersController::class, 'countActiveUsers']);
@@ -117,6 +120,8 @@ Route::middleware('auth:sanctum')->post('/chat/room/{roomId}/demomessage', [Demo
 
 
 
+//Subbed rooms testing routes
+Route::middleware('auth:sanctum')->get('/allactiveusers/{roomId}', [ActiveUsersController::class, 'allActiveUsers']);
 
 //Subbed rooms testing routes
 Route::middleware('auth:sanctum')->get('/subbed', [RoomController::class, 'subbed']);

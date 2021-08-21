@@ -46,17 +46,14 @@
         },
         data: () => {
             return {
-                chatRooms: [],
+                chatRooms: new Array(),
                 toggleValue: false,
             }
         },
         methods: {
             async getRooms(val){
                 this.toggleValue = val;
-                let endpoint = '/chat/rooms';
-                if(this.toggleValue){
-                    endpoint = '/chat/subbedrooms';
-                }
+                let endpoint = this.toggleValue ? '/chat/subbedrooms' : '/chat/rooms';
                 try{
                     let response = await axios.get(endpoint);
                     console.log(response.data);
@@ -64,7 +61,7 @@
                 }catch(e){
                     console.error(e);
                 }
-            },
+            }
         },
         created() {
             this.getRooms(this.toggleValue);
