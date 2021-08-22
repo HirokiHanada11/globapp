@@ -52,10 +52,13 @@ Route::middleware(['auth:sanctum', 'verified'])->get('/chatrooms/newRoom', funct
 
 //Room
 //Get Chat rooms
-Route::middleware('auth:sanctum')->get('/chat/rooms', [RoomController::class, 'rooms']);
+Route::middleware('auth:sanctum')->get('/allrooms', [RoomController::class, 'rooms']);
 
 //Get Subbed Chat rooms
-Route::middleware('auth:sanctum')->get('/chat/subbedrooms', [RoomController::class, 'subbedRooms']);
+Route::middleware('auth:sanctum')->get('/subbedrooms', [RoomController::class, 'subbedRooms']);
+
+//Get Subbed Chat rooms
+Route::middleware('auth:sanctum')->get('/searchrooms/{keyword}', [RoomController::class, 'searchRooms']);
 
 //Get current room
 Route::middleware('auth:sanctum')->get('/chat/currentroom/{roomId}', [RoomController::class, 'currentRoom']);

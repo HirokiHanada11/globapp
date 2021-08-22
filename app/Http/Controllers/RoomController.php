@@ -40,6 +40,16 @@ class RoomController extends Controller
         return $returnArray;
     }
 
+    // gets all the entries in ChatRoom Model with keyword match in name or description
+    public function searchRooms( Request $request, $keyword ){
+        return ChatRoom::
+            where('name', 'LIKE', '%' . $request->keyword . '%')
+            ->orWhere('description', 'LIKE', '%' . $request->keyword . '%')
+            ->with('users')
+            ->with('activeUsers')
+            ->get();
+    }
+
     // gets the currentroom from ChatRoom Model
     public function currentRoom( Request $request, $roomId ){
         return ChatRoom::where('id', $roomId)
