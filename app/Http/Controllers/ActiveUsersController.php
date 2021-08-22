@@ -62,8 +62,8 @@ class ActiveUsersController extends Controller
 
     //update method to deactivate user via pivot table
     public function deactivateUser( Request $request, $roomId, $userId ){
-        if(ChatRoomUser::where('user_id', $userID)->where('chat_room_id', $roomId)->exists()){
-            ChatRoomUser::where('user_id', $userID)->where('chat_room_id', $roomId)
+        if(ChatRoomUser::where('user_id', $userId)->where('chat_room_id', $roomId)->exists()){
+            ChatRoomUser::where('user_id', $userId)->where('chat_room_id', $roomId)
                 ->update(['active' => false]);
         }
     }

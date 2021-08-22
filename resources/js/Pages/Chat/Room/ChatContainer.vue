@@ -116,11 +116,12 @@
                 fetching: false,
             }
         },
-        beforeUnmount() {
-            this.deactivateUser();
-            this.disconnect(this.currentRoom);
+        async beforeUnmount() {
+            await this.disconnectHandler();
+            document.removeEventListener('backbutton', this.disconnectHandler);
         },
         async mounted() {
+            document.addEventListener('backbutton', this.disconnectHandler);
             await this.activateUser();
             await this.getCurrentRoom();
             await this.connect();
@@ -174,6 +175,11 @@
                 } catch (error) {
                     console.error(error);
                 }
+            },
+
+            async disconnectHandler (){                
+                await this.deactivateUser();
+                await this.disconnect(this.currentRoom);
             },
 
             //toggling methods for view
