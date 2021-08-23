@@ -71,9 +71,10 @@
             },
             async liveSearch(){
                 try {
-                    console.log(this.keyword);
-                    let response = await axios.get(`/searchrooms/${this.keyword}`);
-                    this.chatRooms = response.data;
+                    if(this.keyword){
+                        let response = await axios.get(`/searchrooms/${this.keyword}`);
+                        this.chatRooms = await response.data;
+                    }
                 } catch (error) {
                     console.error(error);
                 }

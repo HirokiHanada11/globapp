@@ -125,7 +125,6 @@
             await this.activateUser();
             await this.getCurrentRoom();
             await this.connect();
-            this.getPaginatedMessages();
         },
         methods: {
             //room method
@@ -145,8 +144,19 @@
                 if( this.currentRoom.id ){
                     let vm = this;
                     console.log('connecting')
-                    window.Echo.private(`chat.${this.currentRoom.id}`)
-                    .listen('.message.new', e => {
+                    window.Echo.join(`chat.${this.currentRoom.id}`)
+                    .here((users)=>{
+                        this.getPaginatedMessages();
+                    })
+                    .joining((user) => {
+                        console.log(user, 'joined the channel')
+                        this.getCurrentRoom();
+                    })
+                    .leaving((user) => {
+                        console.log(user, 'left the channel')
+                        this.getCurrentRoom();
+                    })
+                    .listen('NewChatMessage', e => {
                         vm.getNewestMessage();
                     });
                 }
@@ -211,23 +221,22 @@
                 }
             },
 
-            getPaginatedMessages(){//called when user reachs max scroll       
-                this.fetching = true;         
-                axios.get(`/chat/room/${this.currentRoom.id}/paginated/${this.pagination}`)
-                .then( response => {
-                    if(response.data.length > 0){
-                        this.messages = response.data.reverse().concat(this.messages);
-                        if (this.pagination == 0){
-                            this.newestMessageId = this.messages[this.messages.length-1].id;
+            async getPaginatedMessages(){//called when user reachs max scroll       
+                this.fetching = true;
+                try {
+                    let response = await axios.get(`/chat/room/${this.currentRoom.id}/paginated/${this.pagination}`);
+                        if(response.data.length > 0){
+                            this.messages = await response.data.reverse().concat(this.messages);
+                            if (this.pagination == 0){
+                                this.newestMessageId = await this.messages[this.messages.length-1].id;
+                            }
+                            this.pagination += 1;
                         }
-                        this.pagination += 1;
-                    }
-                    this.fetching = false;  
-                })
-                .catch( error => {
-                    console.error(error);
-                    this.fetching = false;  
-                })
+                            this.fetching = false; 
+                } catch (error) {
+                   console.error(error);
+                    this.fetching = false;   
+                }   
             },
 
             getNewestMessage(){//gets the latest message when new message event occurs

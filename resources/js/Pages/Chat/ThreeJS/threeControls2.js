@@ -325,8 +325,8 @@ export class ThreeSetup2 {
         userModelPlane.position.y = (prefecToCoords[user.pivot.region][0] - 35.837181) * 30/25
 
         this.scene.getObjectByName('Plane').getObjectByName('UserModels').add(userModelPlane);
-
-    } 
+        console.log(this.scene.getObjectByName('Plane').getObjectByName('UserModels'));
+;    } 
     
     //funtion to convert prefecture name to position on map
     prefecToCoordsOnMap = (prefec) => {
