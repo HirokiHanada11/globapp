@@ -60,8 +60,9 @@ class User extends Authenticatable
     ];
 
     public function chatrooms(){
-        return $this->belongsToMany(ChatRoom::class, 'chat_room_user')
-        ->withPivot('active', 'last_read')
-        ->withTimestamps();
+        return $this->belongsToMany(ChatRoom::class)
+            ->using(ChatRoomUser::class)
+            ->withPivot('active', 'last_read')
+            ->withTimestamps();
     }
 }

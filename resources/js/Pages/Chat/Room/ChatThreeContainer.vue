@@ -73,6 +73,7 @@ export default {
         },
         generateUserModel(user, sessionUser) {
             threeSetup2.createUserModel(user, sessionUser);
+            console.log('generated model for ', user)
         },
         createMessagePayload(message){
             if(message.link){

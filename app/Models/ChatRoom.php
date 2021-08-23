@@ -18,13 +18,15 @@ class ChatRoom extends Model
     // }
 
     public function users() {
-        return $this->belongsToMany(User::class, 'chat_room_user')
+        return $this->belongsToMany(User::class)
+            ->using(ChatRoomUser::class)
             ->withPivot('active', 'last_read', 'region')
             ->withTimestamps();
     }
 
     public function activeUsers() {
-        return $this->belongsToMany(User::class, 'chat_room_user')
+        return $this->belongsToMany(User::class)
+            ->using(ChatRoomUser::class)
             ->withPivot('active', 'last_read', 'region')
             ->withTimestamps()
             ->wherePivot('active', true);

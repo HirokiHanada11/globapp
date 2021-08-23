@@ -72,7 +72,7 @@ export default {
         },
         scrollCheck(){
             this.scrollPosition = this.$refs.chat.scrollTop;
-            console.log(this.scrollPosition);
+            // console.log(this.scrollPosition);
             if(!this.ticking){
                 window.requestAnimationFrame(() => {
                     if(this.scrollPosition == 0){

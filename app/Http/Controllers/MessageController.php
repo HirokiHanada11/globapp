@@ -9,14 +9,6 @@ use Illuminate\Support\Facades\Auth;
 
 class MessageController extends Controller
 {
-    /*Gets all the message in ChatMessage model */
-    public function messages( Request $request, $roomId ){
-        return ChatMessage::where('chat_room_id', $roomId)
-            ->with('user')
-            ->orderBy('created_at', "DESC")
-            ->get();
-    }
-
     /*Gets paginated message in ChatMessage model */
     public function getPaginatedMessages( Request $request, $roomId, $pagination ){
         $offset = $pagination * 20;

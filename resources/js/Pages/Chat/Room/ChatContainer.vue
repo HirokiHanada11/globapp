@@ -212,15 +212,6 @@
             },
 
             //message methods
-            async getMessages(){ // called once when user joins 
-                try { 
-                    let response = await axios.get(`/chat/room/${this.currentRoom.id}/messages`);
-                    this.messages = await response.data;
-                } catch (error) {
-                    console.error(error);
-                }
-            },
-
             async getPaginatedMessages(){//called when user reachs max scroll       
                 this.fetching = true;
                 try {
@@ -239,16 +230,15 @@
                 }   
             },
 
-            getNewestMessage(){//gets the latest message when new message event occurs
-                axios.get(`/chat/room/${this.currentRoom.id}/newestmessage`)
-                .then( response => {
-                    let newMessage = [response.data];
-                    this.messages = this.messages.concat(newMessage);
-                    this.newestMessageId = this.messages[this.messages.length-1].id;
-                })
-                .catch( error => {
+            async getNewestMessage(){//gets the latest message when new message event occurs
+                try{
+                let response = await axios.get(`/chat/room/${this.currentRoom.id}/newestmessage`);
+                    let newMessage = await [response.data];
+                    this.messages = await this.messages.concat(newMessage);
+                    this.newestMessageId = await this.messages[this.messages.length-1].id;
+                } catch(error) {
                     console.error(error);
-                })
+                }
             },
 
             appendNewMessage(value){ //appends new message to the message data 
@@ -325,25 +315,23 @@
             
 
             //Demo Methods
-            startDemo(){
+            async startDemo(){
                 const randomComment = ['私は南極に行く','軽く死ねますね','アメンボ赤いな愛ゆえに','選択肢はずっとあったよでも選んだんだよ、ここを選んだんだよ自分で','うるかにしてください','プリンは飲み物'];
                 for(let i = 2; i < 6; i++){
-                    let demoRegion = Object.keys(prefecToCoords)[Math.floor(Math.random() * 46)]
-                    axios.post(`/chat/room/${this.currentRoom.id}/newdemoactiveuser`, {
-                        userId: i,
-                        region: demoRegion,
-                    })
-                    .then( response => {
-                        if( response.status == 201 ){
+                    try {
+                        let demoRegion = Object.keys(prefecToCoords)[Math.floor(Math.random() * 46)]
+                        let response = await axios.post(`/activate/${this.currentRoom.id}/${i}`, {
+                            region: demoRegion,
+                        });
+                        if( response.status == 200 ){
                             console.log('activated new demo user', response.data);
                         }
-                    })
-                    .catch( error => {
+                    } catch (error) {
                         console.error(error);
-                    })
+                    }
+                    await this.getCurrentRoom();
                 }
-                this.getActiveUsers();
-                this.demoInterval = setInterval(()=>{
+                this.demoInterval = await setInterval(()=>{
                     let id = Math.floor(Math.random() * (6 - 2) + 2);
                     let randomIndex = Math.floor(Math.random()* (randomComment.length - 1));
                     let comment = randomComment[randomIndex];
@@ -369,16 +357,18 @@
             stopDemo(){
                 clearInterval(this.demoInterval);
                 this.demoInterval = 0;
-                axios.post(`/chat/room/deactivatedemo/${this.currentRoom.id}`)
-                .then( response => {
-                    if( response.status == 201 ){
-                        console.log('deactivated demo users');
-                        this.getActiveUsers();
-                    }
-                })
-                .catch( error => {
-                    console.error(error);
-                })
+                for(let i = 2; i < 6; i++){
+                    axios.post(`/deactivate/${this.currentRoom.id}/${i}`)
+                    .then( response => {
+                        if( response.status == 201 ){
+                            console.log('deactivated demo users');
+                        }
+                    })
+                    .catch( error => {
+                        console.error(error);
+                    })
+                }
+                this.getCurrentRoom();
             },
             
         },
