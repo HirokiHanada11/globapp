@@ -86,8 +86,7 @@ class RoomController extends Controller
 
     //for retrieving subbed users
     public function subbedusers( Request $request ){
-        $subbedUsers = ChatRoom::where('id', 1)->first();
-        $subbedUsers->load('users');
+        $subbedUsers = ChatRoom::where('id', 1)->with('users')->first();
         return $subbedUsers->users;             
     }
 

@@ -20,5 +20,11 @@ class ChatRoomSeeder extends Seeder
             'description' => 'For talking about olympics',
             'photo' => '/storage/useruploads/globe.png'
         ]);
+        DB::table('chat_rooms')->insert([
+            'name' => 'Tech talk',
+            'topic' => 'Tech',
+            'description' => 'For talking about olympics',
+            'photo' => '/storage/useruploads/tech-rings.png'
+        ]);
     }
 }

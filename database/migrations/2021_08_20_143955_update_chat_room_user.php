@@ -14,9 +14,7 @@ class UpdateChatRoomUser extends Migration
     public function up()
     {
         Schema::table('chat_room_user', function (Blueprint $table) {
-            $table->after('chat_room_id', function (Blueprint $table){
-                $table->string('region')->nullable()->change();
-            });
+            $table->string('region')->nullable();            
         });
     }
 
