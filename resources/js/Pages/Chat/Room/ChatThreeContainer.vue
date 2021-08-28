@@ -72,7 +72,7 @@ export default {
             this.animate();
         },
         generateUserModel(user, sessionUser) {
-            threeSetup2.createUserModel(user, sessionUser);
+            threeSetup2.createUserModel(user, sessionUser, this.room.photo);
             console.log('generated model for ', user)
         },
         createMessagePayload(message){

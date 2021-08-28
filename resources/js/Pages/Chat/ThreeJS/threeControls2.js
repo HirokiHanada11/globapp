@@ -1,3 +1,4 @@
+import axios from 'axios';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import {nameToCoords, soucresToCountry} from "./countries.js";
@@ -292,8 +293,9 @@ export class ThreeSetup2 {
     }
 
     //static function to create user model when user joins the room, the model generated is a placeholder at the moment, planning to develop more complex models in the future
-    createUserModel = (user, sessionUser) =>{
+    createUserModel = (user, sessionUser, fallback_url) =>{
         const loader = new THREE.TextureLoader();
+        loader.setCrossOrigin('use-credentials');
         const userModelPlane = new THREE.Group;
         userModelPlane.name = user.name;
 
@@ -307,12 +309,18 @@ export class ThreeSetup2 {
             bodyMaterial.color = new THREE.Color(0xff0000);
         }else {
             // headMaterial.color = new THREE.Color("#808080");
-            bodyMaterial.color = new THREE.Color(0xff0000);
+            bodyMaterial.color = new THREE.Color(0x808080);
         }
         
         const body = new THREE.Mesh(pyramidGeometry,bodyMaterial);
         body.name = 'Body';
-        headMaterial.map = loader.load(user.profile_photo_url);
+
+        if(/^https?:\/\//.test(user.profile_photo_url)){
+            headMaterial.map = loader.load(fallback_url);  
+        }else{
+            headMaterial.map = loader.load(user.profile_photo_url);
+        }
+        
         const head = new THREE.Mesh(circleGeometry,headMaterial);
         head.name = 'Head';
         head.position.z = 2;
@@ -326,7 +334,8 @@ export class ThreeSetup2 {
 
         this.scene.getObjectByName('Plane').getObjectByName('UserModels').add(userModelPlane);
         console.log(this.scene.getObjectByName('Plane').getObjectByName('UserModels'));
-;    } 
+    }
+    
     
     //funtion to convert prefecture name to position on map
     prefecToCoordsOnMap = (prefec) => {
