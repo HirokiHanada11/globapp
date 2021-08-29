@@ -6,7 +6,8 @@ import { prefecToCoords } from './japanPrefecture.js';
 
 //class for setting up three js 
 export class ThreeSetup2 {
-    constructor(width, height, canvas) {
+    constructor(width, height, canvas, welcome = 0) {
+        this.welcome = welcome;
         this.width = width;
         this.height = height;
         this.canvas = canvas;
@@ -20,20 +21,19 @@ export class ThreeSetup2 {
         this.raycaster = new THREE.Raycaster();
         this.mouse = new THREE.Vector2();
         this.objectsInScene = [];
-        this.clock = new THREE.Clock();
-        this.axis = new THREE.Vector3();
+        this.clock = new THREE.Clock();new THREE.Vector3();
         this.up = new THREE.Vector3(0,1,0);
-        this.target = new THREE.Vector3(50,0,0);
+        this.target = welcome ? undefined : new THREE.Vector3(50,0,0);
         this.movement = { //setting trusy values here will trigger corresponding animations 
             camera: new Object(),
-            user: true,
+            user: welcome ? undefined : true,
             water: true,
             payloads: [],
             news: [],
             sphereControl: false,
             sphereControlOrigin: new THREE.Vector2(),
             sphereRotation: new THREE.Vector2(0.1, 0),
-            fireworks:[],
+            fireworks: [],
         };
     }
     init = () => {
@@ -601,7 +601,9 @@ export class ThreeSetup2 {
 
         if (this.movement.water){ //wave animation
             sphere.getObjectByName('Water').material.normalScale.set( Math.sin(elapsedTime*0.3), Math.cos(elapsedTime*0.3));
-            this.scene.getObjectByName('Plane').getObjectByName('Water').material.normalScale.set( Math.sin(elapsedTime*0.3), Math.cos(elapsedTime*0.3));
+            if(!this.welcome){
+                this.scene.getObjectByName('Plane').getObjectByName('Water').material.normalScale.set( Math.sin(elapsedTime*0.3), Math.cos(elapsedTime*0.3));
+            }
         }
 
         if(this.movement.user){ //user animation, currenty unset
