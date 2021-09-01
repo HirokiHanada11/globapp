@@ -191,7 +191,7 @@
                 this.alert = {
                     user: user,
                     message: type ? ' joined the chat!' : ' left the chat', 
-                    timestamp: new Date.now(),
+                    timestamp: Date.now(),
                 }
             },
             
