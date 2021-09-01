@@ -101,7 +101,11 @@
             return {
                 currentRoom: new Object(),
                 messages: new Array(),
-                activeUsers: new Array(),
+                activeUsers: {
+                    changeType: 'default',
+                    subjectUser: null,
+                    usersList: new Array(),
+                },
                 showActive: false,
                 showMessages: true,
                 chatScrollPosition: 0,
@@ -123,7 +127,14 @@
         async mounted() {
             document.addEventListener('backbutton', this.disconnectHandler);
             await this.activateUser();
-            await this.getCurrentRoom();
+            this.currentRoom = await this.getCurrentRoom();
+            this.activeUsers = await {
+                changeType: 'default',
+                subjectUser: null,
+                usersList: this.currentRoom.active_users,
+            };
+            this.subscribers = await this.currentRoom.users;
+            // console.log(this.activeUsers);
             await this.connect();
         },
         methods: {
@@ -131,12 +142,40 @@
             async getCurrentRoom(){ //fetch the information about the current room
                 try { 
                     let response = await axios.get(`/chat/currentroom/${this.roomId}`);
-                    this.currentRoom = await response.data;
-                    this.activeUsers = await response.data.active_users;
-                    this.subscribers = await response.data.users;
+                    return response.data;                    
                 } catch (error) {
                     console.error(error);
                 }
+            },
+
+            //new active user handler
+            async newUserHandler(user){
+                let data = await this.getCurrentRoom();
+                this.activeUsers = await {
+                    changeType: 'create',
+                    subjectUser: data.active_users.find(activeUser => activeUser.id === user.id),
+                    usersList: data.active_users,
+                };
+                this.subscribers = await data.users;
+            },
+
+            //leaving user handler
+            removeUserHandler(user){
+                let subjectUser;
+                let newList = new Array();
+                for(let i = 0; i < this.activeUsers.usersList.length; i++){
+                    if (this.activeUsers.usersList[i].id === user.id){
+                        subjectUser = activeUser;
+                        newList = this.activeUsers.usersList.slice(0, i).concat(this.activeUsers.usersList.slice(i + 1))
+                        break;
+                    }
+                }
+
+                this.activeUsers = {
+                    changeType: 'remove',
+                    subjectUser: subjectUser,
+                    usersList: newList,
+                };
             },
             
             //Broadcasting methods
@@ -150,11 +189,11 @@
                     })
                     .joining((user) => {
                         console.log(user, 'joined the channel')
-                        this.getCurrentRoom();
+                        this.newUserHandler(user);
                     })
                     .leaving((user) => {
                         console.log(user, 'left the channel')
-                        this.getCurrentRoom();
+                        this.removeUserHandler(user);
                     })
                     .listen('NewChatMessage', e => {
                         vm.getNewestMessage();
