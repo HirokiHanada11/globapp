@@ -165,7 +165,7 @@
                 let newList = new Array();
                 for(let i = 0; i < this.activeUsers.usersList.length; i++){
                     if (this.activeUsers.usersList[i].id === user.id){
-                        subjectUser = activeUser;
+                        subjectUser = this.activeUsers.usersList[i];
                         newList = this.activeUsers.usersList.slice(0, i).concat(this.activeUsers.usersList.slice(i + 1))
                         break;
                     }
