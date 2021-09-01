@@ -64,9 +64,9 @@
                         </button>
                     </div> 
                     <chat-three-container :messages="messages" :room="currentRoom" :activeUsers="activeUsers" :news="news" :cameraNum="camera" />
-                    <div v-if="alert.show" class="fixed bottom-0 justify-center"
+                    <div v-if="alert.user" class="absolute -top-6 justify-center"
                         v-bind:class="{'animate-fade-in-up': alert.show, 'animate-fade-out-down': !alert.show}">
-                        <b>{{alert.user.name}}</b>{{alert.message}}
+                        <span><b>{{alert.user.name}}</b>{{alert.message}}</span>
                     </div>
                 </div>
                 <input-message 
