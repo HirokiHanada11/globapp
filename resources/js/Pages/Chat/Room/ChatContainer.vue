@@ -64,7 +64,8 @@
                         </button>
                     </div> 
                     <chat-three-container :messages="messages" :room="currentRoom" :activeUsers="activeUsers" :news="news" :cameraNum="camera" />
-                    <div v-if="alert.user" class="fixed bottom-0 text-center animate-fade-in-down">
+                    <div class="fixed bottom-0 justify-center"
+                        v-bind:class="{'animate-fade-in-up': alert.show, 'animate-fade-out-down': !alert.show}">
                         <b>{{alert.user.name}}</b>{{alert.message}}
                     </div>
                 </div>
@@ -122,6 +123,7 @@
                 newestMessageId: 0,
                 fetching: false,
                 alert: {
+                    show: false,
                     user: null,
                     message: null, 
                     timestamp: null,
@@ -188,11 +190,20 @@
 
             //alert for user joining and leaving
             createAlert(user, type){
+                if(this.alert.timeOut){
+                    clearTimeout(this.alert.timeOut);
+                }
                 this.alert = {
+                    show: true,
                     user: user,
                     message: type ? ' joined the chat!' : ' left the chat', 
                     timestamp: Date.now(),
+                    timeOut: setTimeout(() => {
+                        this.alert.show = false;
+                        this.alert.timeOut = undefined;
+                    }, 3000),
                 }
+                
             },
             
             //Broadcasting methods
