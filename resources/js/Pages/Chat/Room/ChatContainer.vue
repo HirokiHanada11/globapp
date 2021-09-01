@@ -188,11 +188,11 @@
                         this.getPaginatedMessages();
                     })
                     .joining((user) => {
-                        console.log(user, 'joined the channel')
+                        this.appendNewAlert(`${user} joined the room`);
                         this.newUserHandler(user);
                     })
                     .leaving((user) => {
-                        console.log(user, 'left the channel')
+                        this.appendNewAlert(`${user} left the room`);
                         this.removeUserHandler(user);
                     })
                     .listen('NewChatMessage', e => {
@@ -294,6 +294,15 @@
                 }];
                 this.messages = this.messages.concat(newMessage);
                 this.newestMessageId = this.messages[this.messages.length-1].id;
+            },
+
+            appendNewAlert(value){ //appends new alert to the message data 
+                let newMessage = [{
+                    id: null,
+                    message: value,
+                    created_at: Date.now(),
+                }];
+                this.messages = this.messages.concat(newMessage);;
             },
 
             messageFailedToSend(){//error display
