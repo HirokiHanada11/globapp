@@ -24,13 +24,13 @@ module.exports = {
                     },
                     'to': {
                         opacity: '0',
-                        transform: 'translateY(10px)'
+                        transform: 'translateY(50%)'
                     },
                 },
                 'fade-in-up': {
                     '0%': {
                         opacity: '0',
-                        transform: 'translateY(10px)'
+                        transform: 'translateY(50%)'
                     },
                     '100%': {
                         opacity: '1',
