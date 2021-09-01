@@ -64,6 +64,9 @@
                         </button>
                     </div> 
                     <chat-three-container :messages="messages" :room="currentRoom" :activeUsers="activeUsers" :news="news" :cameraNum="camera" />
+                    <div v-if="alert.user" class="fixed bottom-0 text-center animate-fade-in-down">
+                        <b>{{alert.user.name}}</b>{{alert.message}}
+                    </div>
                 </div>
                 <input-message 
                     :room="currentRoom" 
@@ -118,6 +121,11 @@
                 pagination: 0,
                 newestMessageId: 0,
                 fetching: false,
+                alert: {
+                    user: null,
+                    message: null, 
+                    timestamp: null,
+                },
             }
         },
         async beforeUnmount() {
@@ -177,6 +185,15 @@
                     usersList: newList,
                 };
             },
+
+            //alert for user joining and leaving
+            createAlert(user, type){
+                this.alert = {
+                    user: user,
+                    message: type ? ' joined the chat!' : ' left the chat', 
+                    timestamp: new Date.now(),
+                }
+            },
             
             //Broadcasting methods
             connect(){ //connects the user to the room channel
@@ -188,11 +205,11 @@
                         this.getPaginatedMessages();
                     })
                     .joining((user) => {
-                        this.appendNewAlert(`${user} joined the room`);
+                        this.createAlert(user, 1);
                         this.newUserHandler(user);
                     })
                     .leaving((user) => {
-                        this.appendNewAlert(`${user} left the room`);
+                        this.createAlert(user, 0);
                         this.removeUserHandler(user);
                     })
                     .listen('NewChatMessage', e => {
@@ -294,15 +311,6 @@
                 }];
                 this.messages = this.messages.concat(newMessage);
                 this.newestMessageId = this.messages[this.messages.length-1].id;
-            },
-
-            appendNewAlert(value){ //appends new alert to the message data 
-                let newMessage = [{
-                    id: null,
-                    message: value,
-                    created_at: Date.now(),
-                }];
-                this.messages = this.messages.concat(newMessage);;
             },
 
             messageFailedToSend(){//error display
