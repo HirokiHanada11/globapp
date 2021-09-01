@@ -335,6 +335,12 @@ export class ThreeSetup2 {
         this.scene.getObjectByName('Plane').getObjectByName('UserModels').add(userModelPlane);
         console.log(this.scene.getObjectByName('Plane').getObjectByName('UserModels'));
     }
+
+    //function to remove user model for the specified user
+    removeUserModel = (user) => {
+        let subjectModel = this.scene.getObjectByName('Plane').getObjectByName('UserModels').getObjectByName(user.name);
+        this.scene.getObjectByName('Plane').getObjectByName('UserModels').remove(subjectModel);
+    }
     
     
     //funtion to convert prefecture name to position on map

@@ -17,7 +17,16 @@
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 relative" style="height:70vh">               
                 <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg h-full w-full relative">
                     <div class="h-full w-1/4 absolute top-0 right-0 flex flex-col ">
-                        <message-container v-show="showMessages" :messages="messages" :fetching="fetching" v-on:resend="resendMessage" v-on:fetchmoremessages="getPaginatedMessages"/>
+                        <message-container 
+                            v-show="showMessages.state != 'hide'" 
+                            :messages="messages" 
+                            :fetching="fetching" 
+                            v-on:resend="resendMessage" 
+                            v-on:fetchmoremessages="getPaginatedMessages"
+                            v-bind:class="{
+                                'animate-fade-in-right': showMessages.state == 'show',
+                                'animate-fade-out-left': showMessages.state == 'hiding', 
+                            }" />
                         <div class="h-full w-1/12 absolute top-0 right-0 bg-gray-300 opacity-5 hover:opacity-50" @click="toggleMessage"></div>               
                     </div> 
                     <div class="h-1/2 w-1/4 absolute top-0 right-1/4">
@@ -25,11 +34,15 @@
                     </div>
                     <div class="h-full w-1/4 absolute top-0 left-0">
                         <news-container 
-                            v-show="showNews" 
+                            v-show="showNews.state != 'hide'" 
                             :news="news" 
                             :roomId="currentRoom.id" 
                             v-on:sending="appendNewMessage"
                             v-on:messagefailed="messageFailedToSend"
+                            v-bind:class="{
+                                'animate-fade-in-left': showNews.state == 'show',
+                                'animate-fade-out-right': showNews.state == 'hiding', 
+                            }"
                         />
                         <div class="h-full w-1/12 absolute top-0 left-0 bg-gray-300 opacity-5 hover:opacity-50" @click="toggleNews"></div>
                     </div>
@@ -64,6 +77,10 @@
                         </button>
                     </div> 
                     <chat-three-container :messages="messages" :room="currentRoom" :activeUsers="activeUsers" :news="news" :cameraNum="camera" />
+                    <div v-if="alert.user" class="absolute bottom-20 w-full justify-center flex"
+                        v-bind:class="{'animate-fade-in-up': alert.show, 'animate-fade-out-down': !alert.show}">
+                        <span><b>{{alert.user.name}}</b>{{alert.message}}</span>
+                    </div>
                 </div>
                 <input-message 
                     :room="currentRoom" 
@@ -101,19 +118,35 @@
             return {
                 currentRoom: new Object(),
                 messages: new Array(),
-                activeUsers: new Array(),
+                activeUsers: {
+                    changeType: 'default',
+                    subjectUser: null,
+                    usersList: new Array(),
+                },
                 showActive: false,
-                showMessages: true,
+                showMessages: {
+                    state: 'show',
+                    timeOut: undefined,
+                    },
+                showNews: {
+                    state: 'hide',
+                    timeOut: undefined,
+                    },
                 chatScrollPosition: 0,
                 sortBy: 'popularity',
                 news: new Array(),
-                showNews: false,
                 topic: '',
                 camera: true,
                 demoInterval: 0,
                 pagination: 0,
                 newestMessageId: 0,
                 fetching: false,
+                alert: {
+                    show: false,
+                    user: null,
+                    message: null, 
+                    timestamp: null,
+                },
             }
         },
         async beforeUnmount() {
@@ -123,7 +156,14 @@
         async mounted() {
             document.addEventListener('backbutton', this.disconnectHandler);
             await this.activateUser();
-            await this.getCurrentRoom();
+            this.currentRoom = await this.getCurrentRoom();
+            this.activeUsers = await {
+                changeType: 'default',
+                subjectUser: null,
+                usersList: this.currentRoom.active_users,
+            };
+            this.subscribers = await this.currentRoom.users;
+            // console.log(this.activeUsers);
             await this.connect();
         },
         methods: {
@@ -131,12 +171,59 @@
             async getCurrentRoom(){ //fetch the information about the current room
                 try { 
                     let response = await axios.get(`/chat/currentroom/${this.roomId}`);
-                    this.currentRoom = await response.data;
-                    this.activeUsers = await response.data.active_users;
-                    this.subscribers = await response.data.users;
+                    return response.data;                    
                 } catch (error) {
                     console.error(error);
                 }
+            },
+
+            //new active user handler
+            async newUserHandler(user){
+                let data = await this.getCurrentRoom();
+                this.activeUsers = await {
+                    changeType: 'create',
+                    subjectUser: data.active_users.find(activeUser => activeUser.id === user.id),
+                    usersList: data.active_users,
+                };
+                this.subscribers = await data.users;
+            },
+
+            //leaving user handler
+            removeUserHandler(user){
+                let subjectUser;
+                let newList = new Array();
+                for(let i = 0; i < this.activeUsers.usersList.length; i++){
+                    if (this.activeUsers.usersList[i].id === user.id){
+                        subjectUser = this.activeUsers.usersList[i];
+                        newList = this.activeUsers.usersList.slice(0, i).concat(this.activeUsers.usersList.slice(i + 1))
+                        break;
+                    }
+                }
+
+                this.activeUsers = {
+                    changeType: 'remove',
+                    subjectUser: subjectUser,
+                    usersList: newList,
+                };
+            },
+
+            //alert for user joining and leaving
+            createAlert(user, type){
+                if(this.alert.timeOut){
+                    clearTimeout(this.alert.timeOut);
+                }
+                this.alert = {
+                    show: true,
+                    user: user,
+                    message: type ? ' joined the chat!' : ' left the chat', 
+                    timestamp: Date.now(),
+                    timeOut: setTimeout(() => {
+                        this.alert.show = false;
+                        this.alert.timeOut = undefined;
+                        setTimeout(() => this.alert.user = null, 500);
+                    }, 3000),
+                }
+                
             },
             
             //Broadcasting methods
@@ -149,12 +236,12 @@
                         this.getPaginatedMessages();
                     })
                     .joining((user) => {
-                        console.log(user, 'joined the channel')
-                        this.getCurrentRoom();
+                        this.createAlert(user, 1);
+                        this.newUserHandler(user);
                     })
                     .leaving((user) => {
-                        console.log(user, 'left the channel')
-                        this.getCurrentRoom();
+                        this.createAlert(user, 0);
+                        this.removeUserHandler(user);
                     })
                     .listen('NewChatMessage', e => {
                         vm.getNewestMessage();
@@ -198,13 +285,33 @@
             },
 
             toggleMessage() { //show and hide message column
-                
-                this.showMessages = !this.showMessages;
-                
+                if(this.showMessages.state === 'show'){
+                    this.showMessages.state = 'hiding';
+                    this.showMessages.timeOut = setTimeout(() => this.showMessages.state = 'hide', 300);
+                }
+                else if(this.showMessages.state === 'hiding'){
+                    this.showMessages.state = 'show'
+                    clearTimeout(this.showMessages.timeOut);
+                    this.showMessages.timeOut = undefined;
+                }
+                else if(this.showMessages.state === 'hide'){
+                    this.showMessages.state = 'show'
+                }
             },
 
             toggleNews() { //show and hide news column
-                this.showNews = !this.showNews;
+                if(this.showNews.state === 'show'){
+                    this.showNews.state = 'hiding';
+                    this.showNews.timeOut = setTimeout(() => this.showNews.state = 'hide', 300);
+                }
+                else if(this.showNews.state === 'hiding'){
+                    this.showNews.state = 'show'
+                    clearTimeout(this.showNews.timeOut);
+                    this.showNews.timeOut = undefined;
+                }
+                else if(this.showNews.state === 'hide'){
+                    this.showNews.state = 'show'
+                }
             },
 
             toggleShowActive() { //show and hide active users column
@@ -284,7 +391,7 @@
 
             //news search methods
             fetchNews(topic) {
-                this.showNews = true;
+                this.showNews.state = 'show';
                 if(topic != ''){
                     axios.get(`/chat/room/news/${encodeURI(topic)}`)
                     .then( response => {
@@ -298,7 +405,7 @@
                 }
             },
             searchNews(topic) {
-                this.showNews = true;
+                this.showNews.state = 'show';
                 if(topic != ''){
                     axios.get(`/chat/room/news/search/${encodeURI(topic)}`)
                     .then( response => {

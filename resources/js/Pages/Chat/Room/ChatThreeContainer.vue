@@ -24,11 +24,17 @@ export default {
         },
         activeUsers(newVal, oldVal){
             console.log("activeusers changed", oldVal,"->",newVal);
-            let filtered = newVal.filter(user => !(oldVal.includes(user)));
-            console.log('filtered array',filtered)
-            filtered.forEach((user)=>{
-                this.generateUserModel(user, this.$page.props.user.name);
-            })
+            switch(newVal.changeType){
+                case 'default':
+                    newVal.usersList.forEach(user => this.generateUserModel(user));
+                    break;
+                case 'create':
+                    this.generateUserModel(newVal.subjectUser);
+                    break;
+                case 'remove':
+                    this.removeUserModel(newVal.subjectUser);
+                    break;
+            }
         },
         messages(newVal, oldVal){
             if(oldVal.length > 0 && newVal[0].id === oldVal[0].id){
@@ -71,15 +77,19 @@ export default {
             this.createPlane();
             this.animate();
         },
-        generateUserModel(user, sessionUser) {
-            threeSetup2.createUserModel(user, sessionUser, this.room.photo);
-            console.log('generated model for ', user)
+        generateUserModel(user) {
+            threeSetup2.createUserModel(user, this.$page.props.user.name, this.room.photo);
+            console.log('generated model for ', user);
+        },
+        removeUserModel(user){
+            threeSetup2.removeUserModel(user);
+            console.log('removed usermodel for ', user);
         },
         createMessagePayload(message){
             if(message.link){
                 threeSetup2.createNewsPayload(message);
             }else {
-                let user = this.activeUsers.find(activeUser => activeUser.id == message.user.id);
+                let user = this.activeUsers.usersList.find(activeUser => activeUser.id == message.user.id);
                 console.log("from ", user);
                 threeSetup2.createMessageAnimation(message, user.pivot.region);
             }
