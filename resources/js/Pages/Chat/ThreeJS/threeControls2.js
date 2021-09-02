@@ -37,15 +37,25 @@ export class ThreeSetup2 {
         };
     }
     init = () => {
-        this.camera.position.set(0, -18, 79);//this.camera.position.set(0, -12, 9);
-        this.camera.lookAt(0, -30, 70);//this.camera.lookAt(0, 0, 0);
+        window.addEventListener('resize', this.canvasRezizedHandler);
+
+        this.welcome ? this.camera.position.set(-30, -18, 79) : this.camera.position.set(0, -18, 79);
+        this.welcome ? this.camera.lookAt(-30, -30, 70) : this.camera.lookAt(0, -30, 70);
         this.movement.camera['init'] = false;
-        this.movement.camera['targetPath'] = new THREE.QuadraticBezierCurve3(
+        this.movement.camera['targetPath'] = this.welcome ? new THREE.QuadraticBezierCurve3(
+            new THREE.Vector3(-30, -30, 70),
+            new THREE.Vector3(-30,-30,20),
+            new THREE.Vector3(-30,0,0)
+        ) : new THREE.QuadraticBezierCurve3(
             new THREE.Vector3(0, -30, 70),
             new THREE.Vector3(0,-30,20),
             new THREE.Vector3(0,0,0)
-        );
-        this.movement.camera['positionPath'] = new THREE.QuadraticBezierCurve3(
+        );;
+        this.movement.camera['positionPath'] = this.welcome ? new THREE.QuadraticBezierCurve3(
+            new THREE.Vector3(-30, -18, 79),
+            new THREE.Vector3(-30,-18, 60),
+            new THREE.Vector3(-30,0,60)
+        ) : new THREE.QuadraticBezierCurve3(
             new THREE.Vector3(0, -18, 79),
             new THREE.Vector3(0,-18, 60),
             new THREE.Vector3(0,0,60)
@@ -56,9 +66,24 @@ export class ThreeSetup2 {
         this.renderer.setSize(this.width, this.height);
         this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
         this.renderer.setClearColor(new THREE.Color('#1d2951'),1);
-        this.canvas.appendChild(this.renderer.domElement);
-
+        this.canvas.appendChild(this.renderer.domElement);        
     }
+
+    //function to handle canvas/window rezise
+    canvasRezizedHandler = () => {
+        this.width = this.canvas.getBoundingClientRect().width;
+        this.height = this.canvas.getBoundingClientRect().height;
+        console.log('canvas size changed to ', this.width, this.height);
+
+        // Update camera
+        this.camera.aspect = this.width / this.height;
+        this.camera.updateProjectionMatrix();
+    
+        // Update renderer
+        this.renderer.setSize(this.width, this.height);
+        this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    }
+
 
     //function for moveing camera from plane to sphere and vise versa
     moveCamera = (cameraNum) => {
@@ -66,14 +91,18 @@ export class ThreeSetup2 {
             this.movement.camera.init = true;
             this.movement.camera.fraction = 0.01;
             this.movement.camera['animation'] = this.cameraForward;
-            this.canvas.addEventListener('click', this.meshClicked);
-            this.canvas.addEventListener('mousemove', this.mouseMove);
+            if(!this.welcome){
+                this.canvas.addEventListener('click', this.meshClicked);
+                this.canvas.addEventListener('mousemove', this.mouseMove);
+            }
         }else{
             this.movement.camera.init = true;
             this.movement.camera.fraction = 0.99;
             this.movement.camera['animation'] = this.cameraBackward;
-            this.canvas.removeEventListener('click', this.meshClicked);
-            this.canvas.removeEventListener('mousemove', this.mouseMove);
+            if(!this.welcome){
+                this.canvas.removeEventListener('click', this.meshClicked);
+                this.canvas.removeEventListener('mousemove', this.mouseMove);
+            }
         }
     }
 
