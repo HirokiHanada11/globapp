@@ -91,14 +91,18 @@ export class ThreeSetup2 {
             this.movement.camera.init = true;
             this.movement.camera.fraction = 0.01;
             this.movement.camera['animation'] = this.cameraForward;
-            this.canvas.addEventListener('click', this.meshClicked);
-            this.canvas.addEventListener('mousemove', this.mouseMove);
+            if(!this.welcome){
+                this.canvas.addEventListener('click', this.meshClicked);
+                this.canvas.addEventListener('mousemove', this.mouseMove);
+            }
         }else{
             this.movement.camera.init = true;
             this.movement.camera.fraction = 0.99;
             this.movement.camera['animation'] = this.cameraBackward;
-            this.canvas.removeEventListener('click', this.meshClicked);
-            this.canvas.removeEventListener('mousemove', this.mouseMove);
+            if(!this.welcome){
+                this.canvas.removeEventListener('click', this.meshClicked);
+                this.canvas.removeEventListener('mousemove', this.mouseMove);
+            }
         }
     }
 
