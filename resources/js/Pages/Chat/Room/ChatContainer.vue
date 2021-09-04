@@ -95,7 +95,7 @@
         </div>
     </app-layout>
 
-    <room-settings-modal :showModal="showModal" v-on:close="showModal = false" />
+    <room-settings-modal :showModal="showModal" :currentRoom="currentRoom" :subscribers="subscribers" :activeUsers="activeUsers" v-on:close="showModal = false" />
 
 </template>
 
