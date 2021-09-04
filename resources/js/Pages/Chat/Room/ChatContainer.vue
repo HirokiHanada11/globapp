@@ -1,9 +1,10 @@
 <template>
     <app-layout>
         <template #header>
-            <img :src="currentRoom.photo" class="grid-col-1 h-12 w-12 mx-4 float-left" style="border-radius: 50%"/>
+            <img :src="currentRoom.photo" class="h-12 w-12 mx-4 float-left rounded-full"/>
             <h2 class="font-semibold text-xl text-gray-800 leading-tight p-3">
                 <b>{{currentRoom.name}}</b> -- {{currentRoom.description}} 
+            <img src="/textures/icons8-settings-50.png" class="h-8 w-8 mx-4 float-right hover:cursor-pointer rounded-full" @click="showModal = true"/>
             <button v-if='!showActive' @click="toggleShowActive" class="float-right place-self-end bg-blue-500 hover:bg-gray-500 py-1 px-2 mt-1  rounded text-white text-sm">
                 Show Active Users
             </button>
@@ -93,6 +94,9 @@
             </div>
         </div>
     </app-layout>
+
+    <room-settings-modal :showModal="showModal" v-on:close="showModal = false" />
+
 </template>
 
 <script>
@@ -103,6 +107,7 @@
     import ActiveUsersContainer from './ActiveUsersContainer.vue'
     import NewsContainer from './NewsContainer.vue'
     import { prefecToCoords } from '../ThreeJS/japanPrefecture'
+    import RoomSettingsModal from './RoomSettingsModal.vue'
 
     export default {
         props: ['roomId'],
@@ -113,6 +118,7 @@
             ChatThreeContainer,
             ActiveUsersContainer,
             NewsContainer,
+            RoomSettingsModal,
         },
         data: () => {
             return {
@@ -127,11 +133,12 @@
                 showMessages: {
                     state: 'show',
                     timeOut: undefined,
-                    },
+                },
                 showNews: {
                     state: 'hide',
                     timeOut: undefined,
-                    },
+                },
+                showModal: false,
                 chatScrollPosition: 0,
                 sortBy: 'popularity',
                 news: new Array(),
