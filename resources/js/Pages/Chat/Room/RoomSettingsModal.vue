@@ -11,8 +11,17 @@
             <h4 >Share Link</h4>
             <p class="mt-1 text-sm text-gray-600">Share this link to invite guest users</p>
             <div class="flex flex-row">
-                <input type="text" v-model="shareLink" ref="link" class="rounded-lg w-5/6 border-opacity-50">
+                <input type="text" v-model="shareLink" ref="link" class="rounded-lg w-5/6 border-opacity-50" disabled>
                 <button @click="copyLink"><img src="/textures/copy-icon.png" class="self-center"></button>
+                <span 
+                    v-if="copiedAlert != 'hide'" 
+                    v-bind:class="{
+                        'animate-fade-in-up':copiedAlert == 'show',
+                        'animate-fade-out-down':copiedAlert == 'hiding',
+                    }"
+                    class="text-gray-600 text-sm self-center ml-2">
+                    Copied!
+                </span>
             </div>
 
             <section-border/>
@@ -47,7 +56,8 @@
         props: ['showModal', 'currentRoom', 'subscribers', 'activeUsers'],
         data (){
             return {
-                shareLink: 'sharelinkdefo'
+                shareLink: 'sharelinkdefo',
+                copiedAlert: 'hide',
             }
         },
         methods: {
@@ -56,6 +66,14 @@
                 this.$refs.link.setSelectionRange(0,99999);
 
                 navigator.clipboard.writeText(this.$refs.link.value);
+
+                this.copiedAlert = 'show';
+                setTimeout(()=>{
+                    this.copiedAlert = 'hiding';
+                    setTimeout(()=>{
+                        this.copiedAlert = 'hide';
+                    }, 500)
+                }, 1500)
             }
         },
     }
