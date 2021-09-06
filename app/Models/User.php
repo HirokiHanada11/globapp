@@ -59,6 +59,16 @@ class User extends Authenticatable
         'profile_photo_url',
     ];
 
+    /**
+     * Get the default profile photo URL if no profile photo has been uploaded.
+     *
+     * @return string
+     */
+    protected function defaultProfilePhotoUrl()
+    {
+        return 'https://avatars.dicebear.com/api/initials/' . urlencode($this->name) .'.svg';
+    }
+
     public function chatrooms(){
         return $this->belongsToMany(ChatRoom::class)
             ->using(ChatRoomUser::class)
