@@ -344,6 +344,7 @@ export class ThreeSetup2 {
         body.name = 'Body';
 
         if(user.profile_photo_url.substr(8,22) === 'ui-avatars.com'){
+            loader.crossOrigin = '';
             headMaterial.map = loader.load(user.profile_photo_url);  
         }else{
             headMaterial.map = loader.load(user.profile_photo_url);
