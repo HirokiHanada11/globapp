@@ -324,7 +324,6 @@ export class ThreeSetup2 {
     //static function to create user model when user joins the room, the model generated is a placeholder at the moment, planning to develop more complex models in the future
     createUserModel = (user, sessionUser, fallback_url) =>{
         const loader = new THREE.TextureLoader();
-        loader.setCrossOrigin('use-credentials');
         const userModelPlane = new THREE.Group;
         userModelPlane.name = user.name;
 
@@ -344,8 +343,9 @@ export class ThreeSetup2 {
         const body = new THREE.Mesh(pyramidGeometry,bodyMaterial);
         body.name = 'Body';
 
-        if(/^https?:\/\//.test(user.profile_photo_url)){
-            headMaterial.map = loader.load(fallback_url);  
+        if(user.profile_photo_url.substr(8,22) === 'ui-avatars.com'){
+            loader.crossOrigin = '';
+            headMaterial.map = loader.load(user.profile_photo_url);  
         }else{
             headMaterial.map = loader.load(user.profile_photo_url);
         }
