@@ -22,6 +22,7 @@ class RoomController extends Controller
     public function rooms( Request $request ){
         return ChatRoom::with('users')
             ->with('activeUsers')
+            ->with('owner')
             ->get();
     }
 
@@ -35,6 +36,7 @@ class RoomController extends Controller
             $returnArray[] = ChatRoom::where('id', $chatroom->id)
             ->with('users')
             ->with('activeUsers')
+            ->with('owner')
             ->first();
         }
         return $returnArray;
@@ -47,6 +49,7 @@ class RoomController extends Controller
             ->orWhere('description', 'LIKE', '%' . $request->keyword . '%')
             ->with('users')
             ->with('activeUsers')
+            ->with('owner')
             ->get();
     }
 
@@ -55,6 +58,7 @@ class RoomController extends Controller
         return ChatRoom::where('id', $roomId)
             ->with('users')
             ->with('activeUsers')
+            ->with('owner')
             ->first();
     }
 
