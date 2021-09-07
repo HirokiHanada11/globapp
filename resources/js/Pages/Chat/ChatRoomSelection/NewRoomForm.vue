@@ -2,7 +2,7 @@
     <form>
         <!-- Room Name Input -->
         <div class="grid grid-cols-2 mt-4 p-4">
-            <label class="block font-medium text-sm text-gray-700 " for="roomName">
+            <label class="block font-medium text-sm text-gray-700 ">
                 Input New Chat Room Name
             </label>
             <input 
@@ -15,27 +15,19 @@
         </div>
         <!-- Topics Select -->
         <div class="grid grid-cols-2 mt-4 p-4">
-            <label class="block font-medium text-sm text-gray-700" for='topic'>
-                Select Topic 
+            <label class="block font-medium text-sm text-gray-700">
+                Input Topic 
             </label>
-            <div id="topic">
-                <select
-                    v-model="selected"
-                    class=" rounded py-1">
-
-                    <option
-                        v-for="(topic, index) in topics"
-                        :key="index"
-                        :value="topic"
-                        >
-                    {{ topic }}
-                    </option>
-                </select>
-            </div>
+            <input 
+                type='text'
+                v-model="topic"
+                placeholder="Enter room topic: eg. Olympics"
+                class="w-3/4 rounded p-1 mx-1 focus:border-blue-300"  
+            />
         </div>
         <!-- Room Description Input -->
         <div class="grid grid-cols-2 mt-4 p-4">
-            <label class="block font-medium text-sm text-gray-700" for="roomName">
+            <label class="block font-medium text-sm text-gray-700">
                 Input Room description
             </label>
             <input 
@@ -47,8 +39,8 @@
         </div>
         <!-- Room photo input -->
         <div class="grid grid-cols-2 mt-4 p-4">
-            <label class="block font-medium text-sm text-gray-700" for="roomName">
-                Select Room Photo
+            <label class="block font-medium text-sm text-gray-700">
+                Select Room Photo (optional)
             </label>
             <input 
                 type='file'
@@ -76,8 +68,7 @@ export default {
     emits: ['roomcreated'],
     data ()  {
         return {
-            topics: ['Olympics', 'Tech'],
-            selected: 'Olympics',
+            topic: '',
             roomName: '',
             roomDescription: '',
             file: ''
@@ -87,8 +78,8 @@ export default {
         createRoom (e) {
             e.preventDefault();
             
-            if( this.roomName == '' || this.roomDescription == '' || this.file == ''){
-                alert("Please Enter room name, description, and photo");
+            if( this.roomName == '' || this.roomDescription == '' || this.topic == ''){
+                alert("Please Enter room name, description, and topic");
                 return;
             }
 
@@ -100,7 +91,7 @@ export default {
 
             let data = new FormData(); 
             data.append('roomName', this.roomName);
-            data.append('roomTopic', this.selected);
+            data.append('roomTopic', this.topic);
             data.append('roomDescription', this.roomDescription);
             data.append('roomPhoto', this.file);
             console.log(data.values);
@@ -110,7 +101,7 @@ export default {
                 if( response.status == 201 ){
                     this.roomName = '';
                     this.roomDescription = '';
-                    this.selected = 'Olympics';
+                    this.topic = '';
                     this.file = '';
                     this.$emit('roomcreated'); //emit event messagesent which can be accessed by the parent component
                 }
