@@ -14,7 +14,7 @@ class ChatRoom extends Model
     }
 
     public function owner() {
-        return $this->hasOne(User::class, 'id', 'owner_id');
+        return $this->hasOne(User::class, 'owner_id');
     }
 
     public function users() {

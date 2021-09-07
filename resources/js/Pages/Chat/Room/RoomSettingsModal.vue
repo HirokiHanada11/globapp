@@ -34,7 +34,7 @@
                     class="w-full grid grid-cols-2 rounded hover:bg-gray-100"> 
                     <div class="flex flex-row m-1 gap-1 ">
                         <img :src="user.profile_photo_url" class="rounded-full h-6 ">
-                        <b>{{user.name}}</b><span v-if="currentRoom.owner.id === user.id">(Owner)</span>
+                        <b>{{user.name}}</b>
                         <span v-if="activeUsers.usersList.find(active => active.name === user.name)" class="h-2 w-2 rounded-full bg-green-300 self-center"></span>
                     </div> 
                     <div class="flex flex-row justify-center">
