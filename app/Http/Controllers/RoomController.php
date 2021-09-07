@@ -64,6 +64,7 @@ class RoomController extends Controller
         $newRoom->name = $request->roomName;
         $newRoom->topic = $request->roomTopic;
         $newRoom->description = $request->roomDescription;
+        $newRoom->owner_id = Auth::id();
         
         if ($request->hasFile('roomPhoto')) {
             $request->validate([
@@ -72,6 +73,8 @@ class RoomController extends Controller
             $filename = $request->roomPhoto->getClientOriginalName();
             $path = $request->roomPhoto->storePubliclyAs('useruploads', $filename, 'public');
             $newRoom->photo = '/storage/'.$path;
+        }else {
+            $newRoom->photo = 'https://avatars.dicebear.com/api/jdenticon/'.$request->roomName.'.svg';
         }
 
         $newRoom->save();
