@@ -8,6 +8,7 @@ use App\Http\Controllers\NewsController;
 use App\Http\Controllers\RoomController;
 use App\Http\Controllers\ActiveUsersController;
 use App\Http\Controllers\DemoController;
+use App\Http\Controllers\GuestController;
 
 /*
 |--------------------------------------------------------------------------
@@ -28,7 +29,7 @@ Route::get('/', function () {
         'laravelVersion' => Application::VERSION,
         'phpVersion' => PHP_VERSION,
     ]);
-});
+})->name('welcome');
 
 Route::middleware(['auth:sanctum', 'verified'])->get('/dashboard', function () {
     return Inertia::render('Dashboard');
@@ -42,12 +43,20 @@ Route::middleware(['auth:sanctum', 'verified'])->get('/chatrooms', function () {
     return Inertia::render('Chat/ChatRoomSelection/ChatRoomsContainer');
 })->name('chatrooms');
 
-Route::middleware('auth:sanctum')->get('/chatrooms/chatroom/{roomId}', [RoomController::class, 'chatroomView']);
+Route::middleware('auth:sanctum')->get('/chatrooms/chatroom/{roomId}', [RoomController::class, 'chatroomView'])->name('joinRoom');
 
 Route::middleware(['auth:sanctum', 'verified'])->get('/chatrooms/newRoom', function () {
     return Inertia::render('Chat/ChatRoomSelection/CreateNewContainer');
 })->name('newRoom');
 
+
+//guest routes
+Route::get('/guest/join/{chatroom}', [GuestController::class, 'guestRegister']);
+
+Route::middleware('auth:sanctum', 'verified')->get('/guest/settings', [GuestController::class, 'guestSettingsView']);
+
+// //post create new room
+// Route::middleware('auth:sanctum')->post('/guest/settings', [RoomController::class, 'newRoom']);
 
 
 //Room
