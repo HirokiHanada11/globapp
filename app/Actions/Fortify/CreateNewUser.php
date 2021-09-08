@@ -20,7 +20,7 @@ class CreateNewUser implements CreatesNewUsers
      */
     public function create(array $input)
     {
-        if(empty($input['is_guest'])){
+        if(empty($input['is_guest_at'])){
             Validator::make($input, [
                 'name' => ['required', 'string', 'max:255'],
                 'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
@@ -43,7 +43,7 @@ class CreateNewUser implements CreatesNewUsers
                 'name' => $input['name'],
                 'email' => $input['name'].'@guest.user',
                 'password' => Hash::make('5skgjjNwfjop0DQR'),
-                'is_guest' => true,
+                'is_guest_at' => $input['is_guest_at'],
             ]);
         }
     }

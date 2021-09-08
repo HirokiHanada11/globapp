@@ -13,12 +13,8 @@
             </div>
 
             <div class="flex items-center justify-end mt-4">
-                <inertia-link :href="route('login')" class="underline text-sm text-gray-600 hover:text-gray-900">
-                    Already registered?
-                </inertia-link>
-
-                <inertia-link :href="route('register')" class="underline text-sm text-gray-600 hover:text-gray-900">
-                    Want to Sign up?
+                <inertia-link :href="route('joinRoom', {'roomId': roomId})" class="underline text-sm text-gray-600 hover:text-gray-900">
+                    Already have an account?
                 </inertia-link>
 
                 <jet-button class="ml-4" :class="{ 'opacity-25': form.processing }" :disabled="form.processing">
@@ -48,11 +44,14 @@
             JetLabel,
             JetValidationErrors
         },
+        
+        props: ['roomId'],
 
         data() {
             return {
                 form: this.$inertia.form({
                     name: '',
+                    'is_guest_at': this.roomId,
                 })
             }
         },
