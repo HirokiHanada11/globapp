@@ -51,12 +51,12 @@ Route::middleware(['auth:sanctum', 'verified'])->get('/chatrooms/newRoom', funct
 
 
 //guest routes
-Route::get('/guest/{chatroom}', [GuestController::class, 'guestRegister']);
+Route::get('/guest/join/{chatroom}', [GuestController::class, 'guestRegister']);
 
-Route::get('/guest/settings', [GuestController::class, 'guestSettingsView']);
+Route::middleware('auth:sanctum', 'verified')->get('/guest/settings', [GuestController::class, 'guestSettingsView']);
 
-//post create new room
-Route::middleware('auth:sanctum')->post('/guest/settings', [RoomController::class, 'newRoom']);
+// //post create new room
+// Route::middleware('auth:sanctum')->post('/guest/settings', [RoomController::class, 'newRoom']);
 
 
 //Room

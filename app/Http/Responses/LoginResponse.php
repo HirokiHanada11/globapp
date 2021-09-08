@@ -10,7 +10,7 @@ class LoginResponse implements LoginResponseContract
 
     public function toResponse($request)
     {
-        $redirect_path = Auth::user()->is_guest_at ? '/guest/settings' : '/chatrooms';
+        $redirect_path = Auth::user()->is_admin ? '/dashboard' : '/chatrooms';
         
         return redirect()->intended($redirect_path);
     }
