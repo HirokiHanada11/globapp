@@ -26,6 +26,9 @@ class UpdateChatRoomTable extends Migration
      */
     public function down()
     {
-        //
+        Schema::table('chat_rooms', function (Blueprint $table) {
+            $table->dropColumn('owner_id');      
+            $table->dropColumn('allow_guest');       
+        });
     }
 }

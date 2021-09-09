@@ -25,6 +25,8 @@ class UpdateChatRoomUser extends Migration
      */
     public function down()
     {
-        //
+    //     Schema::table('chat_room_user', function (Blueprint $table) {
+    //         $table->dropColumnIfExists('region');          
+    //     });
     }
 }
