@@ -16,4 +16,9 @@ class GuestController extends Controller
     public function guestSettingsView(Request $request){
         return Inertia::render('Chat/GuestSetup/GuestSettings', ['roomId' => Auth::user()->is_guest_at]);
     }
+
+    public function guestGetRoomInfo(Request $request, $roomId){
+        $room = ChatRoom::where('id', $roomId)->first();
+        return ['name' => $room->name, 'description' => $room->description, 'photo' => $room->photo];
+    }
 }

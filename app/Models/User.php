@@ -67,7 +67,7 @@ class User extends Authenticatable
      */
     protected function defaultProfilePhotoUrl()
     {
-        return 'https://avatars.dicebear.com/api/initials/' . urlencode($this->name) .'.svg';
+        return 'https://avatars.dicebear.com/api/initials/' . urlencode($this->name) .'.svg?size=32&backgroundColorLevel=400';
     }
 
     public function chatrooms(){
