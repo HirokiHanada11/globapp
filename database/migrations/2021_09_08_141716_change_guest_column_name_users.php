@@ -27,7 +27,7 @@ class ChangeGuestColumnNameUsers extends Migration
     public function down()
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->boolean('is_guest')->default(false)->after('password')->change();      
+            $table->boolean('is_guest_at')->default(false)->after('password')->change();      
             $table->renameColumn('is_guest_at', 'is_guest');       
         });
     }

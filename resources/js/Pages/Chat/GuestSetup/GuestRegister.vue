@@ -70,8 +70,12 @@
         },
 
         async mounted (){
-            let response = await axios.get(`/guest/invited/${this.roomId}`);
-            this.currentRoom = await response.data;
+            if(this.$page.props.user){
+                window.location = `/chatrooms/chatroom/${this.roomId}`;
+            }else{
+                let response = await axios.get(`/guest/invited/${this.roomId}`);
+                this.currentRoom = await response.data;
+            }
         }
     }
 </script>

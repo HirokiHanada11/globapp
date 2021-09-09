@@ -69,10 +69,17 @@ export default {
         }
     },
     async mounted() {
-        this.userRegions = Object.keys(prefecToCoords);
-        this.selected = this.userRegions[0];
-        let response = await axios.get(`/guest/invited/${this.roomId}`);
-        this.currentRoom = await response.data;
-    }   
+        if(this.$page.props.user.is_guest_at === 0){
+            window.location = `/chatrooms/chatroom/${this.roomId}`;
+        }else{
+            this.userRegions = Object.keys(prefecToCoords);
+            this.selected = this.userRegions[0];
+            let response = await axios.get(`/guest/invited/${this.roomId}`);
+            this.currentRoom = await response.data;
+        }
+    },   
+    created () {
+        
+    }
 }
 </script>
