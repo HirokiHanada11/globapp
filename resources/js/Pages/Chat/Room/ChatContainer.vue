@@ -1,22 +1,25 @@
 <template>
     <app-layout>
-        <template #header>
-            <img :src="currentRoom.photo" class="h-12 w-12 mx-4 float-left rounded-full"/>
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight p-3">
-                <b>{{currentRoom.name}}</b> -- {{currentRoom.description}} 
-            <img src="/textures/icons8-settings-50.png" class="h-8 w-8 mx-4 float-right hover:cursor-pointer rounded-full" @click="showModal = true"/>
-            <button v-if='!showActive' @click="toggleShowActive" class="float-right place-self-end bg-blue-500 hover:bg-gray-500 py-1 px-2 mt-1  rounded text-white text-sm">
-                Show Active Users
-            </button>
-            <button v-if='showActive' @click="toggleShowActive" class="float-right place-self-end bg-blue-500 hover:bg-gray-500 py-1 px-2 mt-1 rounded text-white text-sm">
-                Hide Active Users
-            </button>
-            </h2>
-        </template>
+        <!-- <template #header>
+            
+        </template> -->
 
-        <div class="py-12">
-            <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 relative" style="height:70vh">               
+        <!-- <div class="py-12"> -->
+            <div class="w-full mx-auto sm:px-6 lg:px-8 relative" style="height:90vh">               
                 <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg h-full w-full relative">
+                    <div class="mx-auto py-6 px-4 sm:px-6 lg:px-8 absolute flex flex-row w-full justify-center">
+                        <img :src="currentRoom.photo" class="h-12 w-12 mx-4 float-left rounded-full"/>
+                        <h2 class="font-semibold text-xl text-gray-800 leading-tight p-3">
+                            <b>{{currentRoom.name}}</b> -- {{currentRoom.description}} 
+                        <img src="/textures/icons8-settings-50.png" class="h-8 w-8 mx-4 float-right hover:cursor-pointer rounded-full" @click="showModal = true"/>
+                        <button v-if='!showActive' @click="toggleShowActive" class="float-right place-self-end bg-blue-500 hover:bg-gray-500 py-1 px-2 mt-1  rounded text-white text-sm">
+                            Show Active Users
+                        </button>
+                        <button v-if='showActive' @click="toggleShowActive" class="float-right place-self-end bg-blue-500 hover:bg-gray-500 py-1 px-2 mt-1 rounded text-white text-sm">
+                            Hide Active Users
+                        </button>
+                        </h2>
+                    </div>
                     <div class="h-full w-1/4 absolute top-0 right-0 flex flex-col ">
                         <message-container 
                             v-show="showMessages.state != 'hide'" 
@@ -92,7 +95,7 @@
                     />
                 
             </div>
-        </div>
+        <!-- </div> -->
     </app-layout>
 
     <room-settings-modal :showModal="showModal" :currentRoom="currentRoom" :subscribers="subscribers" :activeUsers="activeUsers" v-on:close="showModal = false" />
