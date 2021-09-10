@@ -13,12 +13,15 @@ class GuestController extends Controller
         return Inertia::render('Chat/GuestSetup/GuestRegister', ['roomId' => $roomId]);
     }
 
-    public function guestSettingsView(Request $request){
-        return Inertia::render('Chat/GuestSetup/GuestSettings', ['roomId' => Auth::user()->is_guest_at]);
+    public function guestSettingsView(Request $request, $roomId = null){
+        if($roomId === null){
+            $roomId = Auth::user()->is_guest_at;
+        }
+        return Inertia::render('Chat/GuestSetup/GuestSettings', ['roomId' => $roomId]);
     }
 
     public function guestGetRoomInfo(Request $request, $roomId){
         $room = ChatRoom::where('id', $roomId)->first();
-        return ['name' => $room->name, 'description' => $room->description, 'photo' => $room->photo];
+        return $room !== null ? ['name' => $room->name, 'description' => $room->description, 'photo' => $room->photo] : null;
     }
 }

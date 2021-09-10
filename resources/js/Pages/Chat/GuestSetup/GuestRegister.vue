@@ -71,7 +71,7 @@
 
         async mounted (){
             if(this.$page.props.user){
-                window.location = `/chatrooms/chatroom/${this.roomId}`;
+                window.location = `/guest/settings/${this.roomId}`;
             }else{
                 let response = await axios.get(`/guest/invited/${this.roomId}`);
                 this.currentRoom = await response.data;
