@@ -10,7 +10,7 @@ class RegisterResponse implements RegisterResponseContract
 
     public function toResponse($request)
     {
-        $redirect_path = Auth::user()->is_guest_at ? '/guest/settings' : '/chatrooms';
+        $redirect_path = Auth::user()->is_guest_at != 0 ? '/guest/settings' : '/chatrooms';
         
         return redirect()->intended($redirect_path);
     }

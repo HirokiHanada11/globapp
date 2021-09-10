@@ -55,7 +55,7 @@ Route::get('/guest/join/{chatroom}', [GuestController::class, 'guestRegister']);
 
 Route::get('/guest/invited/{roomId}', [GuestController::class, 'guestGetRoomInfo']);
 
-Route::middleware('auth:sanctum', 'verified')->get('/guest/settings', [GuestController::class, 'guestSettingsView']);
+Route::middleware('auth:sanctum', 'verified')->get('/guest/settings/{roomId?}', [GuestController::class, 'guestSettingsView']);
 
 // //post create new room
 // Route::middleware('auth:sanctum')->post('/guest/settings', [RoomController::class, 'newRoom']);
