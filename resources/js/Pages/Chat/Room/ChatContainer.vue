@@ -130,6 +130,7 @@
                     usersList: new Array(),
                 },
                 showActive: false,
+                subscribers: new Array(),
                 showMessages: {
                     state: 'show',
                     timeOut: undefined,
