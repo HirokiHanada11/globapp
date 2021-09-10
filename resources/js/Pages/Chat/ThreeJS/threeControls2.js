@@ -353,8 +353,8 @@ export class ThreeSetup2 {
         body.rotateX(-Math.PI /2)
 
         userModelPlane.add(head, body);
-        userModelPlane.position.x = (prefecToCoords[user.pivot.region][1] - 136.261570) * 43/45
-        userModelPlane.position.y = (prefecToCoords[user.pivot.region][0] - 35.837181) * 30/25
+        userModelPlane.position.x = (prefecToCoords[user.pivot.region][1] - 136.261570) * 43/45 + Math.random();
+        userModelPlane.position.y = (prefecToCoords[user.pivot.region][0] - 35.837181) * 30/25 + Math.random();
 
         this.scene.getObjectByName('Plane').getObjectByName('UserModels').add(userModelPlane);
         console.log(this.scene.getObjectByName('Plane').getObjectByName('UserModels'));
