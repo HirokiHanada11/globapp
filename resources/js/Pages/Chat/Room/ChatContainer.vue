@@ -26,11 +26,6 @@
             </template>
 
             <template #activeUsersContainer>
-                <div class="w-11/12 self-end p-auto">
-                    <jet-nav-link :href="route('chatrooms')" :active="route().current('chatrooms')">
-                        Chat Rooms
-                    </jet-nav-link>
-                </div>
                 <active-users-container 
                     v-show="showActive.state != 'hide'" 
                     :activeUsers="activeUsers"
@@ -154,7 +149,6 @@
 
 <script>
     import AppLayout from '@/Layouts/AppLayout'
-    import JetNavLink from '@/Jetstream/NavLink'
     import MessageContainer from './MessageContainer.vue'
     import InputMessage from './InputMessage.vue'
     import ChatThreeContainer from './ChatThreeContainer.vue'
@@ -173,7 +167,6 @@
             ActiveUsersContainer,
             NewsContainer,
             RoomSettingsModal,
-            JetNavLink,
         },
         data: () => {
             return {
