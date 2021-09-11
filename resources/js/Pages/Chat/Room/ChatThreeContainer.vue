@@ -1,5 +1,19 @@
 <template>
-    <div ref="canvas" class="h-full w-full">
+    <div ref="canvas" class="h-screen w-full relative overflow-hidden">
+        <div class=" h-full w-full absolute grid grid-cols-4 grid-rows-2">
+            <div class="mx-auto py-6 px-4 sm:px-6 lg:px-8 flex flex-row w-full justify-center col-start-2 col-span-2">
+                <slot name="header"></slot>
+            </div>
+            <div class="mx-auto py-6 px-4 sm:px-6 lg:px-8 content-end flex flex-wrap w-full justify-center col-start-2 col-span-2 row-start-2">
+                <slot name="footer"></slot>
+            </div>
+            <div class="h-full w-full flex flex-col col-start-1 row-start-1 row-span-2 relative">
+                <slot name="activeUsersContainer"></slot>
+            </div>
+            <div class="h-full w-full flex flex-col col-start-4 row-start-1 row-span-2 relative">
+                <slot name="messagesContainer"></slot>
+            </div>
+        </div>
     </div>
 </template>
 

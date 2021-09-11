@@ -1,13 +1,63 @@
 <template>
-    <app-layout>
-        <!-- <template #header>
-            
-        </template> -->
+    <!-- <app-layout> -->
+        <chat-three-container :messages="messages" :room="currentRoom" :activeUsers="activeUsers" :news="news" :cameraNum="camera" >
+            <template #header>
+                <img :src="currentRoom.photo" class="h-12 w-12 mx-4 float-left rounded-full"/>
+                <h1 class="font-semibold text-4xl leading-tight p-3">
+                    <span @click="showModal = true" class="cursor-pointer hover:underline text-gray-200"><b>{{currentRoom.name}}</b> -- {{currentRoom.description}}</span>
+                </h1>
+            </template>
 
-        <!-- <div class="py-12"> -->
-            <div class="w-full mx-auto sm:px-6 lg:px-8 relative" style="height:90vh">               
+            <template #footer>
+                <!-- <div v-if="alert.user" class="w-full justify-center flex"
+                    v-bind:class="{'animate-fade-in-up': alert.show, 'animate-fade-out-down': !alert.show}">
+                    <span><b>{{alert.user.name}}</b>{{alert.message}}</span>
+                </div> -->
+                <div class="w-full justify-center flex">
+                    <span>Alert box</span>
+                </div>
+                <input-message 
+                    :room="currentRoom" 
+                    v-on:sending="appendNewMessage"
+                    v-on:messagefailed="messageFailedToSend"
+                    v-on:demostarted="startDemo()"
+                    v-on:demostopped="stopDemo()"
+                    />
+            </template>
+
+            <template #activeUsersContainer>
+                <div class="w-11/12 self-end p-auto">
+                    <jet-nav-link :href="route('chatrooms')" :active="route().current('chatrooms')">
+                        Chat Rooms
+                    </jet-nav-link>
+                </div>
+                <active-users-container 
+                    v-show="showActive.state != 'hide'" 
+                    :activeUsers="activeUsers"
+                    v-bind:class="{
+                        'animate-fade-in-left': showActive.state == 'show',
+                        'animate-fade-out-right': showActive.state == 'hiding', 
+                    }"/>
+                <div class="h-full w-1/12 absolute top-0 left-0 bg-gray-300 opacity-5 hover:opacity-50" @click="toggleActive"></div>
+            </template>
+
+            <template #messagesContainer>
+                <message-container 
+                    v-show="showMessages.state != 'hide'" 
+                    :messages="messages" 
+                    :fetching="fetching" 
+                    v-on:resend="resendMessage" 
+                    v-on:fetchmoremessages="getPaginatedMessages"
+                    v-bind:class="{
+                        'animate-fade-in-right': showMessages.state == 'show',
+                        'animate-fade-out-left': showMessages.state == 'hiding', 
+                    }" />
+            <div class="h-full w-1/12 absolute top-0 right-0 bg-gray-300 opacity-5 hover:opacity-50" @click="toggleMessage"></div>
+            </template>
+        </chat-three-container>
+            <!-- <div class="w-full mx-auto sm:px-6 lg:px-8 relative" style="height:90vh">               
                 <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg h-full w-full relative">
-                    <div class="mx-auto py-6 px-4 sm:px-6 lg:px-8 absolute flex flex-row w-full justify-center">
+                     <div class="mx-auto py-6 px-4 sm:px-6 lg:px-8 absolute flex flex-row w-full justify-center">
                         <img :src="currentRoom.photo" class="h-12 w-12 mx-4 float-left rounded-full"/>
                         <h2 class="font-semibold text-xl text-gray-800 leading-tight p-3">
                             <b>{{currentRoom.name}}</b> -- {{currentRoom.description}} 
@@ -19,8 +69,8 @@
                             Hide Active Users
                         </button>
                         </h2>
-                    </div>
-                    <div class="h-full w-1/4 absolute top-0 right-0 flex flex-col ">
+                    </div> -->
+                    <!-- <div class="h-full w-1/4 absolute top-0 right-0 flex flex-col ">
                         <message-container 
                             v-show="showMessages.state != 'hide'" 
                             :messages="messages" 
@@ -32,11 +82,11 @@
                                 'animate-fade-out-left': showMessages.state == 'hiding', 
                             }" />
                         <div class="h-full w-1/12 absolute top-0 right-0 bg-gray-300 opacity-5 hover:opacity-50" @click="toggleMessage"></div>               
-                    </div> 
-                    <div class="h-1/2 w-1/4 absolute top-0 right-1/4">
+                    </div>  -->
+                    <!-- <div class="h-1/2 w-1/4 absolute top-0 right-1/4">
                         <active-users-container v-show="showActive" :activeUsers="activeUsers"/>
-                    </div>
-                    <div class="h-full w-1/4 absolute top-0 left-0">
+                    </div> -->
+                    <!-- <div class="h-full w-1/4 absolute top-0 left-0">
                         <news-container 
                             v-show="showNews.state != 'hide'" 
                             :news="news" 
@@ -49,8 +99,8 @@
                             }"
                         />
                         <div class="h-full w-1/12 absolute top-0 left-0 bg-gray-300 opacity-5 hover:opacity-50" @click="toggleNews"></div>
-                    </div>
-                    <div class="bg-transparent absolute top-0 w-full flex justify-center ">
+                    </div> -->
+                    <!-- <div class="bg-transparent absolute top-0 w-full flex justify-center ">
                         <input 
                             v-if="!camera"
                             type="text"
@@ -71,17 +121,17 @@
                             class="bg-blue-900 border border-transparent hover:outline-2 hover:border-none rounded-full text-white p-2">
                             Fetch News
                         </button>
-                    </div> 
-                    <div class="bg-transparent absolute bottom-0 w-full flex justify-center ">
+                    </div>  -->
+                    <!-- <div class="bg-transparent absolute bottom-0 w-full flex justify-center ">
                         <button
                             v-if="!camera"
                             @click="setBackCamera()"
                             class="bg-blue-900 border border-transparent hover:outline-2 hover:border-none rounded-full text-white p-2">
                             Back To Chat
                         </button>
-                    </div> 
-                    <chat-three-container :messages="messages" :room="currentRoom" :activeUsers="activeUsers" :news="news" :cameraNum="camera" />
-                    <div v-if="alert.user" class="absolute bottom-20 w-full justify-center flex"
+                    </div>  -->
+                    <!-- <chat-three-container :messages="messages" :room="currentRoom" :activeUsers="activeUsers" :news="news" :cameraNum="camera" /> -->
+                    <!-- <div v-if="alert.user" class="absolute bottom-20 w-full justify-center flex"
                         v-bind:class="{'animate-fade-in-up': alert.show, 'animate-fade-out-down': !alert.show}">
                         <span><b>{{alert.user.name}}</b>{{alert.message}}</span>
                     </div>
@@ -95,8 +145,8 @@
                     />
                 
             </div>
-        <!-- </div> -->
-    </app-layout>
+        </div> --> 
+    <!-- </app-layout> -->
 
     <room-settings-modal :showModal="showModal" :currentRoom="currentRoom" :subscribers="subscribers" :activeUsers="activeUsers" v-on:close="showModal = false" />
 
@@ -104,6 +154,7 @@
 
 <script>
     import AppLayout from '@/Layouts/AppLayout'
+    import JetNavLink from '@/Jetstream/NavLink'
     import MessageContainer from './MessageContainer.vue'
     import InputMessage from './InputMessage.vue'
     import ChatThreeContainer from './ChatThreeContainer.vue'
@@ -122,6 +173,7 @@
             ActiveUsersContainer,
             NewsContainer,
             RoomSettingsModal,
+            JetNavLink,
         },
         data: () => {
             return {
@@ -132,8 +184,11 @@
                     subjectUser: null,
                     usersList: new Array(),
                 },
-                showActive: false,
                 subscribers: new Array(),
+                showActive: {
+                    state: 'show',
+                    timeOut: undefined,
+                },
                 showMessages: {
                     state: 'show',
                     timeOut: undefined,
@@ -310,23 +365,19 @@
                 }
             },
 
-            toggleNews() { //show and hide news column
-                if(this.showNews.state === 'show'){
-                    this.showNews.state = 'hiding';
-                    this.showNews.timeOut = setTimeout(() => this.showNews.state = 'hide', 300);
+            toggleActive() { //show and hide news column
+                if(this.showActive.state === 'show'){
+                    this.showActive.state = 'hiding';
+                    this.showActive.timeOut = setTimeout(() => this.showActive.state = 'hide', 300);
                 }
-                else if(this.showNews.state === 'hiding'){
-                    this.showNews.state = 'show'
-                    clearTimeout(this.showNews.timeOut);
-                    this.showNews.timeOut = undefined;
+                else if(this.showActive.state === 'hiding'){
+                    this.showActive.state = 'show'
+                    clearTimeout(this.showActive.timeOut);
+                    this.showActive.timeOut = undefined;
                 }
-                else if(this.showNews.state === 'hide'){
-                    this.showNews.state = 'show'
+                else if(this.showActive.state === 'hide'){
+                    this.showActive.state = 'show'
                 }
-            },
-
-            toggleShowActive() { //show and hide active users column
-                this.showActive = !this.showActive;
             },
 
             //message methods

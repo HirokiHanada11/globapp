@@ -228,7 +228,7 @@
             </header>
 
             <!-- Page Content -->
-            <main>
+            <main class="overflow-hidden">
                 <slot></slot>
             </main>
         </div>

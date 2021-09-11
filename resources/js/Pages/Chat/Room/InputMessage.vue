@@ -1,19 +1,17 @@
 <template>
-    <div class="relative h-10 m-1">
-        <div style="border-top: 1px solid #e6e6e6;" class="flex">
-            <input 
-                type="text"
-                v-model="message"
-                @keyup.enter="sendMessage()"
-                placeholder="Say something ..."
-                class="border rounded-full border-transparent focus:outline-none focus:border-none w-5/6"
-            />
-            <button
-                @click="sendMessage()"
-                class="place-self-end bg-gray-500 hover:bg-blue-500 py-1 px-2 mt-1 rounded-full text-white flex-grow">
-                Send
-            </button>
-        </div> 
+    <div class="w-full h-10 m-1 flex flex-row items-stretch">
+        <input 
+            type="text"
+            v-model="message"
+            @keyup.enter="sendMessage()"
+            placeholder="Say something ..."
+            class="rounded-full focus:outline-none focus:border-none w-5/6 bg-transparent"
+        />
+        <button
+            @click="sendMessage()"
+            class="bg-gray-500 hover:bg-blue-500 py-1 px-2 rounded-full text-white flex-grow">
+            Send
+        </button>
     </div>
 </template>
 
