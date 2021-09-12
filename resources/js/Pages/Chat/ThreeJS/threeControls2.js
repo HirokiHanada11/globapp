@@ -614,9 +614,11 @@ export class ThreeSetup2 {
                 sphere.getObjectByName('Water').material.normalScale.set( Math.sin(elapsedTime*0.3), Math.cos(elapsedTime*0.3));
             }
         }
-        let planeWater =  this.scene.getObjectByName('Plane').getObjectByName('Water');
-        if(!this.welcome && planeWater !== undefined){
-            planeWater.material.normalScale.set( Math.sin(elapsedTime*0.3), Math.cos(elapsedTime*0.3));
+        if(!this.welcome){
+            let planeWater =  this.scene.getObjectByName('Plane').getObjectByName('Water');
+            if(planeWater !== undefined){
+                planeWater.material.normalScale.set( Math.sin(elapsedTime*0.3), Math.cos(elapsedTime*0.3));
+            }
         }
 
         if (this.movement.camera.init){ //camera movement 
