@@ -1,6 +1,4 @@
-import axios from 'axios';
 import * as THREE from 'three';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import {nameToCoords, soucresToCountry} from "./countries.js";
 import { prefecToCoords } from './japanPrefecture.js';
 
@@ -29,7 +27,7 @@ export class ThreeSetup2 {
             user: welcome ? undefined : true,
             water: true,
             payloads: [],
-            news: [],
+            // news: [],
             sphereControl: false,
             sphereControlOrigin: new THREE.Vector2(),
             sphereRotation: new THREE.Vector2(0.1, 0),
@@ -39,7 +37,7 @@ export class ThreeSetup2 {
     init = () => {
         window.addEventListener('resize', this.canvasRezizedHandler);
 
-        this.welcome ? this.camera.position.set(-30, -18, 79) : this.camera.position.set(0, -18, 79);
+        this.welcome ? this.camera.position.set(-30, -15, 85) : this.camera.position.set(0, -15, 85);
         this.welcome ? this.camera.lookAt(-30, -30, 70) : this.camera.lookAt(0, -30, 70);
         this.movement.camera['init'] = false;
         this.movement.camera['targetPath'] = this.welcome ? new THREE.QuadraticBezierCurve3(
@@ -52,12 +50,12 @@ export class ThreeSetup2 {
             new THREE.Vector3(0,0,0)
         );;
         this.movement.camera['positionPath'] = this.welcome ? new THREE.QuadraticBezierCurve3(
-            new THREE.Vector3(-30, -18, 79),
-            new THREE.Vector3(-30,-18, 60),
+            new THREE.Vector3(-30, -15, 85),
+            new THREE.Vector3(-30,-15, 60),
             new THREE.Vector3(-30,0,60)
         ) : new THREE.QuadraticBezierCurve3(
-            new THREE.Vector3(0, -18, 79),
-            new THREE.Vector3(0,-18, 60),
+            new THREE.Vector3(0, -15, 85),
+            new THREE.Vector3(0,-15, 60),
             new THREE.Vector3(0,0,60)
         );
         this.movement.camera['fraction'] = 0;
@@ -91,18 +89,18 @@ export class ThreeSetup2 {
             this.movement.camera.init = true;
             this.movement.camera.fraction = 0.01;
             this.movement.camera['animation'] = this.cameraForward;
-            if(!this.welcome){
-                this.canvas.addEventListener('click', this.meshClicked);
-                this.canvas.addEventListener('mousemove', this.mouseMove);
-            }
+            // if(!this.welcome){
+            //     this.canvas.addEventListener('click', this.meshClicked);
+            //     this.canvas.addEventListener('mousemove', this.mouseMove);
+            // }
         }else{
             this.movement.camera.init = true;
             this.movement.camera.fraction = 0.99;
             this.movement.camera['animation'] = this.cameraBackward;
-            if(!this.welcome){
-                this.canvas.removeEventListener('click', this.meshClicked);
-                this.canvas.removeEventListener('mousemove', this.mouseMove);
-            }
+            // if(!this.welcome){
+            //     this.canvas.removeEventListener('click', this.meshClicked);
+            //     this.canvas.removeEventListener('mousemove', this.mouseMove);
+            // }
         }
     }
 
@@ -229,19 +227,6 @@ export class ThreeSetup2 {
         planeGroup.name = "Plane";
         const userModels = new THREE.Group();
         userModels.name = "UserModels";
-        // let planeAsia = new THREE.PlaneBufferGeometry(40,30, 2048, 1536);
-        // let asiaHeight = loader.load("/textures/asia-without-japan.jpg");
-        // let asiaTexture = loader.load("/textures/asia-without-japan.jpg");
-
-        // let asiaMaterial = new THREE.MeshStandardMaterial( {
-        //     map: asiaTexture,
-        //     color: new THREE.Color('#90ee90'),
-        //     displacementMap: asiaHeight,
-        //     displacementScale: 0.5,
-        // } );
-
-        // let asiaPlane = new THREE.Mesh(planeAsia, asiaMaterial);
-        // asiaPlane.name = 'Asia';
         
         let planeJapan = new THREE.PlaneBufferGeometry(40,30, 1024, 768); //new THREE.PlaneBufferGeometry(40,30, 2048, 1536);
         let japanHeight = loader.load("/textures/JP-EPS-01-0001.jpg");
@@ -560,30 +545,30 @@ export class ThreeSetup2 {
     }
 
     //static function to create news article markers
-    createNewsMarkers = (articles) => {
-        const markerGroup = this.scene.getObjectByName('Sphere').getObjectByName('Markers');
+    // createNewsMarkers = (articles) => {
+    //     const markerGroup = this.scene.getObjectByName('Sphere').getObjectByName('Markers');
         
-        const circleGeometry = new THREE.CircleBufferGeometry(0.75, 32);
-        const loader = new THREE.TextureLoader();
-        articles.forEach((article, index) => {
-            if(typeof soucresToCountry[article.source.name] !== 'undefined'){
-                let pngNum = index + 1;
-                let numberTexture = loader.load("/textures/numbers/number" + pngNum + ".png");
-                const material = new THREE.MeshStandardMaterial({
-                    map: numberTexture
-                });
-                let marker = new THREE.Mesh(circleGeometry, material);
-                marker.name = 'news' + index; 
-                if(markerGroup.getObjectByName(marker.name) !== undefined){
-                    markerGroup.remove(markerGroup.getObjectByName(marker.name));
-                }
-                markerGroup.add(marker);
-                let markerCoords = this.getCoordsFromSource(article.source);
-                marker.position.setFromSphericalCoords( 22, markerCoords.phi, markerCoords.theta );
-                this.movement.news.push(index);
-            }
-        });
-    } 
+    //     const circleGeometry = new THREE.CircleBufferGeometry(0.75, 32);
+    //     const loader = new THREE.TextureLoader();
+    //     articles.forEach((article, index) => {
+    //         if(typeof soucresToCountry[article.source.name] !== 'undefined'){
+    //             let pngNum = index + 1;
+    //             let numberTexture = loader.load("/textures/numbers/number" + pngNum + ".png");
+    //             const material = new THREE.MeshStandardMaterial({
+    //                 map: numberTexture
+    //             });
+    //             let marker = new THREE.Mesh(circleGeometry, material);
+    //             marker.name = 'news' + index; 
+    //             if(markerGroup.getObjectByName(marker.name) !== undefined){
+    //                 markerGroup.remove(markerGroup.getObjectByName(marker.name));
+    //             }
+    //             markerGroup.add(marker);
+    //             let markerCoords = this.getCoordsFromSource(article.source);
+    //             marker.position.setFromSphericalCoords( 22, markerCoords.phi, markerCoords.theta );
+    //             this.movement.news.push(index);
+    //         }
+    //     });
+    // } 
 
     //global function to retrieve coodinates of a country by their name
     getCoords = (region) => {
@@ -614,27 +599,30 @@ export class ThreeSetup2 {
     tick = () => {
         const elapsedTime = this.clock.getElapsedTime();
         let sphere =  this.scene.getObjectByName('Sphere');
-        sphere.rotation.y += this.movement.sphereRotation.x / 40;
-        sphere.rotation.x -= this.movement.sphereRotation.y / 60;
-        if(sphere.rotation.x > Math.PI / 4){
-            sphere.rotation.x = Math.PI / 4;
-        } else if(sphere.rotation.x < - Math.PI / 4){
-            sphere.rotation.x = - Math.PI / 4;
-        }
-        this.scene.getObjectByName('Stars').rotation.y = -0.005 * elapsedTime;
-        this.scene.getObjectByName('Stars').rotation.x = -0.005 * elapsedTime;
+        if(sphere !== undefined){
+            sphere.rotation.y += this.movement.sphereRotation.x / 40;
+            sphere.rotation.x -= this.movement.sphereRotation.y / 60;
+            if(sphere.rotation.x > Math.PI / 4){
+                sphere.rotation.x = Math.PI / 4;
+            } else if(sphere.rotation.x < - Math.PI / 4){
+                sphere.rotation.x = - Math.PI / 4;
+            }
+            this.scene.getObjectByName('Stars').rotation.y = -0.005 * elapsedTime;
+            this.scene.getObjectByName('Stars').rotation.x = -0.005 * elapsedTime;
 
+            if (this.movement.water){ //wave animation
+                sphere.getObjectByName('Water').material.normalScale.set( Math.sin(elapsedTime*0.3), Math.cos(elapsedTime*0.3));
+            }
+        }
+        let planeWater =  this.scene.getObjectByName('Plane').getObjectByName('Water');
+        if(!this.welcome && planeWater !== undefined){
+            planeWater.material.normalScale.set( Math.sin(elapsedTime*0.3), Math.cos(elapsedTime*0.3));
+        }
 
         if (this.movement.camera.init){ //camera movement 
             this.movement.camera.animation();
         }
 
-        if (this.movement.water){ //wave animation
-            sphere.getObjectByName('Water').material.normalScale.set( Math.sin(elapsedTime*0.3), Math.cos(elapsedTime*0.3));
-            if(!this.welcome){
-                this.scene.getObjectByName('Plane').getObjectByName('Water').material.normalScale.set( Math.sin(elapsedTime*0.3), Math.cos(elapsedTime*0.3));
-            }
-        }
 
         if(this.movement.user){ //user animation, currenty unset
             let userModels = this.scene.getObjectByName('Plane').getObjectByName('UserModels');
@@ -652,12 +640,12 @@ export class ThreeSetup2 {
             this.fireworkAnimation();
         }
 
-        if(this.movement.news.length > 0){
-            this.movement.news.forEach((index) => {
-                let marker = this.scene.getObjectByName('Sphere').getObjectByName('Markers').getObjectByName('news' + index);
-                marker.lookAt(this.camera.position);
-            })
-        }
+        // if(this.movement.news.length > 0){
+        //     this.movement.news.forEach((index) => {
+        //         let marker = this.scene.getObjectByName('Sphere').getObjectByName('Markers').getObjectByName('news' + index);
+        //         marker.lookAt(this.camera.position);
+        //     })
+        // }
 
         this.renderer.render(this.scene, this.camera);
         window.requestAnimationFrame(this.tick);

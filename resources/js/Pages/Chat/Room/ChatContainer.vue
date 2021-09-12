@@ -1,147 +1,81 @@
 <template>
-    <!-- <app-layout> -->
-        <chat-three-container :messages="messages" :room="currentRoom" :activeUsers="activeUsers" :news="news" :cameraNum="camera" >
-            <template #header>
-                <img :src="currentRoom.photo" class="h-12 w-12 mx-4 float-left rounded-full"/>
-                <h1 class="font-semibold text-4xl leading-tight p-3">
-                    <span @click="showModal = true" class="cursor-pointer hover:underline text-gray-200"><b>{{currentRoom.name}}</b> -- {{currentRoom.description}}</span>
-                </h1>
-            </template>
+    <chat-three-container :messages="messages" :room="currentRoom" :activeUsers="activeUsers" :news="news" :cameraNum="camera" >
+        <template #header>
+            <img :src="currentRoom.photo" class="h-12 w-12 mx-4 float-left rounded-full"/>
+            <h1 class="font-semibold text-4xl leading-tight p-3">
+                <span @click="showModal = true" class="cursor-pointer hover:underline text-gray-200"><b>{{currentRoom.name}}</b> -- {{currentRoom.description}}</span>
+            </h1>
+        </template>
 
-            <template #footer>
-                <!-- <div v-if="alert.user" class="w-full justify-center flex"
-                    v-bind:class="{'animate-fade-in-up': alert.show, 'animate-fade-out-down': !alert.show}">
-                    <span><b>{{alert.user.name}}</b>{{alert.message}}</span>
-                </div> -->
-                <div class="w-full justify-center flex">
-                    <span>Alert box</span>
-                </div>
-                <input-message 
-                    :room="currentRoom" 
-                    v-on:sending="appendNewMessage"
-                    v-on:messagefailed="messageFailedToSend"
-                    v-on:demostarted="startDemo()"
-                    v-on:demostopped="stopDemo()"
-                    />
-            </template>
+        <template #footer>
+            <div v-if="alert.user" class="w-full justify-center flex"
+                v-bind:class="{'animate-fade-in-up': alert.show, 'animate-fade-out-down': !alert.show}">
+                <span><b>{{alert.user.name}}</b>{{alert.message}}</span>
+            </div>                
+            <input-message 
+                :room="currentRoom" 
+                v-on:sending="appendNewMessage"
+                v-on:messagefailed="messageFailedToSend"
+                v-on:demostarted="console.log('demo not available')"
+                v-on:demostopped="console.log('demo not available')"
+                />
+        </template>
 
-            <template #activeUsersContainer>
-                <active-users-container 
-                    v-show="showActive.state != 'hide'" 
-                    :activeUsers="activeUsers"
-                    v-bind:class="{
-                        'animate-fade-in-left': showActive.state == 'show',
-                        'animate-fade-out-right': showActive.state == 'hiding', 
-                    }"/>
-                <div class="h-full w-1/12 absolute top-0 left-0 bg-gray-300 opacity-5 hover:opacity-50" @click="toggleActive"></div>
-            </template>
+        <template #activeUsersContainer>
+            <active-users-container 
+                v-show="showActive.state != 'hide'" 
+                :activeUsers="activeUsers"
+                v-bind:class="{
+                    'animate-fade-in-left': showActive.state == 'show',
+                    'animate-fade-out-right': showActive.state == 'hiding', 
+                }"/>
+            <div class="h-full w-1/12 absolute top-0 left-0 bg-gray-300 opacity-5 hover:opacity-50" @click="toggleActive"></div>
+        </template>
 
-            <template #messagesContainer>
-                <message-container 
-                    v-show="showMessages.state != 'hide'" 
-                    :messages="messages" 
-                    :fetching="fetching" 
-                    v-on:resend="resendMessage" 
-                    v-on:fetchmoremessages="getPaginatedMessages"
-                    v-bind:class="{
-                        'animate-fade-in-right': showMessages.state == 'show',
-                        'animate-fade-out-left': showMessages.state == 'hiding', 
-                    }" />
-            <div class="h-full w-1/12 absolute top-0 right-0 bg-gray-300 opacity-5 hover:opacity-50" @click="toggleMessage"></div>
-            </template>
-        </chat-three-container>
-            <!-- <div class="w-full mx-auto sm:px-6 lg:px-8 relative" style="height:90vh">               
-                <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg h-full w-full relative">
-                     <div class="mx-auto py-6 px-4 sm:px-6 lg:px-8 absolute flex flex-row w-full justify-center">
-                        <img :src="currentRoom.photo" class="h-12 w-12 mx-4 float-left rounded-full"/>
-                        <h2 class="font-semibold text-xl text-gray-800 leading-tight p-3">
-                            <b>{{currentRoom.name}}</b> -- {{currentRoom.description}} 
-                        <img src="/textures/icons8-settings-50.png" class="h-8 w-8 mx-4 float-right hover:cursor-pointer rounded-full" @click="showModal = true"/>
-                        <button v-if='!showActive' @click="toggleShowActive" class="float-right place-self-end bg-blue-500 hover:bg-gray-500 py-1 px-2 mt-1  rounded text-white text-sm">
-                            Show Active Users
-                        </button>
-                        <button v-if='showActive' @click="toggleShowActive" class="float-right place-self-end bg-blue-500 hover:bg-gray-500 py-1 px-2 mt-1 rounded text-white text-sm">
-                            Hide Active Users
-                        </button>
-                        </h2>
-                    </div> -->
-                    <!-- <div class="h-full w-1/4 absolute top-0 right-0 flex flex-col ">
-                        <message-container 
-                            v-show="showMessages.state != 'hide'" 
-                            :messages="messages" 
-                            :fetching="fetching" 
-                            v-on:resend="resendMessage" 
-                            v-on:fetchmoremessages="getPaginatedMessages"
-                            v-bind:class="{
-                                'animate-fade-in-right': showMessages.state == 'show',
-                                'animate-fade-out-left': showMessages.state == 'hiding', 
-                            }" />
-                        <div class="h-full w-1/12 absolute top-0 right-0 bg-gray-300 opacity-5 hover:opacity-50" @click="toggleMessage"></div>               
-                    </div>  -->
-                    <!-- <div class="h-1/2 w-1/4 absolute top-0 right-1/4">
-                        <active-users-container v-show="showActive" :activeUsers="activeUsers"/>
-                    </div> -->
-                    <!-- <div class="h-full w-1/4 absolute top-0 left-0">
-                        <news-container 
-                            v-show="showNews.state != 'hide'" 
-                            :news="news" 
-                            :roomId="currentRoom.id" 
-                            v-on:sending="appendNewMessage"
-                            v-on:messagefailed="messageFailedToSend"
-                            v-bind:class="{
-                                'animate-fade-in-left': showNews.state == 'show',
-                                'animate-fade-out-right': showNews.state == 'hiding', 
-                            }"
-                        />
-                        <div class="h-full w-1/12 absolute top-0 left-0 bg-gray-300 opacity-5 hover:opacity-50" @click="toggleNews"></div>
-                    </div> -->
-                    <!-- <div class="bg-transparent absolute top-0 w-full flex justify-center ">
-                        <input 
-                            v-if="!camera"
-                            type="text"
-                            v-model="topic"
-                            @keyup.enter="fetchNews(topic)"
-                            placeholder="Search News by keyword"
-                            class="bg-blue-900 border border-transparent focus:outline-none focus:border-none rounded-full text-white"
-                        />
-                        <button
-                            v-if="!camera"
-                            @click="fetchNews(currentRoom.topic)"
-                            class="bg-blue-900 border border-transparent hover:outline-2 hover:border-none rounded-full text-white p-2">
-                            Fetch News On Room Topic
-                        </button>
-                        <button
-                            v-if="camera"
-                            @click="setBackCamera()"
-                            class="bg-blue-900 border border-transparent hover:outline-2 hover:border-none rounded-full text-white p-2">
-                            Fetch News
-                        </button>
-                    </div>  -->
-                    <!-- <div class="bg-transparent absolute bottom-0 w-full flex justify-center ">
-                        <button
-                            v-if="!camera"
-                            @click="setBackCamera()"
-                            class="bg-blue-900 border border-transparent hover:outline-2 hover:border-none rounded-full text-white p-2">
-                            Back To Chat
-                        </button>
-                    </div>  -->
-                    <!-- <chat-three-container :messages="messages" :room="currentRoom" :activeUsers="activeUsers" :news="news" :cameraNum="camera" /> -->
-                    <!-- <div v-if="alert.user" class="absolute bottom-20 w-full justify-center flex"
-                        v-bind:class="{'animate-fade-in-up': alert.show, 'animate-fade-out-down': !alert.show}">
-                        <span><b>{{alert.user.name}}</b>{{alert.message}}</span>
-                    </div>
-                </div>
-                <input-message 
-                    :room="currentRoom" 
-                    v-on:sending="appendNewMessage"
-                    v-on:messagefailed="messageFailedToSend"
-                    v-on:demostarted="startDemo()"
-                    v-on:demostopped="stopDemo()"
-                    />
-                
-            </div>
-        </div> --> 
-    <!-- </app-layout> -->
+        <template #messagesContainer>
+            <message-container 
+                v-show="showMessages.state != 'hide'" 
+                :messages="messages" 
+                :fetching="fetching" 
+                v-on:resend="resendMessage" 
+                v-on:fetchmoremessages="getPaginatedMessages"
+                v-bind:class="{
+                    'animate-fade-in-right': showMessages.state == 'show',
+                    'animate-fade-out-left': showMessages.state == 'hiding', 
+                }" />
+        <div class="h-full w-1/12 absolute top-0 right-0 bg-gray-300 opacity-5 hover:opacity-50" @click="toggleMessage"></div>
+        </template>
+    </chat-three-container>
+        <!-- <div class="bg-transparent absolute top-0 w-full flex justify-center ">
+            <input 
+                v-if="!camera"
+                type="text"
+                v-model="topic"
+                @keyup.enter="fetchNews(topic)"
+                placeholder="Search News by keyword"
+                class="bg-blue-900 border border-transparent focus:outline-none focus:border-none rounded-full text-white"
+            />
+            <button
+                v-if="!camera"
+                @click="fetchNews(currentRoom.topic)"
+                class="bg-blue-900 border border-transparent hover:outline-2 hover:border-none rounded-full text-white p-2">
+                Fetch News On Room Topic
+            </button>
+            <button
+                v-if="camera"
+                @click="setBackCamera()"
+                class="bg-blue-900 border border-transparent hover:outline-2 hover:border-none rounded-full text-white p-2">
+                Fetch News
+            </button>
+        </div>  -->
+        <!-- <div class="bg-transparent absolute bottom-0 w-full flex justify-center ">
+            <button
+                v-if="!camera"
+                @click="setBackCamera()"
+                class="bg-blue-900 border border-transparent hover:outline-2 hover:border-none rounded-full text-white p-2">
+                Back To Chat
+            </button>
+        </div>  -->
 
     <room-settings-modal :showModal="showModal" :currentRoom="currentRoom" :subscribers="subscribers" :activeUsers="activeUsers" v-on:close="showModal = false" />
 
@@ -154,7 +88,7 @@
     import ChatThreeContainer from './ChatThreeContainer.vue'
     import ActiveUsersContainer from './ActiveUsersContainer.vue'
     import NewsContainer from './NewsContainer.vue'
-    import { prefecToCoords } from '../ThreeJS/japanPrefecture'
+    // import { prefecToCoords } from '../ThreeJS/japanPrefecture'
     import RoomSettingsModal from './RoomSettingsModal.vue'
 
     export default {
@@ -193,8 +127,8 @@
                 showModal: false,
                 chatScrollPosition: 0,
                 sortBy: 'popularity',
-                news: new Array(),
-                topic: '',
+                // news: new Array(),
+                // topic: '',
                 camera: true,
                 demoInterval: 0,
                 pagination: 0,
@@ -445,93 +379,93 @@
             },
 
             //news search methods
-            fetchNews(topic) {
-                this.showNews.state = 'show';
-                if(topic != ''){
-                    axios.get(`/chat/room/news/${encodeURI(topic)}`)
-                    .then( response => {
-                        console.log(response.data.articles);
-                        this.news = response.data.articles;
-                        this.topic = '';
-                    })
-                    .catch( error => {
-                        console.error(error);
-                    })
-                }
-            },
-            searchNews(topic) {
-                this.showNews.state = 'show';
-                if(topic != ''){
-                    axios.get(`/chat/room/news/search/${encodeURI(topic)}`)
-                    .then( response => {
-                        console.log(response.data.articles);
-                        this.news = response.data.articles;
-                        this.topic = '';
-                    })
-                    .catch( error => {
-                        console.error(error);
-                    })
-                }
-            },
+            // fetchNews(topic) {
+            //     this.showNews.state = 'show';
+            //     if(topic != ''){
+            //         axios.get(`/chat/room/news/${encodeURI(topic)}`)
+            //         .then( response => {
+            //             console.log(response.data.articles);
+            //             this.news = response.data.articles;
+            //             this.topic = '';
+            //         })
+            //         .catch( error => {
+            //             console.error(error);
+            //         })
+            //     }
+            // },
+            // searchNews(topic) {
+            //     this.showNews.state = 'show';
+            //     if(topic != ''){
+            //         axios.get(`/chat/room/news/search/${encodeURI(topic)}`)
+            //         .then( response => {
+            //             console.log(response.data.articles);
+            //             this.news = response.data.articles;
+            //             this.topic = '';
+            //         })
+            //         .catch( error => {
+            //             console.error(error);
+            //         })
+            //     }
+            // },
 
             
 
             //Demo Methods
-            async startDemo(){
-                const randomComment = ['私は南極に行く','軽く死ねますね','アメンボ赤いな愛ゆえに','選択肢はずっとあったよでも選んだんだよ、ここを選んだんだよ自分で','うるかにしてください','プリンは飲み物'];
-                for(let i = 2; i < 6; i++){
-                    try {
-                        let demoRegion = Object.keys(prefecToCoords)[Math.floor(Math.random() * 46)]
-                        let response = await axios.post(`/activate/${this.currentRoom.id}/${i}`, {
-                            region: demoRegion,
-                        });
-                        if( response.status == 200 ){
-                            console.log('activated new demo user', response.data);
-                        }
-                    } catch (error) {
-                        console.error(error);
-                    }
-                    await this.getCurrentRoom();
-                }
-                this.demoInterval = await setInterval(()=>{
-                    let id = Math.floor(Math.random() * (6 - 2) + 2);
-                    let randomIndex = Math.floor(Math.random()* (randomComment.length - 1));
-                    let comment = randomComment[randomIndex];
-                    console.log(comment)
-                    axios.post(`/chat/room/${this.currentRoom.id}/demomessage`, {
-                        demoUserId: id,
-                        message: comment,
-                        link: false,
-                        article: null,
-                        replyTo: null,
-                    })
-                    .then( response => {
-                        if( response.status == 201 ){
-                            console.log('Dummy message', response.data);
-                            this.getNewestMessage();
-                        }
-                    })
-                    .catch( error => {
-                        console.error(error);
-                    })
-                },3000);
-            },
-            stopDemo(){
-                clearInterval(this.demoInterval);
-                this.demoInterval = 0;
-                for(let i = 2; i < 6; i++){
-                    axios.post(`/deactivate/${this.currentRoom.id}/${i}`)
-                    .then( response => {
-                        if( response.status == 201 ){
-                            console.log('deactivated demo users');
-                        }
-                    })
-                    .catch( error => {
-                        console.error(error);
-                    })
-                }
-                this.getCurrentRoom();
-            },
+            // async startDemo(){
+            //     const randomComment = ['私は南極に行く','軽く死ねますね','アメンボ赤いな愛ゆえに','選択肢はずっとあったよでも選んだんだよ、ここを選んだんだよ自分で','うるかにしてください','プリンは飲み物'];
+            //     for(let i = 2; i < 6; i++){
+            //         try {
+            //             let demoRegion = Object.keys(prefecToCoords)[Math.floor(Math.random() * 46)]
+            //             let response = await axios.post(`/activate/${this.currentRoom.id}/${i}`, {
+            //                 region: demoRegion,
+            //             });
+            //             if( response.status == 200 ){
+            //                 console.log('activated new demo user', response.data);
+            //             }
+            //         } catch (error) {
+            //             console.error(error);
+            //         }
+            //         await this.getCurrentRoom();
+            //     }
+            //     this.demoInterval = await setInterval(()=>{
+            //         let id = Math.floor(Math.random() * (6 - 2) + 2);
+            //         let randomIndex = Math.floor(Math.random()* (randomComment.length - 1));
+            //         let comment = randomComment[randomIndex];
+            //         console.log(comment)
+            //         axios.post(`/chat/room/${this.currentRoom.id}/demomessage`, {
+            //             demoUserId: id,
+            //             message: comment,
+            //             link: false,
+            //             article: null,
+            //             replyTo: null,
+            //         })
+            //         .then( response => {
+            //             if( response.status == 201 ){
+            //                 console.log('Dummy message', response.data);
+            //                 this.getNewestMessage();
+            //             }
+            //         })
+            //         .catch( error => {
+            //             console.error(error);
+            //         })
+            //     },3000);
+            // },
+            // stopDemo(){
+            //     clearInterval(this.demoInterval);
+            //     this.demoInterval = 0;
+            //     for(let i = 2; i < 6; i++){
+            //         axios.post(`/deactivate/${this.currentRoom.id}/${i}`)
+            //         .then( response => {
+            //             if( response.status == 201 ){
+            //                 console.log('deactivated demo users');
+            //             }
+            //         })
+            //         .catch( error => {
+            //             console.error(error);
+            //         })
+            //     }
+            //     this.getCurrentRoom();
+            // },
             
         },
         

@@ -74,12 +74,12 @@ export default {
                 this.createMessagePayload(newVal[newVal.length-1]);
             }
         },
-        news(newVal, oldVal){
-            if(typeof newVal !== 'undefined'){
-                console.log('new fetched', newVal);
-                this.createNewsMarkers(newVal);
-            }
-        },
+        // news(newVal, oldVal){
+        //     if(typeof newVal !== 'undefined'){
+        //         console.log('new fetched', newVal);
+        //         this.createNewsMarkers(newVal);
+        //     }
+        // },
         cameraNum(newVal, oldVal){
             this.setCamera(newVal);
         }
@@ -95,7 +95,7 @@ export default {
         },
 
         createPlane() {
-            threeSetup2.createGlobe();
+            // threeSetup2.createGlobe();
             threeSetup2.createPlane();
             threeSetup2.createPointLight();
             threeSetup2.createParticles();
@@ -118,17 +118,17 @@ export default {
             console.log('removed usermodel for ', user);
         },
         createMessagePayload(message){
-            if(message.link){
-                threeSetup2.createNewsPayload(message);
-            }else {
-                let user = this.activeUsers.usersList.find(activeUser => activeUser.id == message.user.id);
-                console.log("from ", user);
-                threeSetup2.createMessageAnimation(message, user.pivot.region);
-            }
+            // if(message.link){
+            //     threeSetup2.createNewsPayload(message);
+            // }else {
+            let user = this.activeUsers.usersList.find(activeUser => activeUser.id == message.user.id);
+            console.log("from ", user);
+            threeSetup2.createMessageAnimation(message, user.pivot.region);
+            // }
         },
-        createNewsMarkers(articles){
-            threeSetup2.createNewsMarkers(articles);
-        },
+        // createNewsMarkers(articles){
+        //     threeSetup2.createNewsMarkers(articles);
+        // },
         setCamera(cameraNum){
             threeSetup2.moveCamera(cameraNum);
         }
