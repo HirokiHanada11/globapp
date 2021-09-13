@@ -607,9 +607,7 @@ export class ThreeSetup2 {
             } else if(sphere.rotation.x < - Math.PI / 4){
                 sphere.rotation.x = - Math.PI / 4;
             }
-            this.scene.getObjectByName('Stars').rotation.y = -0.005 * elapsedTime;
-            this.scene.getObjectByName('Stars').rotation.x = -0.005 * elapsedTime;
-
+            
             if (this.movement.water){ //wave animation
                 sphere.getObjectByName('Water').material.normalScale.set( Math.sin(elapsedTime*0.3), Math.cos(elapsedTime*0.3));
             }
@@ -620,6 +618,9 @@ export class ThreeSetup2 {
                 planeWater.material.normalScale.set( Math.sin(elapsedTime*0.3), Math.cos(elapsedTime*0.3));
             }
         }
+        
+        this.scene.getObjectByName('Stars').rotation.y = -0.005 * elapsedTime;
+        this.scene.getObjectByName('Stars').rotation.x = -0.005 * elapsedTime;
 
         if (this.movement.camera.init){ //camera movement 
             this.movement.camera.animation();

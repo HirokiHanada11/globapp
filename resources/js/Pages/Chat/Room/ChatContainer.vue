@@ -1,5 +1,5 @@
 <template>
-    <chat-three-container :messages="messages" :room="currentRoom" :activeUsers="activeUsers" :news="news" :cameraNum="camera" >
+    <chat-three-container :messages="messages" :room="currentRoom" :activeUsers="activeUsers" :cameraNum="camera" >
         <template #header>
             <img :src="currentRoom.photo" class="h-12 w-12 mx-4 float-left rounded-full"/>
             <h1 class="font-semibold text-4xl leading-tight p-3">
@@ -87,7 +87,7 @@
     import InputMessage from './InputMessage.vue'
     import ChatThreeContainer from './ChatThreeContainer.vue'
     import ActiveUsersContainer from './ActiveUsersContainer.vue'
-    import NewsContainer from './NewsContainer.vue'
+    // import NewsContainer from './NewsContainer.vue'
     // import { prefecToCoords } from '../ThreeJS/japanPrefecture'
     import RoomSettingsModal from './RoomSettingsModal.vue'
 
@@ -99,7 +99,7 @@
             InputMessage,
             ChatThreeContainer,
             ActiveUsersContainer,
-            NewsContainer,
+            // NewsContainer,
             RoomSettingsModal,
         },
         data: () => {
@@ -120,10 +120,10 @@
                     state: 'show',
                     timeOut: undefined,
                 },
-                showNews: {
-                    state: 'hide',
-                    timeOut: undefined,
-                },
+                // showNews: {
+                //     state: 'hide',
+                //     timeOut: undefined,
+                // },
                 showModal: false,
                 chatScrollPosition: 0,
                 sortBy: 'popularity',
@@ -292,7 +292,7 @@
                 }
             },
 
-            toggleActive() { //show and hide news column
+            toggleActive() { //show and hide active users column
                 if(this.showActive.state === 'show'){
                     this.showActive.state = 'hiding';
                     this.showActive.timeOut = setTimeout(() => this.showActive.state = 'hide', 300);

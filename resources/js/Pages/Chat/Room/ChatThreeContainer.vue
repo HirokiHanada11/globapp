@@ -40,7 +40,7 @@ export default {
     components:{
             JetNavLink,
             },
-    props: ['messages', 'room', 'activeUsers', 'news', 'cameraNum'],
+    props: ['messages', 'room', 'activeUsers', 'cameraNum'],
     data () {
         return {
             roomRegion: '',
