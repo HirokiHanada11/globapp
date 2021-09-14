@@ -1,5 +1,5 @@
 <template>
-    <div class="p-2 flex flex-col overflow-y-scroll no-scrollbar mt-3 w-11/12" id="chat" ref="chat">
+    <div class="h-full p-2 flex flex-col overflow-y-scroll no-scrollbar mt-3 w-11/12" id="chat" ref="chat">
         <div v-for="(message, index) in messages" :key="index" class="space-y-20" >
             <message-item :message="message" v-on:resend="passEvent"/>
         </div>
