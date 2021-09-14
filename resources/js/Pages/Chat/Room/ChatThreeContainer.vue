@@ -13,9 +13,7 @@
                         <span class="text-gray-200 text-lg">Chat Rooms</span>
                     </jet-nav-link>
                 </div>
-                <div class="flex-grow relative flex flex-col">
-                    <slot name="activeUsersContainer"></slot>
-                </div>
+                <slot name="activeUsersContainer"></slot>
             </div>
             <div class="h-full w-full flex flex-col col-start-4 row-start-1 row-span-2 relative">
                 <div v-if="$page.props.user.is_guest_at === 0" class="w-full flex content-center justify-center p-auto h-8">
@@ -23,9 +21,7 @@
                         <span class="text-gray-200 text-lg">Profile</span>
                     </jet-nav-link>
                 </div>
-                <div class="flex-grow relative flex flex-col">
-                    <slot name="messagesContainer"></slot>
-                </div>
+                <slot name="messagesContainer"></slot>
             </div>
         </div>
     </div>
