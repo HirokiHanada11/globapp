@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 use App\Models\ChatRoom;
 use App\Models\User;
@@ -69,6 +70,7 @@ class RoomController extends Controller
         $newRoom->topic = $request->roomTopic;
         $newRoom->description = $request->roomDescription;
         $newRoom->owner_id = Auth::id();
+        $newRoom->link = Str::random();
         
         if ($request->hasFile('roomPhoto')) {
             $request->validate([
