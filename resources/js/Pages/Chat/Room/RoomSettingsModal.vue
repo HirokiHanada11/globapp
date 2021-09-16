@@ -56,7 +56,7 @@
         props: ['showModal', 'currentRoom', 'subscribers', 'activeUsers'],
         data (){
             return {
-                shareLink: 'sharelinkdefo',
+                shareLink: 'not set',
                 copiedAlert: 'hide',
             }
         },
@@ -76,5 +76,9 @@
                 }, 1500)
             }
         },
+        updated () {
+            // this.shareLink = `localhost/guest/join/${this.currentRoom.link}`;
+            this.shareLink = `https://www.globechatapp.com/guest/join/${this.currentRoom.link}`;
+        }
     }
 </script>
