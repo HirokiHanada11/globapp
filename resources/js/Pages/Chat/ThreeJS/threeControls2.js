@@ -338,8 +338,8 @@ export class ThreeSetup2 {
         body.rotateX(-Math.PI /2)
 
         userModelPlane.add(head, body);
-        userModelPlane.position.x = (prefecToCoords[user.pivot.region][1] - 136.261570) * 43/45 + Math.random();
-        userModelPlane.position.y = (prefecToCoords[user.pivot.region][0] - 35.837181) * 30/25 + Math.random();
+        userModelPlane.position.x = (prefecToCoords[user.pivot.region][1] - 136.261570) * 43/45 + Math.random() * 2 - 1;
+        userModelPlane.position.y = (prefecToCoords[user.pivot.region][0] - 35.837181) * 30/25 + Math.random() * 2 - 1;
 
         this.scene.getObjectByName('Plane').getObjectByName('UserModels').add(userModelPlane);
         console.log(this.scene.getObjectByName('Plane').getObjectByName('UserModels'));
@@ -466,17 +466,21 @@ export class ThreeSetup2 {
         let coords = this.prefecToCoordsOnMap(userRegion);
         let mainColor = new THREE.Color("#" + Math.floor(Math.random() * 0xFFFFFF).toString(16));
         let subColor = new THREE.Color("#" + Math.floor(Math.random() * 0xFFFFFF).toString(16));
-        let randomColor = new THREE.Color("gray");
+        // let randomColor = new THREE.Color("gray");
         let fireworkGroup = new THREE.Group();
         fireworkGroup.name = message.id;
-        let payloadLight = new THREE.PointLight(randomColor, 0.5);
+        let payloadLight = new THREE.PointLight(mainColor, 0.5);
         let payloadStarGeometry = new THREE.SphereBufferGeometry(0.1, 16, 16);
-        let material = new THREE.PointsMaterial({
-            color: randomColor,
+        let mainMaterial = new THREE.PointsMaterial({
+            color: mainColor,
+            size: 0.008,
+        });
+        let subMaterial = new THREE.PointsMaterial({
+            color: subColor,
             size: 0.005,
         });
-        let payloadStar = new THREE.Points(payloadStarGeometry, material);
-        let subPayloadStar = new THREE.Points(payloadStarGeometry, material);
+        let payloadStar = new THREE.Points(payloadStarGeometry, mainMaterial);
+        let subPayloadStar = new THREE.Points(payloadStarGeometry, subMaterial);
         subPayloadStar.material.color = new THREE.Color("gray");
         fireworkGroup.add(payloadLight, subPayloadStar, payloadStar);
         this.scene.getObjectByName('Plane').add(fireworkGroup);
@@ -485,7 +489,6 @@ export class ThreeSetup2 {
         this.movement.fireworks.push({
             name: message.id,
             frame: 0,
-            colors: [mainColor, subColor],
             animation: this.fireworkAnimation
         })
     }
@@ -497,7 +500,9 @@ export class ThreeSetup2 {
             let fireworkObj = this.scene.getObjectByName('Plane').getObjectByName(firework.name);
             firework.frame += 1;
             if (firework.frame < 60){           
-                fireworkObj.position.z += Math.max(0.3 + 1/2*(-0.011)*firework.frame, 0);
+                fireworkObj.position.z += 0.1;
+                fireworkObj.position.x += Math.random()*0.1 - 0.05;
+                fireworkObj.position.y += Math.random()*0.1 - 0.05;
                 fireworkObj.lookAt(this.camera.position);
                 fireworkObj.children[0].power *= 0.9;
                 // console.log(fireworkObj.position.z)
@@ -506,16 +511,13 @@ export class ThreeSetup2 {
                 fireworkObj.children[0].power = 0;
                 return firework;
             }else if(firework.frame == 75){
-                fireworkObj.children[1].position.set(-0.1,-0.1,-0.1);
+                fireworkObj.children[1].scale.multiplyScalar(0.6);
                 fireworkObj.children[0].power = 3*Math.PI;
-                fireworkObj.children[1].material.color = firework.colors[0];
-                fireworkObj.children[2].material.color = firework.colors[1];
-                fireworkObj.children[2].material.size = 0.05;
-                fireworkObj.children[1].material.size = 0.05;
+                fireworkObj.children[1].material.size = 0.04;
+                fireworkObj.children[2].material.size = 0.08;
                 return firework;
             }else if(firework.frame > 75 && firework.frame < 130){
-                fireworkObj.scale.multiplyScalar(1.1);
-                fireworkObj.lookAt(this.camera.position);
+                fireworkObj.scale.multiplyScalar(1.05);
                 return firework;
             }else if(firework.frame == 130){
                 fireworkObj.remove(fireworkObj.children[0]);

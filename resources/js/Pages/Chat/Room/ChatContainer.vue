@@ -16,8 +16,8 @@
                 :room="currentRoom" 
                 v-on:sending="appendNewMessage"
                 v-on:messagefailed="messageFailedToSend"
-                v-on:demostarted="console.log('demo not available')"
-                v-on:demostopped="console.log('demo not available')"
+                v-on:demostarted="demoStart"
+                v-on:demostopped="demoStop"
                 />
         </template>
 
@@ -407,7 +407,34 @@
             //         })
             //     }
             // },
-
+            demoStart(){
+                if(this.currentRoom.owner.id === this.$page.props.user.id)
+                {
+                    this.demoInterval = setInterval(()=>{
+                        if(Math.random() > 0.5){
+                            let randomIndex = Math.floor(Math.random() * (this.activeUsers.usersList.length - 1) + 1);
+                            let newMessage = [{
+                                id: this.newestMessageId + 1,
+                                user: this.activeUsers.usersList[randomIndex],
+                                user_id: this.activeUsers.usersList[randomIndex].id,
+                                chat_room_id: this.currentRoom.id,
+                                message: '8'.repeat(Math.floor(Math.random()* 8 + 4)),
+                                link: false,
+                                article: null,
+                                replying_to: null,
+                                created_at: Date.now(),
+                            }];
+                            console.log(this.activeUsers.usersList, newMessage);
+                            this.messages = this.messages.concat(newMessage);
+                            this.newestMessageId = this.messages[this.messages.length-1].id;
+                        }
+                    },250)
+                }
+            },
+            demoStop(){
+                clearInterval(this.demoInterval);
+                this.demoInterval = 0;
+            }
             
 
             //Demo Methods
