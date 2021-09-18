@@ -30,11 +30,11 @@ export default {
         sendMessage() {
             if( this.message == '' ){
                 return;
-            }else if( this.message == '/demostart'){
+            }else if( this.message == '/demo'){
                 this.$emit('demostarted');
                 this.message = '';
                 return;
-            }else if ( this.message == '/demostop'){
+            }else if ( this.message == '/stop'){
                 this.$emit('demostopped');
                 this.message = '';
                 return;
