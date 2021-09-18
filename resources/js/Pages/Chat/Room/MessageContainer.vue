@@ -41,15 +41,16 @@ export default {
             this.prevHeight = this.newHeight;
             this.newHeight = this.$refs.chat.scrollHeight;
             if(this.atBottom){
+                console.log('at bottom');
                 this.$nextTick(()=>{
                     this.scrollToBottom();
                 })
             }else if(newVal[0].id !== oldVal[0].id){
                 this.$refs.chat.scrollTop = this.newHeight - this.prevHeight ;
-            }else if(newVal[newVal.length-1].user.id !== this.$page.props.user.id){
-                this.showNewMessage = true;
-                this.newestMessage = newVal[newVal.length-1];
-                this.newMessagesCounter += 1;
+            // }else if(newVal[newVal.length-1].user.id !== this.$page.props.user.id){
+            //     this.showNewMessage = true;
+            //     this.newestMessage = newVal[newVal.length-1];
+            //     this.newMessagesCounter += 1;
             }else{
                 this.$nextTick(()=>{
                     this.scrollToBottom();

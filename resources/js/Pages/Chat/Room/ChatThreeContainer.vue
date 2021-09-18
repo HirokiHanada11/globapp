@@ -117,9 +117,8 @@ export default {
             // if(message.link){
             //     threeSetup2.createNewsPayload(message);
             // }else {
-            let user = this.activeUsers.usersList.find(activeUser => activeUser.id == message.user.id);
-            console.log("from ", user);
-            threeSetup2.createMessageAnimation(message, user.pivot.region);
+            console.log("from ", message.user);
+            threeSetup2.createMessageAnimation(message);
             // }
         },
         // createNewsMarkers(articles){

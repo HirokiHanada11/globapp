@@ -411,7 +411,7 @@
                 if(this.currentRoom.owner.id === this.$page.props.user.id)
                 {
                     this.demoInterval = setInterval(()=>{
-                        if(Math.random() > 0.5){
+                        if(Math.random() > 0.7){
                             let randomIndex = Math.floor(Math.random() * (this.activeUsers.usersList.length - 1) + 1);
                             let newMessage = [{
                                 id: this.newestMessageId + 1,
@@ -428,7 +428,7 @@
                             this.messages = this.messages.concat(newMessage);
                             this.newestMessageId = this.messages[this.messages.length-1].id;
                         }
-                    },250)
+                    },200)
                 }
             },
             demoStop(){
