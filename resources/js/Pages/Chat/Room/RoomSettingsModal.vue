@@ -1,6 +1,6 @@
 <template>
     <modal :show="showModal" @close="$emit('close')">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 relative py-6" style="height:70vh">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 relative py-6 overflow-y-scroll no-scrollbar" style="height:70vh">
             <img :src="currentRoom.photo" class="h-12 w-12 mx-4 float-left rounded-full"/>
             <h3 class="font-semibold text-xl text-gray-800 leading-tight p-3">
                 <b>{{currentRoom.name}}</b> -- {{currentRoom.description}} 

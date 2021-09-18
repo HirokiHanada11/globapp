@@ -2,8 +2,8 @@
     <chat-three-container :messages="messages" :room="currentRoom" :activeUsers="activeUsers" :cameraNum="camera" >
         <template #header>
             <img :src="currentRoom.photo" class="h-12 w-12 mx-4 float-left rounded-full"/>
-            <h1 class="font-semibold text-4xl leading-tight p-3">
-                <span @click="showModal = true" class="cursor-pointer hover:underline text-gray-200"><b>{{currentRoom.name}}</b> -- {{currentRoom.description}}</span>
+            <h1 class="font-semibold text-4xl leading-tight p-3 truncate">
+                <span @click="showModal = true" class="cursor-pointer hover:underline text-gray-200 "><b>{{currentRoom.name}}</b> --{{currentRoom.description}}</span>
             </h1>
         </template>
 
