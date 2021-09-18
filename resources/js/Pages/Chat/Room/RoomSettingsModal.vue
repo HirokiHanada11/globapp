@@ -27,7 +27,7 @@
             <section-border/>
 
             <h4>Users ({{activeUsers.usersList.length}}/{{subscribers.length}})</h4>
-            <div class="overflow-y-scroll no-scrollbar flex flex-col">
+            <div class="overflow-y-scroll no-scrollbar flex flex-col flex-grow">
                 <div 
                     v-for="(user, index) in subscribers"
                     v-bind:key="index"
