@@ -1,8 +1,8 @@
 <template>
     <jet-authentication-card>
-        <template #logo>
+        <!-- <template #logo>
             <jet-authentication-card-logo />
-        </template>
+        </template> -->
 
         <jet-validation-errors class="mb-4" />
 

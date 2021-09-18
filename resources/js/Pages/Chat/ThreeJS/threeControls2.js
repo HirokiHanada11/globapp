@@ -10,6 +10,8 @@ export class ThreeSetup2 {
         this.height = height;
         this.canvas = canvas;
         this.scene = new THREE.Scene();
+        this.plane = new THREE.Group();
+        this.userModels = new THREE.Group();
         this.camera = new THREE.PerspectiveCamera( 75, width / height, 0.1, 1000 );
         this.renderer = new THREE.WebGLRenderer({
             alpha: false, 
@@ -212,12 +214,12 @@ export class ThreeSetup2 {
 
         this.scene.add(sphereGroup);
 
-        const japanGeometry = new THREE.PlaneBufferGeometry(1,1);
-        const userModelGlobe = new THREE.Mesh(japanGeometry,new THREE.MeshBasicMaterial());
-        userModelGlobe.name = 'Japan'; 
-        sphereGroup.add(userModelGlobe);
-        let coords = this.getCoords('Japan');
-        userModelGlobe.position.setFromSphericalCoords(20,coords.phi,coords.theta);
+        // const japanGeometry = new THREE.PlaneBufferGeometry(1,1);
+        // const userModelGlobe = new THREE.Mesh(japanGeometry,new THREE.MeshBasicMaterial());
+        // userModelGlobe.name = 'Japan'; 
+        // sphereGroup.add(userModelGlobe);
+        // let coords = this.getCoords('Japan');
+        // userModelGlobe.position.setFromSphericalCoords(20,coords.phi,coords.theta);
     }
 
     //function to create base plane
@@ -262,6 +264,8 @@ export class ThreeSetup2 {
         planeGroup.position.set(0,-30, 70); 
         planeGroup.rotateX(-Math.PI/2);
         this.scene.add(planeGroup);
+        this.plane = planeGroup;
+        this.userModels = userModels;
     }
 
     //static function to create background particles to represent stars
@@ -338,17 +342,17 @@ export class ThreeSetup2 {
         body.rotateX(-Math.PI /2)
 
         userModelPlane.add(head, body);
-        userModelPlane.position.x = (prefecToCoords[user.pivot.region][1] - 136.261570) * 43/45 + Math.random() * 2 - 1;
-        userModelPlane.position.y = (prefecToCoords[user.pivot.region][0] - 35.837181) * 30/25 + Math.random() * 2 - 1;
+        userModelPlane.position.x = (prefecToCoords[user.pivot.region][1] - 136.261570) * 43/45 + Math.random() * 1 - 0.5;
+        userModelPlane.position.y = (prefecToCoords[user.pivot.region][0] - 35.837181) * 30/25 + Math.random() * 1 - 0.5;
 
-        this.scene.getObjectByName('Plane').getObjectByName('UserModels').add(userModelPlane);
-        console.log(this.scene.getObjectByName('Plane').getObjectByName('UserModels'));
+        this.userModels.add(userModelPlane);
+        // console.log(this.plane.getObjectByName('UserModels'));
     }
 
     //function to remove user model for the specified user
     removeUserModel = (user) => {
-        let subjectModel = this.scene.getObjectByName('Plane').getObjectByName('UserModels').getObjectByName(user.name);
-        this.scene.getObjectByName('Plane').getObjectByName('UserModels').remove(subjectModel);
+        let subjectModel = this.userModels.getObjectByName(user.name);
+        this.userModels.remove(subjectModel);
     }
     
     
@@ -362,108 +366,10 @@ export class ThreeSetup2 {
 
     //static function to create message payload object and its path for message sent animation. 
     //returns a curve that reprsents the path of the payload that it travels on
-    createNewsPayload = (message) =>{        
-        if (message.link){
-            const curvePath = new THREE.CurvePath();
-            const position = new THREE.Vector3();
-            let japan = this.scene.getObjectByName('Sphere').getObjectByName('Japan');
-            position.setFromMatrixPosition(japan.matrixWorld);
-            let article = JSON.parse(message.article);
-            console.log('new Link')
-            if(typeof soucresToCountry[article.source.name] !== 'undefined'){
-                const marker = this.scene.getObjectByName('Sphere').getObjectByName('Markers').getObjectByName(message.message);
-                const origin = new THREE.Vector3();
-                origin.setFromMatrixPosition(marker.matrixWorld);
-                curvePath.add(this.createPayloadPath(position, origin));
-                
-                const tarilGeometry = new THREE.CylinderBufferGeometry(0.2,0.7, 1, 8, 8, false);
-                const trailMaterial = new THREE.PointsMaterial({size:0.0005}) 
-                const trail = new THREE.Points(tarilGeometry, trailMaterial);
-                
-                const tarilGeometry2 = new THREE.CylinderBufferGeometry(0.4,0.1, 3.5, 8, 8, false);
-                const trailMaterial2 = new THREE.PointsMaterial({size:0.0005}) 
-                const trail2 = new THREE.Points(tarilGeometry2, trailMaterial2);
-                trail2.position.y = -2;
-                
-                const trailGroup = new THREE.Group();
-                trailGroup.name = message.id;
-                trailGroup.add(trail);
-                trailGroup.add(trail2);
-                trailGroup.position.set(position.x, position.y, position.z);
-                this.scene.add(trailGroup);
-                
-                const target = new THREE.Vector3(50,0,0);
-                let p1 = new THREE.Vector3();
-                let p2 = new THREE.Vector3();
-                let px = new THREE.Vector3();
-                let py = new THREE.Vector3();
-                let p = new THREE.Vector3();
-                let p0 = position;
-                let p3 = target;
-                let angle = Math.abs(position.angleTo(target));
-                if (angle > Math.PI/2){
-                    px.set(0, p0.y, p0 .z).normalize();
-                    py.copy(p3).normalize();
-                    p2.copy(px).multiplyScalar(40*angle/Math.PI);
-                    p1.copy(p0).add(p.copy(px).multiplyScalar(40*angle/Math.PI)).add(py.multiplyScalar(-5));
-                }
-                else{
-                    px.set(0, p0.y, p0 .z).normalize();
-                    py.copy(p3).normalize();
-                    p1.copy(px).multiplyScalar(30*(angle / (Math.PI/2))).add(p.copy(py).multiplyScalar(5));
-                    p2.copy(px).multiplyScalar(30*(angle / (Math.PI/2))).add(p.copy(py).multiplyScalar(30));
-                }
-                // console.log(p0,p1,p2,p3)
-                curvePath.add(new THREE.CubicBezierCurve3(p0,p1,p2,p3));
-                // return curvePath;
-                this.movement.payloads.push({
-                    payloadId: message.id,
-                    curve: curvePath,
-                    fraction: 0.03,
-                    animation: this.newsPayloadAnimation,
-                });
-            }
-        }
-    }
-
-    //function to animate news payload
-    newsPayloadAnimation = () => {
-        let f = false;
-            this.movement.payloads.map((payload, index) => {
-                let payloadModel = new THREE.Object3D();
-                payloadModel = this.scene.getObjectByName(payload.payloadId);
-                // if (typeof payload.light === 'undefined'){
-                //     payload.light = this.scene.getObjectByName(`light${index}`)
-                // }
-                if(payload.fraction < 1){
-                    // let lightPosition = payload.curve.getPoint(payload.fraction);
-                    // payload.light.position.copy(lightPosition);
-
-                    let newPostion = payload.curve.getPoint(payload.fraction-0.02);
-                    let tangent = payload.curve.getTangent(payload.fraction-0.02);
-                    let radians = this.up.angleTo(this.target);
-                    this.axis.crossVectors(this.up,tangent).normalize();
-                    payloadModel.position.copy(newPostion);
-                    payloadModel.quaternion.setFromAxisAngle(this.axis,radians);
-                    payload.fraction += 0.01;
-                    return payload;
-                } else{
-                    this.scene.remove(payloadModel);
-                    // payload.light.position.set(0,0,0);
-                    f = true;
-                    return null;
-                }
-            });
-            if(f){
-                this.movement.payloads = this.movement.payloads.filter(payload => payload.fraction < 1);
-                console.log(this.movement.payloads)
-                f = false;
-            }
-    }
-
+    
     //function to set up animation for fireworks
     createMessageAnimation = (message, userRegion) => {
-        let coords = this.prefecToCoordsOnMap(userRegion);
+        let coords = this.userModels.getObjectByName(message.user.name).position;
         let mainColor = new THREE.Color("#" + Math.floor(Math.random() * 0xFFFFFF).toString(16));
         let subColor = new THREE.Color("#" + Math.floor(Math.random() * 0xFFFFFF).toString(16));
         // let randomColor = new THREE.Color("gray");
@@ -483,21 +389,22 @@ export class ThreeSetup2 {
         let subPayloadStar = new THREE.Points(payloadStarGeometry, subMaterial);
         subPayloadStar.material.color = new THREE.Color("gray");
         fireworkGroup.add(payloadLight, subPayloadStar, payloadStar);
-        this.scene.getObjectByName('Plane').add(fireworkGroup);
+        this.plane.add(fireworkGroup);
         fireworkGroup.position.set(coords.x, coords.y, 0);
-
+        
         this.movement.fireworks.push({
             name: message.id,
             frame: 0,
+            object: fireworkGroup,
             animation: this.fireworkAnimation
         })
     }
-
+    
     //funciton for firework animation
     fireworkAnimation = () =>{
         let f = false;
         this.movement.fireworks.map(firework => {
-            let fireworkObj = this.scene.getObjectByName('Plane').getObjectByName(firework.name);
+            let fireworkObj = firework.object;
             firework.frame += 1;
             if (firework.frame < 60){           
                 fireworkObj.position.z += 0.1;
@@ -512,18 +419,18 @@ export class ThreeSetup2 {
                 return firework;
             }else if(firework.frame == 75){
                 fireworkObj.children[1].scale.multiplyScalar(0.6);
-                fireworkObj.children[0].power = 3*Math.PI;
+                fireworkObj.children[0].power = 2*Math.PI;
                 fireworkObj.children[1].material.size = 0.04;
                 fireworkObj.children[2].material.size = 0.08;
                 return firework;
-            }else if(firework.frame > 75 && firework.frame < 130){
+            }else if(firework.frame > 75 && firework.frame < 150){
                 fireworkObj.scale.multiplyScalar(1.05);
                 return firework;
-            }else if(firework.frame == 130){
+            }else if(firework.frame == 150){
                 fireworkObj.remove(fireworkObj.children[0]);
                 return firework;
-            }else if(firework.frame == 140){
-                this.scene.getObjectByName('Plane').remove(fireworkObj);
+            }else if(firework.frame == 155){
+                this.plane.remove(fireworkObj);
                 f = true;
                 return null;
             }
@@ -534,17 +441,115 @@ export class ThreeSetup2 {
             // console.log(this.scene.children);
         }
     }
+    // createNewsPayload = (message) =>{        
+    //     if (message.link){
+    //         const curvePath = new THREE.CurvePath();
+    //         const position = new THREE.Vector3();
+    //         let japan = this.scene.getObjectByName('Sphere').getObjectByName('Japan');
+    //         position.setFromMatrixPosition(japan.matrixWorld);
+    //         let article = JSON.parse(message.article);
+    //         console.log('new Link')
+    //         if(typeof soucresToCountry[article.source.name] !== 'undefined'){
+    //             const marker = this.scene.getObjectByName('Sphere').getObjectByName('Markers').getObjectByName(message.message);
+    //             const origin = new THREE.Vector3();
+    //             origin.setFromMatrixPosition(marker.matrixWorld);
+    //             curvePath.add(this.createPayloadPath(position, origin));
+                
+    //             const tarilGeometry = new THREE.CylinderBufferGeometry(0.2,0.7, 1, 8, 8, false);
+    //             const trailMaterial = new THREE.PointsMaterial({size:0.0005}) 
+    //             const trail = new THREE.Points(tarilGeometry, trailMaterial);
+                
+    //             const tarilGeometry2 = new THREE.CylinderBufferGeometry(0.4,0.1, 3.5, 8, 8, false);
+    //             const trailMaterial2 = new THREE.PointsMaterial({size:0.0005}) 
+    //             const trail2 = new THREE.Points(tarilGeometry2, trailMaterial2);
+    //             trail2.position.y = -2;
+                
+    //             const trailGroup = new THREE.Group();
+    //             trailGroup.name = message.id;
+    //             trailGroup.add(trail);
+    //             trailGroup.add(trail2);
+    //             trailGroup.position.set(position.x, position.y, position.z);
+    //             this.scene.add(trailGroup);
+                
+    //             const target = new THREE.Vector3(50,0,0);
+    //             let p1 = new THREE.Vector3();
+    //             let p2 = new THREE.Vector3();
+    //             let px = new THREE.Vector3();
+    //             let py = new THREE.Vector3();
+    //             let p = new THREE.Vector3();
+    //             let p0 = position;
+    //             let p3 = target;
+    //             let angle = Math.abs(position.angleTo(target));
+    //             if (angle > Math.PI/2){
+    //                 px.set(0, p0.y, p0 .z).normalize();
+    //                 py.copy(p3).normalize();
+    //                 p2.copy(px).multiplyScalar(40*angle/Math.PI);
+    //                 p1.copy(p0).add(p.copy(px).multiplyScalar(40*angle/Math.PI)).add(py.multiplyScalar(-5));
+    //             }
+    //             else{
+    //                 px.set(0, p0.y, p0 .z).normalize();
+    //                 py.copy(p3).normalize();
+    //                 p1.copy(px).multiplyScalar(30*(angle / (Math.PI/2))).add(p.copy(py).multiplyScalar(5));
+    //                 p2.copy(px).multiplyScalar(30*(angle / (Math.PI/2))).add(p.copy(py).multiplyScalar(30));
+    //             }
+    //             // console.log(p0,p1,p2,p3)
+    //             curvePath.add(new THREE.CubicBezierCurve3(p0,p1,p2,p3));
+    //             // return curvePath;
+    //             this.movement.payloads.push({
+    //                 payloadId: message.id,
+    //                 curve: curvePath,
+    //                 fraction: 0.03,
+    //                 animation: this.newsPayloadAnimation,
+    //             });
+    //         }
+    //     }
+    // }
+
+    // //function to animate news payload
+    // newsPayloadAnimation = () => {
+    //     let f = false;
+    //         this.movement.payloads.map((payload, index) => {
+    //             let payloadModel = new THREE.Object3D();
+    //             payloadModel = this.scene.getObjectByName(payload.payloadId);
+    //             // if (typeof payload.light === 'undefined'){
+    //             //     payload.light = this.scene.getObjectByName(`light${index}`)
+    //             // }
+    //             if(payload.fraction < 1){
+    //                 // let lightPosition = payload.curve.getPoint(payload.fraction);
+    //                 // payload.light.position.copy(lightPosition);
+
+    //                 let newPostion = payload.curve.getPoint(payload.fraction-0.02);
+    //                 let tangent = payload.curve.getTangent(payload.fraction-0.02);
+    //                 let radians = this.up.angleTo(this.target);
+    //                 this.axis.crossVectors(this.up,tangent).normalize();
+    //                 payloadModel.position.copy(newPostion);
+    //                 payloadModel.quaternion.setFromAxisAngle(this.axis,radians);
+    //                 payload.fraction += 0.01;
+    //                 return payload;
+    //             } else{
+    //                 this.scene.remove(payloadModel);
+    //                 // payload.light.position.set(0,0,0);
+    //                 f = true;
+    //                 return null;
+    //             }
+    //         });
+    //         if(f){
+    //             this.movement.payloads = this.movement.payloads.filter(payload => payload.fraction < 1);
+    //             console.log(this.movement.payloads)
+    //             f = false;
+    //         }
+    // }
 
     //function to create payload path from point on globe to another point on globe
-    createPayloadPath = (target, origin) => {
-        let p = new THREE.Vector3();
-        let p1 = new THREE.Vector3();
-        let p0 = origin;
-        let p2 = target;
-        p1.copy(p0).add(p.copy(p2)).normalize().multiplyScalar(30);
-        console.log(p0,p1,p2)
-        return new THREE.QuadraticBezierCurve3(p0,p1,p2);
-    }
+    // createPayloadPath = (target, origin) => {
+    //     let p = new THREE.Vector3();
+    //     let p1 = new THREE.Vector3();
+    //     let p0 = origin;
+    //     let p2 = target;
+    //     p1.copy(p0).add(p.copy(p2)).normalize().multiplyScalar(30);
+    //     console.log(p0,p1,p2)
+    //     return new THREE.QuadraticBezierCurve3(p0,p1,p2);
+    // }
 
     //static function to create news article markers
     // createNewsMarkers = (articles) => {
@@ -573,30 +578,30 @@ export class ThreeSetup2 {
     // } 
 
     //global function to retrieve coodinates of a country by their name
-    getCoords = (region) => {
-        const coords = nameToCoords[region];
-        const jittering = this.createJittering();
-        return {
-            phi: (90 - coords[0] + jittering.phiJit) * Math.PI / 180,
-            theta: (90 + coords[1] + jittering.thetaJit) * Math.PI / 180,
-        }
-    }
+    // getCoords = (region) => {
+    //     const coords = nameToCoords[region];
+    //     const jittering = this.createJittering();
+    //     return {
+    //         phi: (90 - coords[0] + jittering.phiJit) * Math.PI / 180,
+    //         theta: (90 + coords[1] + jittering.thetaJit) * Math.PI / 180,
+    //     }
+    // }
 
-    getCoordsFromSource = (source) => {
-        const coords = soucresToCountry[source.name];
-        const jittering = this.createJittering();
-        return {
-            phi: ((90 - coords.coords[0] + jittering.phiJit) * Math.PI / 180),
-            theta: ((90 + coords.coords[1] + jittering.thetaJit) * Math.PI / 180) ,
-        }
-    }
+    // getCoordsFromSource = (source) => {
+    //     const coords = soucresToCountry[source.name];
+    //     const jittering = this.createJittering();
+    //     return {
+    //         phi: ((90 - coords.coords[0] + jittering.phiJit) * Math.PI / 180),
+    //         theta: ((90 + coords.coords[1] + jittering.thetaJit) * Math.PI / 180) ,
+    //     }
+    // }
     
-    createJittering = () => {
-        return {
-            phiJit: Math.floor(Math.random() * (10 + 10) - 10),
-            thetaJit: Math.floor(Math.random() * (10 + 10) - 10), 
-        }
-    }
+    // createJittering = () => {
+    //     return {
+    //         phiJit: Math.floor(Math.random() * (10 + 10) - 10),
+    //         thetaJit: Math.floor(Math.random() * (10 + 10) - 10), 
+    //     }
+    // }
 
     tick = () => {
         const elapsedTime = this.clock.getElapsedTime();
@@ -615,7 +620,7 @@ export class ThreeSetup2 {
             }
         }
         if(!this.welcome){
-            let planeWater =  this.scene.getObjectByName('Plane').getObjectByName('Water');
+            let planeWater =  this.plane.getObjectByName('Water');
             if(planeWater !== undefined){
                 planeWater.material.normalScale.set( Math.sin(elapsedTime*0.3), Math.cos(elapsedTime*0.3));
             }
@@ -630,8 +635,7 @@ export class ThreeSetup2 {
 
 
         if(this.movement.user){ //user animation, currenty unset
-            let userModels = this.scene.getObjectByName('Plane').getObjectByName('UserModels');
-            userModels.children.forEach(model => {
+            this.userModels.children.forEach(model => {
                 model.position.z = 0.3*Math.sin(elapsedTime) 
                 model.getObjectByName('Body').rotation.y = 0.5*elapsedTime;
             })
